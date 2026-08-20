@@ -1,0 +1,3430 @@
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.15.4 | Data: 2026-07-19 -->
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>App Tatuador</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="App Tatuador">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- emailjs eliminat: ara s'usa endpoint /api/send-email al servidor propi -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --black: #1a1a1a;
+      --white: #ffffff;
+      --g100: #f4f4f4;
+      --g200: #e6e6e6;
+      --g500: #999;
+      --header-gray: #7a7a7a;
+      --iva-bg: #eeebe5;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    html, body {
+      height: 100dvh;
+      overflow: hidden;
+      max-width: 100vw;
+      display: flex;
+      flex-direction: column;
+      background: #e4e4e4;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── OVERLAYS ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: #1a1a1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .overlay-title {
+      color: var(--gold); font-size: 13px; font-weight: 800;
+      letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px;
+      text-align: center; width: 100%;
+    }
+    .overlay-sub {
+      color: #999; font-size: 14px; text-align: center; margin-bottom: 32px;
+    }
+
+    /* PIN */
+    .pin-dots {
+      display: flex; gap: 16px; margin-bottom: 40px; justify-content: center;
+    }
+    .pin-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--gold); background: transparent;
+      transition: background .15s;
+    }
+    .pin-dot.filled { background: var(--gold); }
+    .pin-err { color: var(--red); font-size: 13px; margin-top: -28px; margin-bottom: 28px; min-height: 18px; text-align: center; width: 100%; }
+
+    .keypad {
+      display: grid; grid-template-columns: repeat(3, 72px);
+      gap: 12px;
+    }
+    .key {
+      height: 64px; border-radius: 12px;
+      background: #2a2a2a; border: none; color: #fff;
+      font-size: 24px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .key:active { background: #3a3a3a; }
+    .key.key-del { font-size: 18px; background: #222; }
+    .key.key-empty { background: transparent; cursor: default; }
+
+    /* QR */
+    #qr-reader { width: 100%; max-width: 320px; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+    #qr-reader * { border-radius: 0 !important; }
+    #qr-reader video { border-radius: 12px !important; }
+    .btn-start-scan { display:flex; align-items:center; justify-content:center; gap:12px; background:#2a2a2a; border:2px solid var(--gold); border-radius:16px; padding:22px 40px; color:var(--gold); font-size:18px; font-weight:800; cursor:pointer; letter-spacing:.04em; -webkit-tap-highlight-color:transparent; margin-bottom:8px; width:100%; max-width:320px; }
+    .btn-stop-scan { display:none; background:rgba(239,68,68,.15); border:1px solid #ef4444; border-radius:10px; color:#ef4444; font-size:13px; font-weight:700; padding:9px 20px; cursor:pointer; margin-bottom:8px; }
+    .qr-manual-row {
+      display: flex; gap: 8px; width: 100%; max-width: 320px; margin-top: 16px;
+    }
+    .qr-manual-row input {
+      flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 13px; letter-spacing: 1px;
+    }
+    .qr-manual-row button {
+      padding: 12px 16px; border-radius: 10px; background: var(--gold);
+      border: none; color: #1a1a1a; font-weight: 800; cursor: pointer; font-size: 13px;
+    }
+    .btn-skip-qr {
+      margin-top: 20px; background: none; border: 1px solid #444;
+      color: #999; font-size: 13px; padding: 10px 24px; border-radius: 8px; cursor: pointer;
+      width: 100%; max-width: 320px;
+    }
+    /* ── SALA D'ESPERA VISUAL (punt 6) ── */
+    .sala-tat-card {
+      background: #161616; border: 1px solid #2a2a2a; border-radius: 16px;
+      padding: 16px; width: 260px; flex-shrink: 0;
+    }
+    .sala-tat-photo {
+      width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+      flex-shrink: 0; background: #2a2a2a;
+    }
+    .sala-tat-photo-placeholder {
+      width: 48px; height: 48px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 22px;
+      background: #2a2a2a; flex-shrink: 0;
+    }
+    .sala-client-row {
+      color: #4ade80; font-size: 13px; padding: 9px 11px; margin-bottom: 6px;
+      background: #0e1a0e; border: 1px solid #1a3a1a; border-radius: 8px;
+      cursor: pointer; transition: background .15s;
+    }
+    .sala-client-row:active { background: #16281a; }
+    .sala-fets-title {
+      color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+      margin: 14px 0 6px; padding-top: 12px; border-top: 1px solid #2a2a2a;
+    }
+    .sala-fet-row {
+      color: #93c5fd; font-size: 12px; padding: 8px 11px; margin-bottom: 6px;
+      background: #0a1220; border: 1px solid #1e2f4a; border-radius: 8px;
+      cursor: pointer; transition: background .15s; display: flex; justify-content: space-between; gap: 8px;
+    }
+    .sala-fet-row:active { background: #10203a; }
+    .btn-show-client-qr {
+      margin-top: 8px; background: none; border: 1px solid var(--gold);
+      color: var(--gold); font-size: 13px; font-weight: 700;
+      padding: 10px 24px; border-radius: 8px; cursor: pointer;
+      width: 100%; max-width: 320px;
+    }
+    .btn-recover-pin {
+      margin-top: 20px; background: none; border: none;
+      color: #666; font-size: 12px; cursor: pointer;
+      text-decoration: underline; padding: 4px 8px;
+      text-align: center; display: block; width: 100%;
+    }
+    .recover-input {
+      width: 100%; max-width: 280px; padding: 14px 16px;
+      border-radius: 12px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 15px;
+      text-align: center; margin-bottom: 12px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--black);
+      padding: max(env(safe-area-inset-top), clamp(4px, 0.75dvh, 8px)) 12px clamp(4px, 0.75dvh, 8px);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+    }
+    .header-center { text-align: center; flex: 1; }
+    .app-title {
+      font-size: clamp(16px, 2.7dvh, 21px); font-weight: 800; color: var(--gold);
+      letter-spacing: 3px; text-transform: uppercase; font-family: Georgia, serif;
+    }
+    .screen-title { font-size: clamp(9px, 1.4dvh, 11px); color: var(--g500); letter-spacing: 2px; text-transform: uppercase; margin-top: 1px; }
+    .btn-reset {
+      background: none; border: 1.5px solid var(--gold); border-radius: 7px;
+      color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: clamp(3px, 0.5dvh, 5px) clamp(6px, 0.9dvh, 9px); cursor: pointer; flex-shrink: 0;
+    }
+    .btn-reset:active { background: rgba(201,168,76,0.15); }
+    .artist-badge {
+      font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 1px;
+      text-transform: uppercase; flex-shrink: 0;
+    }
+
+    /* ── CLIENT BANNER ── */
+    #client-banner {
+      background: #2a2a2a; padding: clamp(3px, 0.55dvh, 6px) 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .cb-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .cb-nom { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cb-tel { font-size: 11px; color: #888; }
+    .cb-badges { display: flex; gap: 6px; flex-shrink: 0; }
+    /* ── ALERTES ── */
+    #alert-menor, #alert-medica {
+      align-items: center; gap: clamp(6px, 0.9dvh, 10px);
+      border-radius: 10px; flex-shrink: 0;
+      padding: clamp(6px, 1dvh, 10px) 14px;
+      margin: clamp(3px, 0.5dvh, 6px) 12px 0;
+    }
+    #alert-menor  { background: #7c2d12; border: 2px solid #f97316; }
+    #alert-medica { background: #450a0a; border: 2px solid #ef4444; }
+    .alert-icon { font-size: clamp(18px, 2.5dvh, 22px); flex-shrink: 0; }
+    .alert-title { font-size: clamp(11px, 1.6dvh, 13px); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .alert-detail { font-size: clamp(10px, 1.4dvh, 12px); margin-top: 2px; }
+    .badge {
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+      letter-spacing: .5px; white-space: nowrap;
+    }
+    .badge-cita  { background: #1e3a5f; color: #60a5fa; }
+    .badge-medic { background: #7f1d1d; color: #fca5a5; }
+    .badge-dep   { background: #14532d; color: var(--green); }
+    .badge-bon   { background: #2e1065; color: #a78bfa; }
+    .badge-walkin{ background: #3a2a00; color: var(--gold); }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1; display: flex; flex-direction: column;
+      gap: clamp(2px, 0.3dvh, 3px); padding: 4px 8px max(env(safe-area-inset-bottom, 0px) + clamp(8px, 1.2dvh, 14px), 12px);
+      min-height: 0; overflow-y: auto; overflow-x: hidden;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white); border-radius: 10px; overflow: hidden;
+      display: flex; flex-direction: column; flex-shrink: 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .card-dades   { }
+    .card-section { }
+
+    /* ── CARD HEADER ── */
+    .ch {
+      background: var(--header-gray); display: flex; align-items: center;
+      gap: 7px; padding: clamp(2px, 0.4dvh, 4px) 12px; flex-shrink: 0;
+    }
+    .ch .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+    .ch span  { font-size: 14px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+
+    /* ── DADES BODY ── */
+    .dades-body { display: flex; flex-direction: column; gap: clamp(2px, 0.4dvh, 4px); padding: clamp(3px, 0.6dvh, 6px) 10px; }
+    .dades-row { display: flex; gap: 6px; min-height: clamp(34px, 5.8dvh, 44px); }
+    .field { display: flex; flex-direction: column; gap: 2px; flex: 1; min-height: 0; min-width: 0; }
+    .field label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--g500); flex-shrink: 0; text-align: center;
+    }
+    .wrap {
+      display: flex; align-items: center; justify-content: center; gap: 2px;
+      border: 1.5px solid var(--g200); border-radius: 7px; overflow: hidden;
+      flex: 1; min-width: 0; background: var(--white); transition: border-color 0.2s;
+    }
+    .wrap:focus-within { border-color: var(--gold); }
+    .wrap input {
+      flex: none; border: none; outline: none; font-size: 17px; font-weight: 600;
+      color: var(--black); padding: 0; background: transparent;
+      min-width: 1ch; width: 4ch; height: 100%; text-align: right;
+    }
+    .wrap .unit { font-size: 13px; font-weight: 600; color: var(--g500); padding: 0; flex: none; }
+    .wrap.calc  { background: var(--g100); border-color: transparent; }
+
+    /* select dins wrap */
+    .wrap select {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-size: 15px; font-weight: 600; color: var(--black);
+      padding: 0 8px; height: 100%; cursor: pointer;
+    }
+
+    /* ── SECTION BODY ── */
+    .sec-body { display: grid; grid-template-columns: 115px 1fr; }
+    .col-pct { display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: clamp(4px, 0.7dvh, 7px) 8px clamp(4px, 0.7dvh, 7px) 10px; border-right: 1px solid var(--g200); }
+    .col-pct label, .col-pct-2 .pct-part label {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--g500); text-align: center;
+    }
+    .col-pct .wrap, .col-pct-2 .pct-part .wrap { max-height: 44px; background: var(--g100); border-color: transparent; }
+    .col-pct .wrap input, .col-pct-2 .pct-part .wrap input, #preu { font-size: clamp(20px, 3.3dvh, 27px); font-weight: 800; color: var(--black); }
+    .pct-calc {
+      font-size: clamp(20px, 3.3dvh, 27px); font-weight: 800; color: var(--black);
+      background: var(--g100); border-radius: 7px; padding: clamp(4px, 0.7dvh, 7px) 8px;
+      flex: 1; max-height: 44px; display: flex; align-items: center; justify-content: center; gap: 2px;
+    }
+    .pct-calc .sym { font-size: 14px; font-weight: 700; color: var(--g500); }
+    .col-pct-2 { display: flex; flex-direction: column; border-right: 1px solid var(--g200); }
+    .col-pct-2 .pct-part { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: clamp(2px, 0.5dvh, 5px) 8px clamp(2px, 0.5dvh, 5px) 10px; }
+    .col-pct-2 .pct-part:first-child { border-bottom: 1px solid var(--g200); }
+    /* Alineació TATUADOR: grid 2×2, pct-parts i rg-rows comparteixen files */
+    .sec-body-tat { grid-template-rows: auto auto; }
+    .sec-body-tat .col-pct-2, .sec-body-tat .col-res { display: contents; }
+    .sec-body-tat .pct-part { border-right: 1px solid var(--g200); }
+    .sec-body-tat .pct-part:first-child { grid-row: 1; grid-column: 1; border-bottom: 1px solid var(--g200); }
+    .sec-body-tat .pct-part:last-child  { grid-row: 2; grid-column: 1; }
+    .sec-body-tat .rg-row-3 { grid-row: 1; grid-column: 2; display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--g200); }
+    .sec-body-tat .rg-row-2 { grid-row: 2; grid-column: 2; display: grid; grid-template-columns: 1fr 1fr; }
+    .sec-body-tat .rg-row .res-cell { padding: clamp(3px, 0.7dvh, 6px) 4px; min-height: clamp(36px, 5.8dvh, 46px); border: none; }
+    .sec-body-tat .rg-row-3 .res-cell { border-right: 1px solid var(--g200); }
+    .sec-body-tat .rg-row-3 .res-cell:last-child { border-right: none; }
+    .sec-body-tat .rg-row-2 .res-cell:first-child { border-right: 1px solid var(--g200); }
+    .sec-body-tat .rg-row-3 .r-val { font-size: clamp(13px, 2.1dvh, 16px); font-weight: 700; }
+    .sec-body-tat .rg-row-2 .r-val { font-size: clamp(16px, 2.6dvh, 20px); font-weight: 800; }
+    .sec-body-tat .rg-row-2 .res-cell.cell-total { background: var(--iva-bg); }
+    .sec-body-tat .rg-row-2 .res-cell.cell-total .r-lbl { color: #a0927a; }
+    .sec-body-tat .rg-row-2 .res-cell.cell-total .r-val { color: #6b5320; }
+    .col-res { display: flex; flex-direction: column; }
+    .res-top { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--g200); }
+    .res-cell { display: flex; flex-direction: column; justify-content: center; padding: clamp(3px, 0.7dvh, 7px) 8px; }
+    .res-cell + .res-cell { border-left: 1px solid var(--g200); }
+    .res-cell .r-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--g500); line-height: 1; margin-bottom: 4px; }
+    .res-cell .r-val { font-size: clamp(16px, 2.6dvh, 20px); font-weight: 700; color: var(--black); line-height: 1.2; text-align: center; }
+    .res-iva { display: flex; flex-direction: column; justify-content: center; padding: clamp(3px, 0.7dvh, 7px) 10px; background: var(--iva-bg); }
+    .res-iva .r-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #a0927a; line-height: 1; }
+    .res-iva .r-val { font-size: clamp(20px, 3.2dvh, 26px); font-weight: 800; color: #6b5320; line-height: 1.2; text-align: center; }
+    /* Graella 3+2 per tatuador i comissió externa */
+    .res-grid-3-2 { display: flex; flex-direction: column; width: 100%; }
+    .res-grid-3-2 .rg-row { display: grid; }
+    .res-grid-3-2 .rg-row-3 { grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--g200); }
+    .res-grid-3-2 .rg-row-2 { grid-template-columns: 1fr 1fr; }
+    .res-grid-3-2 .res-cell { padding: clamp(3px, 0.7dvh, 6px) 4px; min-height: clamp(36px, 5.8dvh, 46px); border: none; }
+    .res-grid-3-2 .rg-row-3 .res-cell { border-right: 1px solid var(--g200); }
+    .res-grid-3-2 .rg-row-3 .res-cell:last-child { border-right: none; }
+    .res-grid-3-2 .rg-row-2 .res-cell:first-child { border-right: 1px solid var(--g200); }
+    .res-grid-3-2 .rg-row-3 .r-val { font-size: clamp(13px, 2.1dvh, 16px); font-weight: 700; }
+    .res-grid-3-2 .rg-row-2 .r-val { font-size: clamp(16px, 2.6dvh, 20px); font-weight: 800; }
+    .res-grid-3-2 .res-cell.cell-total { background: var(--iva-bg); }
+    .res-grid-3-2 .res-cell.cell-total .r-lbl { color: #a0927a; }
+    .res-grid-3-2 .res-cell.cell-total .r-val { color: #6b5320; }
+    .r-val.negative { color: var(--red) !important; font-weight: 700; }
+    .ble-badge { font-size:11px; line-height:1.7; color:#6b5320; background:#fdf6e3; border:1px solid #ddc97a; border-radius:8px; padding:7px 10px; margin-bottom:8px; }
+    .wrap.editable, .col-pct .wrap.editable, .col-pct-2 .pct-part .wrap.editable { background: #fdf9ee; border-color: #ddc97a; }
+    .wrap.editable:focus-within, .col-pct .wrap.editable:focus-within, .col-pct-2 .pct-part .wrap.editable:focus-within { border-color: var(--gold); }
+
+    /* ── EXTRAS CARD ── */
+    .extras-body { padding: clamp(4px, 0.8dvh, 8px) 10px; display: flex; gap: 8px; }
+    .extras-body .field label { margin-bottom: 2px; }
+    .toggle-row { display: flex; gap: 6px; }
+    .tog {
+      flex: 1; padding: 8px 4px; border-radius: 7px; border: 1.5px solid var(--g200);
+      background: var(--g100); font-size: 13px; font-weight: 700; cursor: pointer;
+      text-align: center; transition: all .15s; color: var(--g500);
+    }
+    .tog.active-si  { background: #dcfce7; border-color: var(--green); color: #15803d; }
+    .tog.active-no  { background: #fee2e2; border-color: var(--red);   color: #b91c1c; }
+    .tog.active-sel { background: #fdf9ee; border-color: var(--gold);  color: var(--black); }
+
+    /* ── GRAVAR DADES BUTTON ── */
+    #btn-enviar {
+      flex-shrink: 0; padding: 16px; border-radius: 12px; border: none;
+      background: var(--gold); color: var(--black); font-size: 16px; font-weight: 800;
+      cursor: pointer; letter-spacing: .04em; transition: opacity .15s, transform .1s;
+    }
+    #btn-enviar:active { transform: scale(.98); opacity: .9; }
+    #btn-enviar:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── TOAST ── */
+    #toast {
+      display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #2a2a2a; border: 1px solid #444; border-radius: 10px;
+      padding: 12px 20px; font-size: 13px; z-index: 400; white-space: nowrap; color: #fff;
+    }
+    #toast.ok  { border-color: var(--green); color: var(--green); }
+    #toast.err { border-color: var(--red);   color: var(--red);   }
+
+    /* ── LOADING ── */
+    #loading {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.6); align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+    }
+    #loading.show { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 3px solid #444; border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
+    #loading p { color: #ccc; font-size: 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+    ::-webkit-scrollbar { display: none; }
+
+    /* ── FOTOS OVERLAY ── */
+    #overlay-fotos {
+      position: fixed; inset: 0; z-index: 200;
+      background: #1a1a1a;
+      display: none; flex-direction: column;
+      align-items: stretch;
+    }
+    .fotos-ov-header {
+      background: #111; padding: max(env(safe-area-inset-top), 14px) 16px 14px;
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .fotos-ov-back {
+      background: none; border: 1.5px solid #333; border-radius: 7px;
+      color: #888; padding: 6px 12px; font-size: 13px; cursor: pointer; flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fotos-ov-title {
+      flex: 1; text-align: center; color: var(--gold); font-size: 13px;
+      font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .fotos-ov-count {
+      min-width: 52px; text-align: right; font-size: 12px; color: #888; font-weight: 700;
+    }
+    .fotos-ov-scroll {
+      flex: 1; overflow-y: auto; padding: 16px; min-height: 0;
+    }
+    .fotos-ov-empty {
+      text-align: center; color: #444; padding: 60px 0 20px;
+      font-size: 15px; line-height: 2.2;
+    }
+    .fotos-ov-empty .big-icon { font-size: 48px; line-height: 1; display: block; margin-bottom: 12px; }
+    .fotos-ov-empty .hint { font-size: 12px; color: #333; }
+    .fotos-ov-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px;
+    }
+    .foto-thumb { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #2a2a2a; }
+    .foto-thumb img, .foto-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .foto-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,.7); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; line-height: 22px; text-align: center; padding: 0; }
+    .foto-thumb .video-badge { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,.65); color: #fff; font-size: 10px; border-radius: 4px; padding: 1px 5px; pointer-events: none; }
+    .fotos-ov-actions {
+      padding: 14px max(env(safe-area-inset-right), 16px) max(calc(env(safe-area-inset-bottom) + 14px), 14px) max(env(safe-area-inset-left), 16px);
+      display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;
+      background: #111; border-top: 1px solid #2a2a2a;
+    }
+    .btn-fer-foto {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: #2a2a2a; border: 2px solid #444; border-radius: 12px;
+      padding: 16px; color: #ddd; font-size: 15px; font-weight: 800;
+      cursor: pointer; letter-spacing: .04em; -webkit-tap-highlight-color: transparent;
+      width: 100%;
+    }
+    .btn-fer-foto:active { background: #333; border-color: var(--gold); }
+    #btn-gravar-tattoo {
+      display: none; padding: 16px; border-radius: 12px; border: none;
+      background: var(--gold); color: #1a1a1a; font-size: 16px; font-weight: 800;
+      cursor: pointer; letter-spacing: .04em; transition: opacity .15s, transform .1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-gravar-tattoo:active { transform: scale(.98); opacity: .9; }
+    #btn-gravar-tattoo:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── BIOMETRIA ── */
+    #btn-bio { margin-top: 20px; display: none; flex-direction: column; align-items: center; gap: 4px; background: none; border: 1.5px solid #444; border-radius: 12px; padding: 12px 28px; color: #bbb; font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: .5px; }
+    #btn-bio .bio-icon { font-size: 26px; line-height: 1; }
+
+    /* ── SESSION RESTORE BANNER ── */
+    #session-restore-banner { display:none; align-items:center; gap:8px; background:#1a1400; border:1px solid #c9a84c; border-radius:8px; padding:10px 14px; margin:8px 14px 0; flex-shrink:0; }
+    #session-restore-info { flex:1; font-size:12px; color:#c9a84c; }
+    .btn-restore-sess { background:#c9a84c; border:none; border-radius:6px; color:#1a1a1a; font-size:11px; font-weight:800; padding:5px 10px; cursor:pointer; white-space:nowrap; }
+    .btn-discard-sess { background:none; border:1px solid #444; border-radius:6px; color:#888; font-size:11px; padding:5px 10px; cursor:pointer; white-space:nowrap; }
+
+    /* ── HISTORIAL BUTTON ── */
+    .btn-historial { background:none; border:1px solid #333; border-radius:6px; color:#888; font-size:15px; padding:4px 8px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .btn-historial:active { opacity:.7; }
+
+    /* ── HISTORIAL OVERLAY ── */
+    .hist-list { width:100%; display:flex; flex-direction:column; gap:6px; padding:12px 14px; overflow-y:auto; flex:1; }
+    .hist-item { display:flex; align-items:center; justify-content:space-between; background:#111; border:1px solid #222; border-radius:10px; padding:12px 14px; cursor:pointer; gap:10px; -webkit-tap-highlight-color:transparent; }
+    .hist-item:active { background:#1a1a1a; }
+    .hist-item-info { flex:1; }
+    .hist-item-date { font-size:13px; color:#c9a84c; font-weight:700; }
+    .hist-item-desc { font-size:12px; color:#ccc; margin-top:2px; }
+    .hist-item-client { font-size:11px; color:#666; margin-top:2px; }
+    .hist-foto-badge { background:#1a1a1a; border:1px solid #333; border-radius:5px; color:#888; font-size:11px; padding:3px 7px; white-space:nowrap; }
+    .hist-detail-hdr { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid #222; flex-shrink:0; }
+    .hist-detail-hdr button { background:none; border:1px solid #333; border-radius:6px; color:#888; font-size:12px; padding:5px 10px; cursor:pointer; white-space:nowrap; }
+    .hist-detail-title { font-size:13px; font-weight:700; color:#c9a84c; }
+    .hist-detail-client { font-size:11px; color:#888; margin-top:2px; }
+    #hist-loading { text-align:center; color:#666; font-size:13px; padding:30px; }
+
+    /* ── PHONE SEARCH ── */
+    .qr-divider {
+      display: flex; align-items: center; gap: 10px; width: 100%; max-width: 320px;
+      margin: 18px 0 14px;
+    }
+    .qr-divider span { color: #555; font-size: 11px; white-space: nowrap; }
+    .qr-divider::before, .qr-divider::after {
+      content: ''; flex: 1; height: 1px; background: #333;
+    }
+    .phone-search-row {
+      display: flex; gap: 6px; width: 100%; max-width: 320px; align-items: stretch;
+    }
+    .phone-country-sel {
+      padding: 11px 6px; border-radius: 10px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 13px; cursor: pointer;
+      min-width: 68px; text-align: center;
+    }
+    .phone-number-inp {
+      flex: 1; padding: 12px 10px; border-radius: 10px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 14px; min-width: 0;
+    }
+    .phone-number-inp::placeholder { color: #555; }
+    .phone-search-btn {
+      padding: 12px 14px; border-radius: 10px; background: var(--gold);
+      border: none; color: #1a1a1a; font-weight: 800; cursor: pointer; font-size: 13px;
+    }
+    /* ── CLIENTS EN ESPERA DROPDOWN ── */
+    .clients-espera-row {
+      display: flex; gap: 8px; width: 100%; max-width: 320px; align-items: stretch;
+    }
+    .clients-espera-sel {
+      flex: 1; padding: 11px 10px; border-radius: 10px; border: 1px solid #444;
+      background: #2a2a2a; color: #fff; font-size: 13px; cursor: pointer; min-width: 0;
+    }
+    .clients-espera-sel option { background: #2a2a2a; color: #fff; }
+    .clients-espera-btn {
+      padding: 12px 16px; border-radius: 10px; background: #6366f1;
+      border: none; color: #fff; font-weight: 800; cursor: pointer; font-size: 16px;
+      flex-shrink: 0;
+    }
+    /* ── MUST REGISTER PANEL ── */
+    #must-register-panel {
+      display: none; flex-direction: column; align-items: center;
+      width: 100%; max-width: 320px; padding: 20px 16px; border-radius: 16px;
+      background: rgba(124,58,237,.1); border: 1px solid #7c3aed;
+      margin-top: 8px;
+    }
+    .must-reg-title { font-size: 15px; font-weight: 800; color: #a78bfa; margin-bottom: 6px; text-align: center; }
+    .must-reg-sub { font-size: 12px; color: #888; margin-bottom: 14px; text-align: center; line-height: 1.5; }
+    .must-reg-qr { width: 180px; height: 180px; border-radius: 10px; border: 3px solid #7c3aed; background: #fff; margin-bottom: 14px; }
+    .must-reg-url { font-size: 10px; color: #666; margin-bottom: 16px; text-align: center; }
+    .must-reg-retry {
+      background: var(--gold); border: none; border-radius: 10px; color: #1a1a1a;
+      font-size: 13px; font-weight: 800; padding: 12px 24px; cursor: pointer; width: 100%;
+    }
+    .must-reg-back {
+      margin-top: 8px; background: none; border: 1px solid #444; color: #888;
+      font-size: 12px; padding: 8px 20px; border-radius: 8px; cursor: pointer; width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div id="test-banner" onclick="if(confirm('Desactivar mode proves i tornar a producció?')){localStorage.setItem('blessed_test_mode','0');window.location.reload();}" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff6600;color:#fff;text-align:center;font-weight:bold;font-size:13px;padding:4px;letter-spacing:1px;cursor:pointer;">⚠️ MODE PROVES — BD STAGING — Les dades NO són reals ⚠️ · Toca per desactivar</div>
+<script>if(window.location.port==='8446'||localStorage.getItem('blessed_test_mode')==='1'){var b=document.getElementById('test-banner');if(b)b.style.display='block';}</script>
+
+<!-- ── PIN OVERLAY ── -->
+<div id="overlay-pin" class="overlay">
+
+  <!-- Pas 1: PIN -->
+  <div id="pin-step">
+    <div class="overlay-title">App Tatuador</div>
+    <div class="overlay-sub">Introdueix el teu PIN de 4 dígits</div>
+    <div id="app-ver-pin" style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:-4px;margin-bottom:2px;text-align:center;letter-spacing:0.5px;"></div>
+    <button id="btn-test-mode" onclick="(function(){var v=localStorage.getItem('blessed_test_mode')==='1';localStorage.setItem('blessed_test_mode',v?'0':'1');window.location.reload();})()" style="background:none;border:none;cursor:pointer;font-size:10px;color:rgba(255,255,255,0.25);padding:0 0 8px;letter-spacing:0.3px;"></button>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <div class="keypad">
+      <button class="key" onclick="pinKey('1')">1</button>
+      <button class="key" onclick="pinKey('2')">2</button>
+      <button class="key" onclick="pinKey('3')">3</button>
+      <button class="key" onclick="pinKey('4')">4</button>
+      <button class="key" onclick="pinKey('5')">5</button>
+      <button class="key" onclick="pinKey('6')">6</button>
+      <button class="key" onclick="pinKey('7')">7</button>
+      <button class="key" onclick="pinKey('8')">8</button>
+      <button class="key" onclick="pinKey('9')">9</button>
+      <button class="key key-empty"></button>
+      <button class="key" onclick="pinKey('0')">0</button>
+      <button class="key key-del" onclick="pinDel()">⌫</button>
+    </div>
+    <button id="btn-bio" onclick="doBioAuth()">
+      <span class="bio-icon">🖐</span>
+      <span id="bio-nom-lbl">Tatuador</span>
+    </button>
+    <button class="btn-recover-pin" onclick="showRecoverPin()">No recordo el PIN</button>
+  </div>
+
+  <!-- Pas 2: Oferta biometria (dins el mateix overlay) -->
+  <div id="bio-step" style="display:none;flex-direction:column;align-items:center;text-align:center;max-width:300px;">
+    <div style="font-size:48px;margin-bottom:16px;">🖐</div>
+    <div class="overlay-title">Biometria</div>
+    <div class="overlay-sub" style="margin-bottom:32px;">La propera vegada podràs entrar amb empremta o Face ID en lloc del PIN</div>
+    <button onclick="doBioRegister()" style="background:var(--gold);color:#1a1a1a;font-weight:800;font-size:15px;padding:14px;border-radius:12px;border:none;cursor:pointer;width:240px;margin-bottom:12px;">Sí, activar biometria</button>
+    <button onclick="closeBioOffer()" style="background:none;border:1px solid #444;color:#999;font-size:13px;cursor:pointer;padding:10px 24px;border-radius:8px;">Ara no</button>
+  </div>
+
+</div>
+
+<!-- ── RECUPERAR PIN OVERLAY ── -->
+<div id="overlay-recover-pin" class="overlay" style="display:none;">
+  <div class="overlay-title">Recuperar PIN</div>
+  <div class="overlay-sub">Introdueix el teu nom exactament<br>com apareix a l'app. T'enviarem el PIN per correu.</div>
+  <input id="inp-recover-nom" type="text" class="recover-input" placeholder="El teu nom" autocomplete="off">
+  <div id="recover-msg" style="min-height:20px;font-size:13px;text-align:center;margin-bottom:16px;color:#999;max-width:280px;"></div>
+  <button id="btn-send-recovery" onclick="sendPinRecovery()" style="background:var(--gold);border:none;border-radius:10px;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 40px;cursor:pointer;margin-bottom:12px;">Enviar PIN per correu</button>
+  <button onclick="hideRecoverPin()" style="background:none;border:1px solid #444;color:#999;font-size:13px;padding:10px 24px;border-radius:8px;cursor:pointer;">← Enrere al PIN</button>
+</div>
+
+<!-- ── SALA D'ESPERA VISUAL (pantalla d'inici, punt 6) ── -->
+<div id="overlay-sala-espera" class="overlay" style="display:none;align-items:flex-start;overflow-y:auto;padding-top:36px;">
+  <div style="width:100%;max-width:960px;margin:0 auto;display:flex;flex-direction:column;align-items:center;">
+    <div class="overlay-title">Sala d'espera</div>
+    <div class="overlay-sub" style="margin-bottom:20px;">Clients que esperen tatuatge — clica'n un per començar</div>
+    <div id="sala-espera-grid" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;width:100%;"></div>
+    <button class="btn-skip-qr" onclick="document.getElementById('overlay-sala-espera').style.display='none';goToQR();" style="margin-top:28px;">
+      🔍 Escanejar QR / Cerca manual
+    </button>
+  </div>
+</div>
+
+<!-- ── QR OVERLAY ── -->
+<div id="overlay-qr" class="overlay" style="display:none;">
+
+  <!-- Contingut principal (QR + manual + telèfon) -->
+  <div id="qr-main-content" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:320px;">
+    <button onclick="stopQRScanner();document.getElementById('overlay-qr').style.display='none';goToSalaEspera();" style="background:none;border:none;color:#6366f1;font-size:11px;margin-bottom:12px;cursor:pointer;">← Tornar a la sala d'espera</button>
+    <div id="qr-logged-as" style="color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:10px;"></div>
+    <div class="overlay-title">Escanejar QR client</div>
+    <div class="overlay-sub">Apunta la càmera al QR del client</div>
+
+    <!-- Visor càmera en temps real -->
+    <div id="qr-reader"></div>
+
+    <!-- Botó iniciar escàner -->
+    <button class="btn-start-scan" id="btn-start-scan" onclick="startQRScanner()">
+      📷 Iniciar escàner
+    </button>
+    <!-- Botó aturar escàner -->
+    <button class="btn-stop-scan" id="btn-stop-scan" onclick="stopQRScanner()">✕ Aturar càmera</button>
+
+    <div style="color:#555;font-size:12px;margin-bottom:12px;">O introdueix el QR o val de regal manualment</div>
+
+    <div class="qr-manual-row">
+      <input id="inp-token-manual" type="text" placeholder="BLS-XXXXXXXX-XXXX" autocomplete="off" spellcheck="false">
+      <button onclick="lookupToken(document.getElementById('inp-token-manual').value.trim())">OK</button>
+    </div>
+
+    <!-- Cerca per telèfon -->
+    <div class="qr-divider"><span>O busca per telèfon</span></div>
+    <div class="phone-search-row">
+      <select id="sel-country" class="phone-country-sel">
+        <option value="+34">🇪🇸 +34</option>
+        <option value="+33">🇫🇷 +33</option>
+        <option value="+44">🇬🇧 +44</option>
+        <option value="+39">🇮🇹 +39</option>
+        <option value="+1">🇺🇸 +1</option>
+        <option value="+49">🇩🇪 +49</option>
+        <option value="+351">🇵🇹 +351</option>
+        <option value="+32">🇧🇪 +32</option>
+        <option value="+31">🇳🇱 +31</option>
+      </select>
+      <input id="inp-phone-search" type="tel" class="phone-number-inp" placeholder="612 345 678" autocomplete="off">
+      <button class="phone-search-btn" onclick="buscarPerTelefon()">🔍</button>
+    </div>
+    <div id="phone-search-msg" style="min-height:16px;font-size:11px;color:#ef4444;text-align:center;margin-top:6px;max-width:320px;"></div>
+
+    <div class="qr-divider"><span>O tria un client en espera</span></div>
+    <div class="clients-espera-row">
+      <select id="sel-clients-espera" class="clients-espera-sel">
+        <option value="">— carregant... —</option>
+      </select>
+      <button class="clients-espera-btn" onclick="seleccionarClientEspera()" title="Carregar client seleccionat">→</button>
+    </div>
+    <div id="clients-espera-msg" style="min-height:14px;font-size:11px;color:#888;text-align:center;margin-top:4px;max-width:320px;"></div>
+
+    <button class="btn-skip-qr" onclick="skipQR()">Continuar sense QR (walk-in)</button>
+    <button class="btn-show-client-qr" onclick="showClientQR()">📱 Genera QR per al client</button>
+    <button class="btn-skip-qr" id="btn-historial-qr" onclick="showHistorial()" style="display:none;margin-top:6px;border-color:#c9a84c;color:#c9a84c;">📋 Els meus tattoos</button>
+    <button class="btn-skip-qr" id="btn-cites-qr" onclick="showCites()" style="display:none;margin-top:6px;border-color:#6366f1;color:#6366f1;">📅 Les meves cites</button>
+  </div>
+
+  <!-- Panel "s'ha de registrar" (ocult per defecte) -->
+  <div id="must-register-panel">
+    <div class="must-reg-title" id="must-reg-title">Client no registrat</div>
+    <div class="must-reg-sub" id="must-reg-sub">Aquest client no té compte. Ha de registrar-se i signar els consentiments abans de fer el tattoo.</div>
+    <img id="must-reg-qr-img" class="must-reg-qr" src="" alt="QR registre">
+    <div class="must-reg-url">blessed-checkin.esparkic.workers.dev</div>
+    <button class="must-reg-retry" onclick="retrySearch()">✓ Ja s'ha registrat</button>
+    <button class="must-reg-back" onclick="hideMustRegister()">← Tornar enrere</button>
+  </div>
+
+</div>
+
+<!-- ── QR CLIENT OVERLAY ── -->
+<div id="overlay-qr-client" class="overlay" style="display:none;">
+  <div class="overlay-title">QR per al client</div>
+  <div class="overlay-sub">El client escaneja aquest QR<br>per obrir l'app de check-in al seu mòbil</div>
+  <img id="img-client-qr" src="" alt="QR App Client" style="width:240px;height:240px;border-radius:12px;border:4px solid var(--gold);margin-bottom:20px;background:#fff;">
+  <div style="color:#888;font-size:11px;text-align:center;margin-bottom:28px;">blessed-checkin.esparkic.workers.dev</div>
+  <button onclick="hideClientQR()" style="background:var(--gold);border:none;border-radius:10px;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 40px;cursor:pointer;">✓ Tancar</button>
+</div>
+
+<!-- ── HISTORIAL OVERLAY ── -->
+<div id="overlay-historial" class="overlay" style="display:none;">
+  <div class="fotos-ov-header">
+    <button class="fotos-ov-back" onclick="hideHistorial()">← Tancar</button>
+    <div class="fotos-ov-title">Els meus tattoos</div>
+    <div></div>
+  </div>
+
+  <!-- Filtres -->
+  <div id="hist-filters" style="display:flex;flex-direction:column;gap:8px;padding:10px 14px;border-bottom:1px solid #2a2a2a;background:#111;">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input id="hist-f-phone" type="tel" placeholder="📞 Telèfon client" autocomplete="off" inputmode="numeric" onkeydown="if(event.key==='Enter')aplicarFiltreHistorial()"
+        style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#e0e0e0;font-size:13px;padding:8px 10px;outline:none;">
+      <button onclick="aplicarFiltreHistorial()" style="background:#c9a84c;border:none;border-radius:8px;color:#111;font-size:12px;font-weight:800;padding:8px 14px;cursor:pointer;">Filtrar</button>
+      <button onclick="netejarFiltreHistorial()" style="background:#2a2a2a;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;font-weight:700;padding:8px 10px;cursor:pointer;">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <label style="color:#666;font-size:11px;white-space:nowrap;">De:</label>
+      <input id="hist-f-from" type="date" style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#e0e0e0;font-size:13px;padding:7px 8px;outline:none;">
+      <label style="color:#666;font-size:11px;white-space:nowrap;">Fins:</label>
+      <input id="hist-f-to" type="date" style="flex:1;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#e0e0e0;font-size:13px;padding:7px 8px;outline:none;">
+    </div>
+    <div id="hist-f-info" style="font-size:11px;color:#666;min-height:14px;text-align:center;"></div>
+  </div>
+
+  <!-- Llista de tattoos -->
+  <div id="hist-list-section" style="display:flex;flex-direction:column;flex:1;overflow:hidden;width:100%;">
+    <div id="hist-loading" style="display:none;padding:14px;text-align:center;color:#666;font-size:13px;">⏳ Carregant...</div>
+    <div id="hist-list" class="hist-list"></div>
+  </div>
+
+  <!-- Detall fotos d'un tattoo -->
+  <div id="hist-detail" style="display:none;flex-direction:column;flex:1;overflow:hidden;width:100%;">
+    <div class="hist-detail-hdr">
+      <button onclick="backToHistorialList()">← Enrere</button>
+      <div>
+        <div class="hist-detail-title" id="hist-detail-title"></div>
+        <div class="hist-detail-client" id="hist-detail-client"></div>
+      </div>
+    </div>
+    <div class="fotos-ov-scroll">
+      <!-- Dades del tattoo -->
+      <div id="hist-detail-data" style="padding:12px 14px;border-bottom:1px solid #222;display:none;flex-direction:column;gap:6px;"></div>
+      <div id="hist-detail-loading" style="display:none;padding:20px;text-align:center;color:#666;font-size:13px;">⏳ Carregant...</div>
+      <div id="hist-detail-empty" class="fotos-ov-empty" style="display:none;">
+        <span class="big-icon">📷</span>
+        Cap foto per a aquest tattoo
+      </div>
+      <div id="hist-detail-grid" class="fotos-ov-grid"></div>
+    </div>
+    <div class="fotos-ov-actions">
+      <label class="btn-fer-foto">
+        <input type="file" accept="image/*" capture="environment" id="inp-hist-camera-foto" style="display:none;" onchange="addFotoHistorial(this.files)">
+        📷 Foto
+      </label>
+      <label class="btn-fer-foto" style="border-color:#a855f7;">
+        <input type="file" accept="video/*" capture="environment" id="inp-hist-camera-video" style="display:none;" onchange="addFotoHistorial(this.files)">
+        🎬 Vídeo
+      </label>
+      <label class="btn-fer-foto" style="background:linear-gradient(135deg,#0a1520,#0f2030);border-color:#2563eb;">
+        <input type="file" accept="image/*,video/*,image/jpeg,image/png,image/gif,image/webp,image/heic,video/mp4,video/quicktime,video/x-msvideo,video/webm" multiple id="inp-hist-galeria" style="display:none;" onchange="addFotoHistorial(this.files)">
+        📁 Galeria
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- ── CITES OVERLAY ── -->
+<div id="overlay-cites" class="overlay" style="display:none;">
+  <div class="fotos-ov-header">
+    <button class="fotos-ov-back" onclick="hideCites()">← Tancar</button>
+    <div class="fotos-ov-title">Les meves cites</div>
+    <button onclick="loadCites()" style="background:none;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;padding:6px 10px;cursor:pointer;">↻</button>
+  </div>
+  <div id="cites-tabs" style="display:flex;gap:0;border-bottom:1px solid #2a2a2a;background:#111;">
+    <button id="cites-tab-avui" onclick="setCitesTab('avui')" style="flex:1;background:#1a1a1a;border:none;border-bottom:2px solid #6366f1;color:#6366f1;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">Avui</button>
+    <button id="cites-tab-dema" onclick="setCitesTab('dema')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">Demà</button>
+    <button id="cites-tab-tot" onclick="setCitesTab('tot')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">Properes</button>
+    <button id="cites-tab-espera" onclick="setCitesTab('espera')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">🚶 Espera</button>
+  </div>
+  <div id="cites-loading" style="display:none;padding:20px;text-align:center;color:#666;font-size:13px;">⏳ Carregant...</div>
+  <div id="cites-list" class="hist-list"></div>
+</div>
+
+<!-- ── FOTOS OVERLAY ── -->
+<div id="overlay-fotos">
+  <div class="fotos-ov-header">
+    <button class="fotos-ov-back" onclick="backToForm()">← Enrere</button>
+    <div class="fotos-ov-title">Fotos i vídeos</div>
+    <div class="fotos-ov-count" id="fotos-ov-count"></div>
+  </div>
+
+  <div class="fotos-ov-scroll">
+    <div id="fotos-ov-empty" class="fotos-ov-empty">
+      <span class="big-icon">📷</span>
+      Fes la primera foto o vídeo del tatuatge
+      <br><span class="hint">Cal mínim 1 arxiu per gravar</span>
+    </div>
+    <div id="fotos-ov-grid" class="fotos-ov-grid"></div>
+  </div>
+
+  <div class="fotos-ov-actions">
+    <label class="btn-fer-foto">
+      <input type="file" accept="image/*" capture="environment" id="inp-fotos-camera-foto" style="display:none;" onchange="handleFotosOverlay(this.files)">
+      📷 Foto
+    </label>
+    <label class="btn-fer-foto" style="border-color:#a855f7;">
+      <input type="file" accept="video/*" capture="environment" id="inp-fotos-camera-video" style="display:none;" onchange="handleFotosOverlay(this.files)">
+      🎬 Vídeo
+    </label>
+    <label class="btn-fer-foto" style="background:linear-gradient(135deg,#0a1520,#0f2030);border-color:#2563eb;">
+      <input type="file" accept="image/*,video/*,image/jpeg,image/png,image/gif,image/webp,image/heic,video/mp4,video/quicktime,video/x-msvideo,video/webm" multiple id="inp-fotos-galeria" style="display:none;" onchange="handleFotosOverlay(this.files)">
+      📁 Galeria
+    </label>
+    <button id="btn-gravar-tattoo" onclick="gravaTattoo()">
+      Gravar tattoo ✓
+    </button>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <span class="artist-badge" id="hdr-artist"></span>
+  <div class="header-center">
+    <div class="app-title">App Tatuador</div>
+    <div class="screen-title" id="hdr-subtitle">Tatuador autònom</div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <button class="btn-historial" id="btn-historial" style="display:none;" onclick="showHistorial()" title="Els meus tattoos">📋</button>
+    <button class="btn-reset" onclick="resetApp()">Nou</button>
+  </div>
+</header>
+
+<!-- ── SESSION RESTORE BANNER ── -->
+<div id="session-restore-banner">
+  <div id="session-restore-info"></div>
+  <button class="btn-restore-sess" onclick="restoreSession()">Restaurar</button>
+  <button class="btn-discard-sess" onclick="discardSession()">Descartar</button>
+</div>
+
+<!-- ── CLIENT BANNER ── -->
+<div id="client-banner" style="display:none;">
+  <div class="cb-left">
+    <div class="cb-nom" id="cb-nom">—</div>
+    <div class="cb-tel" id="cb-tel"></div>
+  </div>
+  <div class="cb-badges" id="cb-badges"></div>
+</div>
+
+<div id="alert-menor" style="display:none;">
+  <span class="alert-icon">⚠️</span>
+  <div>
+    <div class="alert-title" style="color:#fed7aa;">CLIENT MENOR D'EDAT</div>
+    <div class="alert-detail" style="color:#ffedd5;">Verifica la presència i identificació del tutor legal abans de continuar.</div>
+  </div>
+</div>
+
+<div id="alert-medica" style="display:none;">
+  <span class="alert-icon">🩺</span>
+  <div>
+    <div class="alert-title" style="color:#fca5a5;">AFECCIÓ MÈDICA DECLARADA</div>
+    <div id="alert-medica-detail" class="alert-detail" style="color:#fecaca;"></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- DADES GENERALS -->
+  <div class="card card-dades">
+    <div class="ch"><div class="dot"></div><span>Dades generals</span></div>
+    <div class="dades-body">
+      <div class="dades-row">
+        <div class="field">
+          <label>Preu del tatuatge</label>
+          <div class="wrap editable">
+            <input type="number" id="preu" placeholder="0,00" min="0" step="0.01" inputmode="decimal" enterkeyhint="done">
+            <span class="unit">€</span>
+          </div>
+        </div>
+      </div>
+      <div class="dades-row">
+        <div class="field">
+          <label>Preu base (s/IVA)</label>
+          <div class="wrap calc">
+            <input type="text" id="base" readonly placeholder="—">
+            <span class="unit">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>IVA tatuatge</label>
+          <div class="wrap calc">
+            <input type="text" id="ivaTotal" readonly placeholder="—">
+            <span class="unit">€</span>
+          </div>
+        </div>
+      </div>
+      <!-- RETENCIÓ BLESSED + A REPARTIR: únicament mode No Autònom -->
+      <div class="dades-row" id="row-noaut-generals" style="display:none;">
+        <div class="field">
+          <label>Retenció Blessed (20%)</label>
+          <div class="wrap calc">
+            <input type="text" id="retBleGen" readonly placeholder="—">
+            <span class="unit">€</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>A repartir</label>
+          <div class="wrap calc">
+            <input type="text" id="aRepartirGen" readonly placeholder="—">
+            <span class="unit">€</span>
+          </div>
+        </div>
+      </div>
+      <!-- NET A COBRAR (A): apareix quan hi ha dipòsit o val de regal -->
+      <div class="dades-row" id="row-net" style="display:none;">
+        <div class="field" style="width:100%;">
+          <label id="lbl-net">Net a cobrar avui</label>
+          <div class="wrap calc" style="border-color:#22c55e;">
+            <input type="text" id="netCobrar" readonly placeholder="—" style="color:#22c55e;font-weight:700;font-size:17px;">
+            <span class="unit" style="color:#22c55e;">€</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRAS: Cobrament + Concepte + Feina -->
+  <div class="card" id="card-extras" style="display:none;">
+    <div class="ch"><div class="dot"></div><span>Registre</span></div>
+    <div class="extras-body">
+      <div class="field">
+        <label>Cobrament</label>
+        <div class="wrap editable" style="max-height:44px;">
+          <select id="sel-cobrament">
+            <option value="" disabled selected>— Tria —</option>
+            <option value="Targeta">Targeta</option>
+            <option value="Comptat">Comptat</option>
+            <option value="Bizum">Bizum</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Concepte</label>
+        <div class="wrap editable" style="max-height:44px;">
+          <select id="sel-concepte">
+            <option value="Tatuatge">Tatuatge</option>
+            <option value="Gemmes dentals">Gemmes</option>
+            <option value="Cremes">Cremes</option>
+            <option value="Altre">Altre</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Feina tat.</label>
+        <div class="toggle-row">
+          <button class="tog" id="tog-si" onclick="setFeina('Sí')" ontouchstart="">Sí</button>
+          <button class="tog active-no" id="tog-no" onclick="setFeina('No')" ontouchstart="">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TATUADOR -->
+  <div class="card card-section" id="sec-tatuador">
+    <div class="ch"><div class="dot"></div><span>Tatuador</span><span id="badge-autonom" style="display:none;font-size:10px;color:#22d3ee;background:#001a1a;border:1px solid #0e4a4a;border-radius:4px;padding:1px 7px;margin-left:8px;font-weight:700;">Autònom</span><span id="badge-assalariat" style="display:none;font-size:10px;color:#9a9a9a;background:#111;border:1px solid #333;border-radius:4px;padding:1px 7px;margin-left:8px;">No Autònom</span></div>
+    <div class="sec-body sec-body-tat">
+      <div class="col-pct-2">
+        <div class="pct-part">
+          <label>% Base</label>
+          <div class="wrap editable">
+            <input type="number" id="pctTatBase" value="60" min="0" max="100" step="0.1" inputmode="decimal" enterkeyhint="done">
+            <span class="unit">%</span>
+          </div>
+        </div>
+        <div class="pct-part">
+          <label>% Efectiu</label>
+          <div class="pct-calc"><span id="pctTatEff">60</span><span class="sym">%</span></div>
+        </div>
+      </div>
+      <div class="col-res">
+        <div class="rg-row rg-row-3" id="tat-row-detall">
+          <div class="res-cell">
+            <span class="r-lbl">Base tatuador</span>
+            <span class="r-val" id="totTat">—</span>
+          </div>
+          <div class="res-cell">
+            <span class="r-lbl">IVA tatuador</span>
+            <span class="r-val" id="ivaTat">—</span>
+          </div>
+          <div class="res-cell">
+            <span class="r-lbl" id="lbl-retencio-tat">Retenció IRPF</span>
+            <span class="r-val" id="retencioTat">—</span>
+          </div>
+        </div>
+        <div class="rg-row rg-row-2" id="tat-row-totals">
+          <div class="res-cell cell-total" id="tat-cell-totaliva">
+            <span class="r-lbl">Total IVA inclòs</span>
+            <span class="r-val" id="totTatIva">—</span>
+          </div>
+          <div class="res-cell cell-total">
+            <span class="r-lbl" id="lbl-totTatLiquid">Total líquid</span>
+            <span class="r-val" id="totTatLiquid">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMISSIÓ EXTERNA -->
+  <div class="card card-section" id="sec-com-ext">
+    <div class="ch"><div class="dot"></div><span>Comissió externa</span></div>
+    <!-- Selector: sempre visible -->
+    <div style="display:flex;align-items:center;gap:8px;padding:clamp(4px,0.7dvh,7px) 10px;border-bottom:1px solid var(--g200);" id="com-ext-selector">
+      <label style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g500);flex-shrink:0;">Col·laborador</label>
+      <div class="wrap editable" style="flex:1;max-height:38px;">
+        <select id="sel-com-ext" onchange="onComExtChange()">
+          <option value="">—</option>
+        </select>
+      </div>
+      <span style="font-size:10px;color:#7a7a7a;flex-shrink:0;">%</span>
+      <span id="lbl-pct-com" style="font-size:clamp(11px,1.5dvh,13px);color:#c9a84c;font-weight:700;flex-shrink:0;min-width:1.5ch;text-align:right;">0</span>
+      <input type="hidden" id="pctCom" value="0">
+    </div>
+    <!-- Resultats: visible només quan hi ha col·laborador -->
+    <div class="sec-body" id="com-ext-body" style="display:none;">
+      <div class="col-pct" style="justify-content:center;">
+        <div style="font-size:clamp(20px,3.3dvh,27px);font-weight:800;color:var(--black);background:var(--g100);border-radius:7px;padding:clamp(4px,0.7dvh,7px) 8px;display:flex;align-items:center;justify-content:center;gap:2px;">
+          <span id="lbl-pct-com-big">0</span><span style="font-size:14px;font-weight:700;color:var(--g500);">%</span>
+        </div>
+      </div>
+      <div class="col-res">
+        <div class="res-grid-3-2">
+          <div class="rg-row rg-row-3">
+            <div class="res-cell">
+              <span class="r-lbl">Base comissió</span>
+              <span class="r-val" id="totCom">—</span>
+            </div>
+            <div class="res-cell">
+              <span class="r-lbl">IVA comissió</span>
+              <span class="r-val" id="ivaCom">—</span>
+            </div>
+            <div class="res-cell">
+              <span class="r-lbl">Retenció IRPF</span>
+              <span class="r-val" id="retencioCom">—</span>
+            </div>
+          </div>
+          <div class="rg-row rg-row-2">
+            <div class="res-cell cell-total">
+              <span class="r-lbl">Total IVA inclòs</span>
+              <span class="r-val" id="totComIva">—</span>
+            </div>
+            <div class="res-cell cell-total">
+              <span class="r-lbl">Total líquid</span>
+              <span class="r-val" id="totComLiquid">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLESSED -->
+  <div class="card card-section">
+    <div class="ch"><div class="dot"></div><span>Blessed</span></div>
+    <div class="sec-body">
+      <div class="col-pct">
+        <label>% Blessed</label>
+        <div class="pct-calc"><span id="pctBle">40</span><span class="sym">%</span></div>
+      </div>
+      <div class="col-res">
+        <div class="res-top">
+          <div class="res-cell">
+            <span class="r-lbl" id="lbl-totBle">Total Blessed</span>
+            <span class="r-val" id="totBle">—</span>
+          </div>
+          <div class="res-cell">
+            <span class="r-lbl" id="lbl-ivaBle">IVA</span>
+            <span class="r-val" id="ivaBle">—</span>
+          </div>
+        </div>
+        <div class="res-top" id="row-ble-noaut" style="display:none;">
+          <div class="res-cell" style="grid-column:1/-1;">
+            <span class="r-lbl" id="lbl-totBleNoAut">Total Blessed</span>
+            <span class="r-val" id="totBleNoAut">—</span>
+          </div>
+        </div>
+        <div class="res-iva">
+          <span class="r-lbl" id="lbl-totBleIva">Total Blessed IVA inclòs</span>
+          <span class="r-val" id="totBleIva">—</span>
+        </div>
+        <!-- E: elements auxiliars ocults (usats per calc interna) -->
+        <div id="ble-ja-cobrat" style="display:none;"></div>
+        <div id="row-ble-avui" style="display:none;"><span id="lbl-ble-avui"></span><span id="bleAvui"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAVAR DADES (obre pantalla fotos) -->
+  <button id="btn-enviar" style="display:none;" onclick="goToFotos()">
+    📷 Fotos
+  </button>
+
+</main>
+
+<div id="loading"><div class="spinner"></div><p id="loading-msg">Carregant...</p></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ⚠️ TEST_MODE: automàtic al port 8446 (staging), o manual via localStorage
+const TEST_MODE = window.location.port === '8446' || location.hostname.includes('staging') || localStorage.getItem('blessed_test_mode') === '1';
+const SUPA_URL = TEST_MODE
+  ? 'https://ntwgegpdnntcwezyafqq.supabase.co'
+  : 'https://zyndhsocnkzbnnlwshug.supabase.co';
+const SUPA_KEY = TEST_MODE
+  ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50d2dlZ3Bkbm50Y3dlenlhZnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczODY3NjgsImV4cCI6MjA5Mjk2Mjc2OH0.qK9_A1tedSLLZxNadPggF3prmThnsIbwt27suMVn8Sw'
+  : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5bmRoc29jbmt6Ym5ubHdzaHVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzMyNDcsImV4cCI6MjA5MTE0OTI0N30.wco-pbB7W_WRjECf6sBQsMtQ-NbVkamuF6HCkA67ZY0';
+// Punt 8: tornada automàtica a l'App Client (check-in) després de gravar/editar,
+// només quan la sessió ha vingut del botó+PIN de l'App Client (dispositiu iPad compartit)
+const CLIENT_URL = TEST_MODE
+  ? 'https://jlpdespatx.myqnapcloud.com:8446/client/'
+  : 'https://blessed-checkin.puyaltoworks.workers.dev/';
+
+// ── QNAP Media Storage ──────────────────────────────────────────────────────
+const QNAP_URL    = 'https://jlpdespatx.myqnapcloud.com:8444';
+
+async function uploadMedia(blobOrFile, folder, isVideo) {
+  const fd = new FormData();
+  fd.append('file', blobOrFile, isVideo ? 'video.mp4' : 'foto.jpg');
+  const r = await fetch(`${QNAP_URL}/api/upload?folder=${encodeURIComponent(folder)}`, {
+    method: 'POST', headers: { 'Authorization': `Bearer ${state.mediaToken}` }, body: fd
+  });
+  if (!r.ok) { const t = await r.text(); throw new Error('Error upload: ' + t); }
+  const j = await r.json();
+  return { url: QNAP_URL + j.url, path: j.path };
+}
+
+const hdrs = (extra = {}) => ({
+  'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`,
+  'Content-Type': 'application/json', ...extra
+});
+
+async function apiFetch(url, opts = {}) {
+  const res = await fetch(url, opts);
+  let body = null;
+  try { body = await res.json(); } catch(_) {}
+  if (!res.ok) throw new Error(body?.message || body?.error || `Error ${res.status}`);
+  return body;
+}
+
+// ── State ────────────────────────────────────────────────────────────────
+let state = {
+  tatuador: null,
+  email: null,
+  esAutonom: false,
+  esPropietari: false,
+  isAdmin: false,        // Punt 5: visibilitat de dades (veure tot vs veure només el propi) — NO barrejar amb esPropietari
+  viaClientPin: false,   // Punt 8: true si la sessió ha vingut del botó+PIN de l'App Client (iPad compartit)
+  editingDiariId: null,  // Punt 7: si no és null, s'està editant un tatuatge ja gravat (PATCH en lloc d'INSERT)
+  editingDiariData: null,
+  pctComtatSi: 60,
+  pctComtatNo: 60,
+  pctDiferitSi: 60,
+  pctDiferitNo: 60,
+  externs: [],          // [{id, nom, pct, es_autonom}]
+  comExtAutonom: false,
+  mediaToken: null,      // Punt seguretat: token de sessió (create_tatuador_session), no el PIN — usat per pujar/esborrar fotos
+  feina: 'No',
+  token: null,
+  citaId: null,         // B: id de la cita per marcar-la completada
+  client: { telefon: null, nom: null, cognom: null },
+  cita: null,
+  deposit: { import: 0, cobrat: false },
+  bon: { id: null, codi: null, import: 0 },
+  aplicarDeposit: true, // E: el client ha triat aplicar el dipòsit avui
+  aplicarBon: true,     // E: el client ha triat aplicar el bon avui
+  esMenor: false,
+  alertaMedica: [],
+  fotos: []
+};
+
+let pinBuffer = '';
+let pinsMap = {};
+
+// ── Biometria ────────────────────────────────────────────────────────────
+const bio = {
+  LS_ID: 'tat:bio_id', LS_NOM: 'tat:bio_nom',
+  isAvailable: async () => {
+    try { return !!(await window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable()); }
+    catch { return false; }
+  },
+  register: async (nom) => {
+    const ch = new Uint8Array(32); crypto.getRandomValues(ch);
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: ch,
+      rp: { name: 'Blessed Art Tattoo BCN', id: location.hostname },
+      user: { id: new TextEncoder().encode('tat_' + nom), name: nom, displayName: nom },
+      pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
+      timeout: 60000
+    }});
+    const id = btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
+    localStorage.setItem(bio.LS_ID, id);
+    localStorage.setItem(bio.LS_NOM, nom);
+    return id;
+  },
+  authenticate: async () => {
+    const id = localStorage.getItem(bio.LS_ID);
+    if (!id) throw new Error('No credential');
+    const ch = new Uint8Array(32); crypto.getRandomValues(ch);
+    const idBytes = Uint8Array.from(atob(id), c => c.charCodeAt(0));
+    await navigator.credentials.get({ publicKey: {
+      challenge: ch,
+      allowCredentials: [{ id: idBytes, type: 'public-key' }],
+      userVerification: 'required', timeout: 60000
+    }});
+    return localStorage.getItem(bio.LS_NOM);
+  }
+};
+
+// ── Compressió imatge ────────────────────────────────────────────────────
+async function compressImg(file) {
+  return new Promise(res => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1400;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) { const r = Math.min(max/w, max/h); w = Math.round(w*r); h = Math.round(h*r); }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => res(b || file), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+    img.src = url;
+  });
+}
+
+// ── Fotos overlay ────────────────────────────────────────────────────────
+function goToFotos() {
+  // Punt 7: editant un tatuatge ja gravat, no calen fotos noves — desa directament
+  if (state.editingDiariId) { desaEdicioTattoo(); return; }
+  document.getElementById('overlay-fotos').style.display = 'flex';
+}
+
+function _obrirCameraDinamica(callback) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*,video/*';
+  inp.setAttribute('capture', 'environment');
+  inp.style.position = 'fixed';
+  inp.style.top = '-9999px';
+  inp.style.opacity = '0';
+  document.body.appendChild(inp);
+  inp.onchange = function() {
+    if (inp.files && inp.files.length) callback(inp.files);
+    document.body.removeChild(inp);
+  };
+  inp.click();
+}
+function obrirCameraOverlay() { _obrirCameraDinamica(handleFotosOverlay); }
+function obrirCameraHistorial() { _obrirCameraDinamica(addFotoHistorial); }
+
+function backToForm() {
+  document.getElementById('overlay-fotos').style.display = 'none';
+}
+
+async function handleFotosOverlay(files) {
+  if (!files || !files.length) return;
+  showLoading('Pujant arxiu...');
+  const folder = (state.client.telefon || 'walkin').replace(/\D/g, '');
+  for (const file of Array.from(files)) {
+    const isVideo = file.type.startsWith('video/');
+    try {
+      const blob = isVideo ? file : await compressImg(file);
+      const { url, path } = await uploadMedia(blob, folder, isVideo);
+      state.fotos.push({ url, path, isVideo: !!isVideo });
+      const grid = document.getElementById('fotos-ov-grid');
+      const idx = state.fotos.length - 1;
+      const div = document.createElement('div');
+      div.className = 'foto-thumb'; div.dataset.idx = idx;
+      if (isVideo) {
+        div.innerHTML = `<video src="${url}" muted playsinline preload="metadata"></video><span class="video-badge">▶ vídeo</span><button class="foto-del" onclick="delFotoOverlay(${idx})">✕</button>`;
+      } else {
+        div.innerHTML = `<img src="${url}"><button class="foto-del" onclick="delFotoOverlay(${idx})">✕</button>`;
+      }
+      grid.appendChild(div);
+    } catch(e) { showToast('Error: ' + e.message, 'err'); }
+  }
+  hideLoading();
+  updateFotosOverlay();
+  saveSession();
+  const ic = document.getElementById('inp-fotos-camera');
+  if (ic) ic.value = '';
+  const ig = document.getElementById('inp-fotos-galeria');
+  if (ig) ig.value = '';
+}
+
+function delFotoOverlay(idx) {
+  state.fotos[idx] = null;
+  const t = document.querySelector(`#fotos-ov-grid .foto-thumb[data-idx="${idx}"]`);
+  if (t) t.remove();
+  updateFotosOverlay();
+  saveSession();
+}
+
+function updateFotosOverlay() {
+  const n = state.fotos.filter(Boolean).length;
+  const empty = document.getElementById('fotos-ov-empty');
+  const btn   = document.getElementById('btn-gravar-tattoo');
+  const count = document.getElementById('fotos-ov-count');
+  empty.style.display = n > 0 ? 'none' : 'block';
+  btn.style.display   = n > 0 ? 'block' : 'none';
+  count.textContent   = n > 0 ? `${n} arxiu${n > 1 ? 's' : ''}` : '';
+}
+
+// ── Utils ────────────────────────────────────────────────────────────────
+function showLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg || 'Carregant...';
+  document.getElementById('loading').classList.add('show');
+}
+function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+function showToast(msg, type = '', ms = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', ms);
+}
+
+const APP_VER="2.15.4", APP_DATE="2026-07-19";
+const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
+const fmtNum = v => v.toFixed(2).replace('.', ',');
+
+function syncW(el) {
+  const v = el.value || el.placeholder || '0';
+  el.style.width = Math.max(v.length, 1) + 'ch';
+}
+function syncAllW() { document.querySelectorAll('.wrap input').forEach(syncW); }
+
+// ── Càlcul econòmic (calcat exactament de la funció useCalc de l'App Blessed) ──
+// Punt: unifica el que es mostra en pantalla i el que es desa a la BD (buildDiariRow),
+// perquè mai més puguin divergir entre ells ni respecte l'App Blessed.
+function calcEconomia(preu, pctTatBase, pctCom, esAutonom, cobrament) {
+  const percIVA  = cobrament === 'Comptat' ? 0 : 0.21; // Comptat = sense IVA declarat, com App Blessed
+  const preuBase = percIVA > 0 ? preu / (1 + percIVA) : preu;
+  const iva      = preu - preuBase;
+  const tatEff   = pctTatBase - pctCom / 2;
+  const bleEff   = 100 - pctTatBase - pctCom / 2;
+  const esComptat = cobrament === 'Comptat';
+  let totalTat, totalCom, totalBlessed, totBlessedIva, retBle, aRepartir;
+  if (esComptat) {
+    // COMPTAT: percentatges sobre el preu total (IVA inclòs, que és 0 aquí)
+    totalTat = preu * tatEff / 100;
+    totalCom = preu * pctCom / 100;
+    totalBlessed = preu - totalTat - totalCom;
+    totBlessedIva = totalBlessed;
+    retBle = 0; aRepartir = preu;
+  } else if (!esAutonom) {
+    // DIFERIT + NO AUTÒNOM: retenció 20% Blessed, repartiment sobre el 80% restant
+    totalCom = preuBase * pctCom / 100;
+    retBle = preuBase * 0.20;
+    aRepartir = preuBase * 0.80;
+    totalTat = aRepartir * tatEff / 100;
+    totalBlessed = aRepartir * bleEff / 100;
+    totBlessedIva = preu - totalTat - totalCom;
+  } else {
+    // DIFERIT + AUTÒNOM: percentatges sobre la base, sense retenció prèvia
+    totalCom = preuBase * pctCom / 100;
+    retBle = 0; aRepartir = preuBase;
+    totalTat = preuBase * tatEff / 100;
+    totalBlessed = preuBase * bleEff / 100;
+    totBlessedIva = totalBlessed + iva;
+  }
+  // IVA sempre proporcional; IRPF únicament si autònom
+  const ivaTatuador  = totalTat * 0.21;
+  const irpfPct      = esAutonom ? 15 : 0;
+  const irpfImport   = esAutonom ? totalTat * 0.15 : 0;
+  const totalTatBrut = totalTat + ivaTatuador;
+  const totalTatNet  = totalTatBrut - irpfImport;
+  return { preuBase, iva, tatEff, bleEff, percBlessed: bleEff, totalTat, totalCom, totalBlessed,
+    totBlessedIva, retBle, aRepartir, esComptat, irpfPct, ivaTatuador, irpfImport, totalTatBrut, totalTatNet };
+}
+
+// ── Calculator ───────────────────────────────────────────────────────────
+function calcClearAll() {
+  document.getElementById('base').value        = '';
+  document.getElementById('ivaTotal').value    = '';
+  document.getElementById('retBleGen').value   = '';
+  document.getElementById('aRepartirGen').value = '';
+  ['totTat','ivaTat','totTatIva','totTatLiquid','retencioTat','totCom','ivaCom','totComIva','totComLiquid','retencioCom','totBle','ivaBle','totBleIva','totBleNoAut']
+    .forEach(id => { const el=document.getElementById(id); if(el){el.textContent='—'; el.classList.remove('negative'); el.style.color='';} });
+  document.getElementById('lbl-totBle').textContent     = 'Total Blessed';
+  document.getElementById('lbl-ivaBle').textContent     = 'IVA';
+  document.getElementById('lbl-totBleIva').textContent  = 'Total Blessed IVA inclòs';
+  document.getElementById('lbl-totTatLiquid').textContent = 'Total líquid';
+  document.getElementById('row-ble-noaut').style.display = 'none';
+  syncAllW();
+}
+
+function calc() {
+  const preu       = parseFloat(document.getElementById('preu').value)       || 0;
+  const pctTatBase = parseFloat(document.getElementById('pctTatBase').value) || 0;
+  const pctCom     = parseFloat(document.getElementById('pctCom').value)     || 0;
+  const cobVal     = document.getElementById('sel-cobrament').value;
+
+  if (!cobVal) { calcClearAll(); return; }
+
+  const c = calcEconomia(preu, pctTatBase, pctCom, state.esAutonom, cobVal);
+
+  const fmtPct = v => (v % 1 === 0 ? v : parseFloat(v.toFixed(1))).toString();
+  document.getElementById('pctTatEff').textContent = fmtPct(c.tatEff);
+  document.getElementById('pctBle').textContent    = fmtPct(c.bleEff);
+
+  if (preu > 0) {
+    document.getElementById('base').value     = fmtNum(c.preuBase);
+    document.getElementById('ivaTotal').value = fmtNum(c.iva);
+
+    const setNeg = (id, val) => {
+      const el = document.getElementById(id);
+      if (val > 0) { el.textContent = '−' + fmt(val); el.classList.add('negative'); }
+      else         { el.textContent = '—';             el.classList.remove('negative'); }
+    };
+
+    const esComptat = cobVal === 'Comptat';
+
+    if (!state.esAutonom) {
+      // ── Mode No Autònom ──────────────────────────────────────────────────
+      // Camps generals (només rellevants quan NO és comptat — al comptat no hi ha retenció/repartiment)
+      document.getElementById('retBleGen').value    = esComptat ? '' : fmtNum(c.retBle);
+      document.getElementById('aRepartirGen').value = esComptat ? '' : fmtNum(c.aRepartir);
+
+      // Tatuador: únicament Total Tatuador
+      document.getElementById('lbl-retencio-tat').textContent = 'Retenció IRPF';
+      ['totTat','ivaTat','retencioTat','totTatIva'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = '—'; el.classList.remove('negative'); el.style.color = '';
+      });
+      document.getElementById('lbl-totTatLiquid').textContent = 'Total Tatuador';
+      document.getElementById('totTatLiquid').textContent = fmt(c.totalTat);
+
+      // Comissió externa (si n'hi ha)
+      if (pctCom > 0) {
+        const ivaComV = state.comExtAutonom ? c.totalCom * 0.21 : 0;
+        const retComV = state.comExtAutonom ? c.totalCom * 0.15 : c.totalCom * 0.20;
+        const totIVACom = c.totalCom + ivaComV;
+        const liqCom = totIVACom - retComV;
+        document.getElementById('totCom').textContent       = fmt(c.totalCom);
+        document.getElementById('ivaCom').textContent       = state.comExtAutonom ? fmt(ivaComV) : '—';
+        document.getElementById('totComIva').textContent    = fmt(totIVACom);
+        document.getElementById('totComLiquid').textContent = fmt(liqCom);
+        setNeg('retencioCom', retComV);
+      } else {
+        ['totCom','ivaCom','retencioCom','totComIva','totComLiquid'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.textContent = '—'; el.classList.remove('negative'); }
+        });
+      }
+
+      if (esComptat) {
+        document.getElementById('lbl-totBle').textContent    = 'Total Blessed';
+        document.getElementById('lbl-ivaBle').textContent    = 'IVA';
+        document.getElementById('lbl-totBleIva').textContent = 'Total líquid Blessed';
+        document.getElementById('totBle').textContent    = '—';
+        document.getElementById('ivaBle').textContent    = '—';
+        document.getElementById('totBleIva').textContent = fmt(c.totalBlessed);
+        ['totBle','ivaBle','totBleIva'].forEach(id => {
+          document.getElementById(id).classList.remove('negative');
+          document.getElementById(id).style.color = '';
+        });
+        document.getElementById('row-ble-noaut').style.display = 'none';
+
+      } else {
+        document.getElementById('lbl-totBle').textContent    = 'Retenció Blessed';
+        document.getElementById('lbl-ivaBle').textContent    = 'IVA tatuatge';
+        document.getElementById('lbl-totBleIva').textContent = 'Total líquid Blessed';
+        document.getElementById('totBle').textContent    = fmt(c.retBle);
+        document.getElementById('ivaBle').textContent    = fmt(c.iva);
+        document.getElementById('totBleIva').textContent = fmt(c.totBlessedIva);
+        ['totBle','ivaBle','totBleIva'].forEach(id => {
+          document.getElementById(id).classList.remove('negative');
+          document.getElementById(id).style.color = '';
+        });
+        document.getElementById('row-ble-noaut').style.display = '';
+        document.getElementById('lbl-totBleNoAut').textContent = 'Total Blessed';
+        document.getElementById('totBleNoAut').textContent = fmt(c.totalBlessed);
+        document.getElementById('totBleNoAut').classList.remove('negative');
+      }
+
+    } else {
+      // ── Mode Autònom ───────────────────────────────────────────────────────
+      document.getElementById('lbl-totTatLiquid').textContent = 'Total líquid';
+      document.getElementById('row-ble-noaut').style.display = 'none';
+
+      // Tatuador
+      if (esComptat) {
+        document.getElementById('lbl-retencio-tat').textContent = 'Retenció IRPF';
+        document.getElementById('totTat').textContent       = '—';
+        document.getElementById('ivaTat').textContent       = '—';
+        document.getElementById('totTatIva').textContent    = '—';
+        document.getElementById('totTatLiquid').textContent = fmt(c.totalTat);
+        const elRet = document.getElementById('retencioTat');
+        elRet.textContent = '—'; elRet.classList.remove('negative');
+      } else {
+        document.getElementById('lbl-retencio-tat').textContent = 'Retenció IRPF (15%)';
+        document.getElementById('totTat').textContent        = fmt(c.totalTat);
+        document.getElementById('ivaTat').textContent        = fmt(c.ivaTatuador);
+        document.getElementById('totTatIva').textContent     = fmt(c.totalTatBrut);
+        document.getElementById('totTatLiquid').textContent  = fmt(c.totalTatNet);
+        setNeg('retencioTat', c.irpfImport);
+      }
+
+      // Comissió externa
+      if (esComptat) {
+        document.getElementById('totCom').textContent       = '—';
+        document.getElementById('ivaCom').textContent       = '—';
+        document.getElementById('totComIva').textContent    = '—';
+        document.getElementById('totComLiquid').textContent = pctCom > 0 ? fmt(c.totalCom) : '—';
+        const elRetC = document.getElementById('retencioCom');
+        elRetC.textContent = '—'; elRetC.classList.remove('negative');
+      } else {
+        const ivaComV      = state.comExtAutonom ? c.totalCom * 0.21 : 0;
+        const retencioComV = state.comExtAutonom ? c.totalCom * 0.15 : (c.totalCom > 0 ? c.totalCom * 0.20 : 0);
+        const totIVACom    = c.totalCom + ivaComV;
+        const liqCom       = totIVACom - retencioComV;
+        document.getElementById('totCom').textContent        = fmt(c.totalCom);
+        document.getElementById('ivaCom').textContent        = state.comExtAutonom ? fmt(ivaComV) : '—';
+        document.getElementById('totComIva').textContent     = fmt(totIVACom);
+        document.getElementById('totComLiquid').textContent  = c.totalCom > 0 ? fmt(liqCom) : '—';
+        setNeg('retencioCom', retencioComV);
+      }
+
+      // Blessed (autònom, amb suport descomptes dipòsit/bon)
+      const depDescE   = (state.deposit && state.deposit.cobrat && state.aplicarDeposit !== false) ? (state.deposit.import || 0) : 0;
+      const bonDescE   = (state.bon && state.bon.codi && state.aplicarBon !== false) ? (state.bon.import || 0) : 0;
+      const totalDescE = depDescE + bonDescE;
+      const elTotBle    = document.getElementById('totBle');
+      const elIvaBle    = document.getElementById('ivaBle');
+      const elTotBleIva = document.getElementById('totBleIva');
+      const lblTotBle   = document.getElementById('lbl-totBle');
+      const lblIvaBle   = document.getElementById('lbl-ivaBle');
+      const lblTotBleIva = document.getElementById('lbl-totBleIva');
+
+      if (totalDescE > 0) {
+        const sessTotal = preu * c.bleEff / 100;
+        const avuiTotal = sessTotal - totalDescE;
+        lblTotBle.textContent = 'Total sessió';
+        elTotBle.textContent  = fmt(sessTotal);
+        elTotBle.classList.remove('negative'); elTotBle.style.color = '';
+        const descLbl = [depDescE > 0 ? `Dip. ${fmt(depDescE)}` : '', bonDescE > 0 ? `Bon ${fmt(bonDescE)}` : ''].filter(Boolean).join(' + ');
+        lblIvaBle.textContent = descLbl || 'Descompte';
+        elIvaBle.textContent  = '−' + fmt(totalDescE);
+        elIvaBle.classList.remove('negative'); elIvaBle.style.color = '#b45309';
+        if (avuiTotal >= 0) {
+          lblTotBleIva.textContent = 'A cobrar avui ✓';
+          elTotBleIva.textContent  = fmt(avuiTotal);
+          elTotBleIva.classList.remove('negative'); elTotBleIva.style.color = '#22c55e';
+        } else {
+          lblTotBleIva.textContent = '⚠️ A cobrar avui';
+          elTotBleIva.textContent  = '−' + fmt(-avuiTotal);
+          elTotBleIva.classList.add('negative'); elTotBleIva.style.color = '';
+        }
+      } else {
+        lblTotBle.textContent    = 'Total Blessed';
+        lblIvaBle.textContent    = 'IVA';
+        lblTotBleIva.textContent = 'Total Blessed IVA inclòs';
+        elIvaBle.style.color = ''; elTotBle.style.color = ''; elTotBleIva.style.color = '';
+        elTotBleIva.classList.remove('negative');
+        if (esComptat) {
+          elTotBle.textContent = '—'; elIvaBle.textContent = '—';
+          elTotBleIva.textContent = fmt(c.totalBlessed);
+        } else {
+          elTotBle.textContent    = fmt(c.totalBlessed);
+          elIvaBle.textContent    = fmt(c.iva);
+          elTotBleIva.textContent = fmt(c.totBlessedIva);
+        }
+        elTotBle.classList.remove('negative'); elIvaBle.classList.remove('negative');
+      }
+    }
+  } else { calcClearAll(); }
+
+  // ── Net a cobrar avui ────────────────────────────────────────────────────
+  const depDesc = (state.deposit && state.deposit.cobrat && state.aplicarDeposit !== false) ? (state.deposit.import || 0) : 0;
+  const bonDesc = (state.bon && state.bon.codi && state.aplicarBon !== false) ? (state.bon.import || 0) : 0;
+  const rowNet  = document.getElementById('row-net');
+  if ((depDesc > 0 || bonDesc > 0) && preu > 0) {
+    const net = Math.max(0, preu - depDesc - bonDesc);
+    const parts = [];
+    if (depDesc > 0) parts.push(`dipòsit −${fmt(depDesc)}`);
+    if (bonDesc > 0) parts.push(`bon −${fmt(bonDesc)}`);
+    document.getElementById('lbl-net').textContent = 'Net a cobrar (' + parts.join(', ') + ')';
+    document.getElementById('netCobrar').value     = fmtNum(net);
+    rowNet.style.display = '';
+  } else { rowNet.style.display = 'none'; }
+
+  syncAllW();
+}
+
+document.getElementById('pctTatBase').addEventListener('input', calc);
+document.getElementById('pctCom').addEventListener('input', calc);
+document.getElementById('preu').addEventListener('input', () => { calc(); saveSession(); });
+document.addEventListener('keydown',    e => { if (e.key === 'Enter') document.activeElement.blur(); });
+document.addEventListener('keyup',      e => { if (e.key === 'Enter') document.activeElement.blur(); });
+document.addEventListener('touchstart', e => { if (!e.target.closest('input, select')) document.activeElement.blur(); }, { passive: true });
+
+calc(); syncAllW();
+document.getElementById('app-ver-pin').textContent = 'v' + APP_VER + ' · ' + APP_DATE;
+(function(){var isTest=localStorage.getItem('blessed_test_mode')==='1';var btn=document.getElementById('btn-test-mode');if(btn)btn.textContent=isTest?'🧪 Mode proves: ✅ ON (clic per desactivar)':'🧪 Mode proves: ⭕ OFF (clic per activar)';})();
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function getPctBase() {
+  const esComptat = document.getElementById('sel-cobrament').value === 'Comptat';
+  const esFeina   = state.feina === 'Sí';
+  if (esComptat) return esFeina ? (state.pctComtatSi  || 60) : (state.pctComtatNo  || 60);
+  return             esFeina ? (state.pctDiferitSi || 60) : (state.pctDiferitNo || 60);
+}
+
+// ── Feina toggle ────────────────────────────────────────────────────────
+function setFeina(val) {
+  state.feina = val;
+  document.getElementById('tog-si').className = 'tog' + (val === 'Sí' ? ' active-si' : '');
+  document.getElementById('tog-no').className = 'tog' + (val === 'No' ? ' active-no' : '');
+  document.getElementById('pctTatBase').value = getPctBase();
+  calc();
+}
+
+// ── Canvi cobrament ──────────────────────────────────────────────────────
+function onCobramentChange() {
+  const val = document.getElementById('sel-cobrament').value;
+  if (!val) {
+    document.getElementById('pctTatBase').value = '';
+    calc();
+    saveSession();
+    return;
+  }
+  document.getElementById('pctTatBase').value = getPctBase();
+  calc();
+  saveSession();
+}
+// Fix iOS Safari: addEventListener és més fiable que onchange inline
+document.getElementById('sel-cobrament').addEventListener('change', onCobramentChange);
+document.getElementById('sel-cobrament').addEventListener('blur',   onCobramentChange);
+
+// ── PIN ──────────────────────────────────────────────────────────────────
+async function initPin() {
+  try {
+    const data = await apiFetch(`${SUPA_URL}/rest/v1/opcions?id=eq.pins_tatuadors&select=valors`, { headers: hdrs() });
+    pinsMap = data?.[0]?.valors || {};
+  } catch(e) {
+    pinsMap = null;
+  }
+  const storedNom = localStorage.getItem(bio.LS_NOM);
+  const storedId  = localStorage.getItem(bio.LS_ID);
+  if (storedNom && storedId) {
+    document.getElementById('bio-nom-lbl').textContent = storedNom;
+    document.getElementById('btn-bio').style.display = 'flex';
+  }
+}
+
+function pinKey(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  updatePinDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 100);
+}
+
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+  document.getElementById('pin-err').textContent = '';
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+async function fetchDadesUsuari(nom) {
+  try {
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/allowed_users?nom=eq.${encodeURIComponent(nom)}&select=email,es_autonom,pct_comptat_si,pct_comptat_no,pct_diferit_si,pct_diferit_no,is_admin`,
+      { headers: hdrs() }
+    );
+    const u = data?.[0];
+    state.email        = u?.email         || null;
+    state.esAutonom    = u?.es_autonom    || false;
+    state.pctComtatSi  = u?.pct_comptat_si  ?? 60;
+    state.pctComtatNo  = u?.pct_comptat_no  ?? 60;
+    state.pctDiferitSi = u?.pct_diferit_si ?? 60;
+    state.pctDiferitNo = u?.pct_diferit_no ?? 60;
+    // is_admin controla NOMÉS la visibilitat de dades (pantalla "sala d'espera"),
+    // no s'ha de barrejar amb esPropietari (que ara només és una etiqueta de rol al
+    // header — l'economia es calcula igual que per a qualsevol altre tatuador, com a l'App Blessed).
+    state.isAdmin      = u?.is_admin      || false;
+  } catch(_) {
+    state.email        = null;
+    state.esAutonom    = false;
+    state.pctComtatSi  = 60;
+    state.pctComtatNo  = 60;
+    state.pctDiferitSi = 60;
+    state.pctDiferitNo = 60;
+    state.isAdmin      = false;
+  }
+}
+
+async function fetchExterns() {
+  try {
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/collaboradors_externs?actiu=eq.true&order=nom.asc&select=id,nom,pct,es_autonom`,
+      { headers: hdrs() }
+    );
+    state.externs = data || [];
+  } catch(_) {
+    state.externs = [];
+  }
+  populateExternsSelect();
+}
+
+function populateExternsSelect() {
+  const sel = document.getElementById('sel-com-ext');
+  // Conserva selecció actual si existeix
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">—</option>';
+  state.externs.forEach(ext => {
+    const opt = document.createElement('option');
+    opt.value    = String(ext.id);
+    opt.dataset.pct    = ext.pct;
+    opt.dataset.autonom = ext.es_autonom ? '1' : '0';
+    opt.textContent = `${ext.nom} (${ext.pct}%)${ext.es_autonom ? ' · Autònom' : ''}`;
+    sel.appendChild(opt);
+  });
+  // Restaura selecció si segueix existint
+  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+  else { sel.value = ''; onComExtChange(); }
+}
+
+function onComExtChange() {
+  const sel = document.getElementById('sel-com-ext');
+  const hiHaExtern = !!sel.value;
+  // Bloqueig Feina Sí quan hi ha comissió externa
+  const togSi = document.getElementById('tog-si');
+  if (hiHaExtern) {
+    if (state.feina === 'Sí') setFeina('No');
+    togSi.disabled = true;
+    togSi.style.opacity = '0.35';
+    togSi.style.cursor = 'not-allowed';
+    togSi.title = 'No disponible amb comissió externa';
+  } else {
+    togSi.disabled = false;
+    togSi.style.opacity = '';
+    togSi.style.cursor = '';
+    togSi.title = '';
+  }
+  const opt = sel.options[sel.selectedIndex];
+  if (!sel.value) {
+    document.getElementById('pctCom').value = '0';
+    document.getElementById('lbl-pct-com').textContent = '0';
+    document.getElementById('lbl-pct-com-big').textContent = '0';
+    state.comExtAutonom = false;
+  } else {
+    const pct = opt.dataset.pct || '0';
+    document.getElementById('pctCom').value = pct;
+    document.getElementById('lbl-pct-com').textContent = pct;
+    document.getElementById('lbl-pct-com-big').textContent = pct;
+    state.comExtAutonom = opt.dataset.autonom === '1';
+  }
+  // Mostrar/ocultar resultats de comissió
+  document.getElementById('com-ext-body').style.display = hiHaExtern ? '' : 'none';
+  calc();
+}
+
+async function checkPin() {
+  if (pinsMap === null) {
+    document.getElementById('pin-err').textContent = 'Error de connexió. Reintenta en uns segons.';
+    pinBuffer = '';
+    updatePinDots();
+    return;
+  }
+  // Comparació directa del PIN de 4 dígits
+  const matchNom = Object.entries(pinsMap).find(([, pin]) => String(pin) === pinBuffer)?.[0] || null;
+  if (matchNom) {
+    state.tatuador = matchNom;
+    // Punt seguretat: el PIN es torna a validar AL SERVIDOR (no només aquí al navegador),
+    // i es crea un token de sessió temporal (24h) que substitueix el secret fix per pujar/esborrar fotos.
+    try {
+      const sessData = await apiFetch(`${SUPA_URL}/rest/v1/rpc/create_tatuador_session`, {
+        method: 'POST', headers: hdrs(), body: JSON.stringify({ p_pin: pinBuffer })
+      });
+      state.mediaToken = sessData?.token || null;
+    } catch (_) { state.mediaToken = null; }
+    await fetchDadesUsuari(matchNom);
+    await fetchExterns();
+    onPinOk();
+  } else {
+    document.getElementById('pin-err').textContent = 'PIN incorrecte. Torna-ho a provar.';
+    pinBuffer = '';
+    updatePinDots();
+  }
+}
+
+function genPin() { return String(Math.floor(1000 + Math.random() * 9000)); }
+
+// ── Mailer helper (recuperació PIN via endpoint propi) ────────────────────
+async function sendEmail(mailerUrl, mailerKey, toEmail, toName, subject, message) {
+  if (!mailerUrl || !toEmail) return false;
+  const res = await fetch(`${mailerUrl}/api/send-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${mailerKey || ''}` },
+    body: JSON.stringify({ to: toEmail, toName: toName || toEmail.split('@')[0], subject, message })
+  });
+  if (!res.ok) { const e = await res.json().catch(() => ({})); console.warn('Mailer error:', e); return false; }
+  return true;
+}
+
+// ── Recuperació de PIN ────────────────────────────────────────────────────
+function showRecoverPin() {
+  document.getElementById('inp-recover-nom').value = '';
+  document.getElementById('recover-msg').textContent = '';
+  document.getElementById('recover-msg').style.color = '#999';
+  document.getElementById('btn-send-recovery').disabled = false;
+  document.getElementById('btn-send-recovery').textContent = 'Enviar PIN per correu';
+  document.getElementById('overlay-recover-pin').style.display = 'flex';
+}
+function hideRecoverPin() {
+  document.getElementById('overlay-recover-pin').style.display = 'none';
+}
+async function sendPinRecovery() {
+  const nom    = document.getElementById('inp-recover-nom').value.trim();
+  const msgEl  = document.getElementById('recover-msg');
+  const btn    = document.getElementById('btn-send-recovery');
+  msgEl.textContent = '';
+  if (!nom) {
+    msgEl.style.color = '#ef4444';
+    msgEl.textContent = 'Introdueix el teu nom.';
+    return;
+  }
+  if (!pinsMap) {
+    msgEl.style.color = '#ef4444';
+    msgEl.textContent = 'Error de connexió. Torna-ho a provar.';
+    return;
+  }
+  // Cerca insensible a majúscules
+  const nomKey = Object.keys(pinsMap).find(k => k.toLowerCase() === nom.toLowerCase());
+  if (!nomKey) {
+    msgEl.style.color = '#ef4444';
+    msgEl.textContent = 'Nom no trobat. Comprova l\'ortografia o contacta amb l\'administrador.';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Enviant...';
+  try {
+    const [users, opts] = await Promise.all([
+      apiFetch(`${SUPA_URL}/rest/v1/allowed_users?nom=eq.${encodeURIComponent(nomKey)}&select=nom,email`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/opcions?limit=1`, { headers: hdrs() })
+    ]);
+    const email     = users?.[0]?.email;
+    const mailerUrl = opts?.[0]?.mailer_url;
+    const mailerKey = opts?.[0]?.mailer_key || '';
+    if (!email) {
+      msgEl.style.color = '#ef4444';
+      msgEl.textContent = 'No hi ha email configurat per a aquest nom. Contacta amb l\'administrador.';
+      btn.disabled = false; btn.textContent = 'Enviar PIN per correu';
+      return;
+    }
+    if (!mailerUrl) {
+      msgEl.style.color = '#ef4444';
+      msgEl.textContent = 'Email no configurat al sistema. Contacta amb l\'administrador.';
+      btn.disabled = false; btn.textContent = 'Enviar PIN per correu';
+      return;
+    }
+    // Generar PIN nou i guardar a Supabase (text pla, 4 dígits)
+    const nouPin  = genPin();
+    const nouPinsMap = { ...pinsMap, [nomKey]: nouPin };
+    await fetch(`${SUPA_URL}/rest/v1/opcions?id=eq.pins_tatuadors`, {
+      method: 'PATCH',
+      headers: { ...hdrs(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ valors: nouPinsMap })
+    });
+    pinsMap = nouPinsMap;
+    const msg = `Hola ${nomKey},\n\nEl teu PIN d'accés a l'App Tatuador ha estat reiniciat.\n\nEl teu nou PIN és:\n\n${nouPin}\n\nGuarda'l en un lloc segur i no el comparteixis.\n\n─────────────────────────────────────────────\nBLESSED ART TATTOO BCN\nCarrer de Sardenya, 224, Eixample, 08013 Barcelona\nTel: 667 279 582\n─────────────────────────────────────────────\nAquest missatge ha estat generat automàticament.`;
+    await sendEmail(mailerUrl, mailerKey, email, nomKey, `PIN d'accés — App Tatuador`, msg);
+    msgEl.style.color = '#22c55e';
+    msgEl.textContent = `✓ PIN nou enviat a ${email}`;
+  } catch(e) {
+    msgEl.style.color = '#ef4444';
+    msgEl.textContent = 'Error en enviar el correu. Torna-ho a provar.';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Enviar PIN per correu';
+}
+
+function goToQR() {
+  document.getElementById('overlay-qr').style.display = 'flex';
+  loadClientsEnEspera();
+}
+
+// ── Sala d'espera visual (punt 6): pantalla d'inici post-login ────────────
+let _salaEsperaTokens = [];
+
+function goToSalaEspera() {
+  document.getElementById('overlay-sala-espera').style.display = 'flex';
+  loadSalaEspera();
+}
+
+let _salaEsperaFets = [];
+
+async function loadSalaEspera() {
+  const grid = document.getElementById('sala-espera-grid');
+  grid.innerHTML = '<div style="color:#666;text-align:center;padding:30px;">⏳ Carregant...</div>';
+  const fa7dies = new Date();
+  fa7dies.setDate(fa7dies.getDate() - 7);
+  fa7dies.setHours(0, 0, 0, 0);
+  // Punt 7: finestra de 3 dies (avui + 2 anteriors) per als tatuatges ja fets
+  const fa2dies = new Date();
+  fa2dies.setDate(fa2dies.getDate() - 2);
+  const dataMin = fa2dies.toISOString().slice(0, 10);
+  try {
+    const [tokens, optRows, userRows, fets] = await Promise.all([
+      apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?usat=eq.false&created_at=gte.${fa7dies.toISOString()}&order=created_at.asc&limit=100`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/opcions?id=eq.tatuadors_noms&select=valors`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/allowed_users?select=nom,email,foto_url`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/diari?data=gte.${dataMin}&deleted_at=is.null&order=created_at.desc&limit=200&select=id,data,created_at,tatuador,telefon,concepte,cobrament,preu`, { headers: hdrs() })
+    ]);
+    _salaEsperaTokens = tokens || [];
+    _salaEsperaFets = fets || [];
+    // Punt 11: la llista guarda EMAILS (identificador estable), no noms — evita que un canvi de nom o una
+    // errada tipogràfica trenqui l'emparellament amb allowed_users.
+    const tatuadorsEmailsActius = optRows?.[0]?.valors || [];
+    const fotoPerNom = {};
+    const nomPerEmail = {};
+    (userRows || []).forEach(u => { if (u.nom) { fotoPerNom[u.nom] = u.foto_url || null; if (u.email) nomPerEmail[u.email] = u.nom; } });
+    const tatuadorsActius = tatuadorsEmailsActius.map(email => nomPerEmail[email]).filter(Boolean);
+
+    const telefonsFets = [...new Set(_salaEsperaFets.map(f => f.telefon).filter(Boolean))];
+    const nomPerTelefon = {};
+    if (telefonsFets.length) {
+      const clientsRows = await apiFetch(
+        `${SUPA_URL}/rest/v1/clients?telefon=in.(${telefonsFets.map(t => encodeURIComponent(t)).join(',')})&select=telefon,nom,cognom`,
+        { headers: hdrs() }
+      ).catch(() => []);
+      (clientsRows || []).forEach(c => {
+        nomPerTelefon[c.telefon] = `${c.nom || ''} ${c.cognom || ''}`.trim();
+      });
+    }
+
+    // Admin: totes les columnes. Tatuador normal: només la seva.
+    const nomsAMostrar = state.isAdmin ? tatuadorsActius : [state.tatuador];
+
+    grid.innerHTML = '';
+    nomsAMostrar.forEach(nom => {
+      const card = document.createElement('div');
+      card.className = 'sala-tat-card';
+      const foto = fotoPerNom[nom];
+      const avatarHtml = foto
+        ? `<img class="sala-tat-photo" src="${foto}" alt="">`
+        : `<span class="sala-tat-photo-placeholder">🎨</span>`;
+
+      const meusIdx = _salaEsperaTokens
+        .map((t, i) => t.tatuador === nom ? i : -1)
+        .filter(i => i !== -1);
+
+      let clientsHtml;
+      if (!meusIdx.length) {
+        clientsHtml = `<div style="color:#555;font-size:12px;padding:8px 0;">Cap client en espera</div>`;
+      } else {
+        clientsHtml = meusIdx.map(i => {
+          const t = _salaEsperaTokens[i];
+          const hora = new Date(t.created_at).toLocaleTimeString('ca', { hour: '2-digit', minute: '2-digit' });
+          const nomComplet = `${t.client_nom || ''} ${t.client_cognom || ''}`.trim();
+          const nomClient = (nomComplet || t.client_telefon || 'Client').replace(/</g, '&lt;');
+          return `<div class="sala-client-row" onclick="registrarDesToken(_salaEsperaTokens[${i}])">🟢 ${nomClient} · ${hora}</div>`;
+        }).join('');
+      }
+
+      const fetsIdx = _salaEsperaFets
+        .map((f, i) => f.tatuador === nom ? i : -1)
+        .filter(i => i !== -1);
+
+      let fetsHtml = `<div class="sala-fets-title">✅ Fets (avui + 2 dies)</div>`;
+      if (!fetsIdx.length) {
+        fetsHtml += `<div style="color:#555;font-size:12px;padding:4px 0;">Cap tatuatge fet encara</div>`;
+      } else {
+        fetsHtml += fetsIdx.map(i => {
+          const f = _salaEsperaFets[i];
+          const dataLabel = new Date(f.data).toLocaleDateString('ca', { day: '2-digit', month: '2-digit' });
+          const nomClient = (nomPerTelefon[f.telefon] || f.telefon || 'Walk-in').replace(/</g, '&lt;');
+          return `<div class="sala-fet-row" onclick="editarTattooDesSala('${f.id}')"><span>${nomClient} · ${dataLabel}</span><span>${Number(f.preu).toFixed(0)}€</span></div>`;
+        }).join('');
+      }
+
+      card.innerHTML = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">${avatarHtml}<div style="font-weight:800;color:#c9a84c;font-size:14px;">${nom}</div></div><div>${clientsHtml}</div>${fetsHtml}`;
+      grid.appendChild(card);
+    });
+
+    if (!nomsAMostrar.length || !nomsAMostrar[0]) {
+      grid.innerHTML = '<div style="color:#666;text-align:center;">No hi ha tatuadors configurats</div>';
+    }
+  } catch(e) {
+    grid.innerHTML = `<div style="color:#ef4444;text-align:center;">Error: ${e.message}</div>`;
+  }
+}
+
+function adaptUIPerMode() {
+  const prop  = state.esPropietari;
+  const aut   = state.esAutonom;
+  // Punt: el propietari es tracta amb la mateixa fórmula econòmica que qualsevol
+  // altre tatuador (igual que ja fa l'App Blessed) — noAut ja no depèn de "prop".
+  const noAut = !aut;
+
+  // Interior tatuador: simplificar per no autònom
+  document.getElementById('tat-row-detall').style.display    = noAut ? 'none' : '';
+  document.getElementById('tat-cell-totaliva').style.display = noAut ? 'none' : '';
+  document.getElementById('tat-row-totals').style.gridTemplateColumns = noAut ? '1fr' : '';
+
+  // Fila Retenció Blessed + A repartir a Dades Generals (només No Autònom)
+  document.getElementById('row-noaut-generals').style.display = noAut ? '' : 'none';
+
+  // Subtítol header
+  document.getElementById('hdr-subtitle').textContent =
+    prop ? 'Propietari' : (aut ? 'Tatuador autònom' : 'Tatuador');
+}
+
+function onPinOk() {
+  state.esPropietari = (state.tatuador === 'Enric Puyalto');
+  document.getElementById('hdr-artist').textContent = state.tatuador;
+  document.getElementById('qr-logged-as').textContent = '👤 ' + state.tatuador;
+  document.getElementById('btn-historial').style.display = '';
+  document.getElementById('btn-historial-qr').style.display = '';
+  document.getElementById('btn-cites-qr').style.display = '';
+  // Badges autònom/no autònom
+  document.getElementById('badge-autonom').style.display    = state.esAutonom ? '' : 'none';
+  document.getElementById('badge-assalariat').style.display = state.esAutonom ? 'none' : '';
+  adaptUIPerMode();
+  // Inicialitza cobrament buit i feina=No per defecte
+  document.getElementById('sel-cobrament').value = '';
+  document.getElementById('pctTatBase').value = '';
+  setFeina('No');
+  calc();
+  const storedNom = localStorage.getItem(bio.LS_NOM);
+  if (storedNom !== state.tatuador) {
+    document.getElementById('pin-step').style.display = 'none';
+    document.getElementById('bio-step').style.display = 'flex';
+  } else {
+    document.getElementById('overlay-pin').style.display = 'none';
+    if (!checkSavedSession()) goToSalaEspera();
+  }
+}
+
+async function doBioAuth() {
+  try {
+    showLoading('Verificant identitat...');
+    const nom = await bio.authenticate();
+    hideLoading();
+    if (!nom) throw new Error('No nom');
+    state.tatuador = nom;
+    await fetchDadesUsuari(nom);
+    await fetchExterns();
+    onPinOk();
+  } catch(e) {
+    hideLoading();
+    // Diagnòstic temporal (punt biometria Android): mostrem l'error real en lloc d'amagar-lo,
+    // per saber si és un problema de certificat HTTPS, de navegador o de maquinari.
+    console.error('Biometria (auth) error:', e);
+    document.getElementById('pin-err').textContent = `Biometria no disponible — usa el PIN [${e.name||'Error'}: ${e.message||'?'}]`;
+    document.getElementById('btn-bio').style.display = 'none';
+    localStorage.removeItem(bio.LS_ID);
+    localStorage.removeItem(bio.LS_NOM);
+  }
+}
+
+async function doBioRegister() {
+  try {
+    showLoading('Configurant biometria...');
+    await bio.register(state.tatuador);
+    hideLoading();
+    showToast('✓ Biometria activada!', 'ok');
+    document.getElementById('bio-nom-lbl').textContent = state.tatuador;
+    document.getElementById('btn-bio').style.display = 'flex';
+  } catch(e) {
+    hideLoading();
+    // Diagnòstic temporal (punt biometria Android): mostrem l'error real en lloc d'amagar-lo,
+    // per saber si és un problema de certificat HTTPS, de navegador o de maquinari.
+    console.error('Biometria (register) error:', e);
+    showToast(`Biometria no disponible: ${e.name||'Error'} — ${e.message||'sense detall'}`, 'err', 8000);
+  }
+  document.getElementById('bio-step').style.display = 'none';
+  document.getElementById('overlay-pin').style.display = 'none';
+  goToSalaEspera();
+}
+
+function closeBioOffer() {
+  document.getElementById('bio-step').style.display = 'none';
+  document.getElementById('overlay-pin').style.display = 'none';
+  goToSalaEspera();
+}
+
+// ── QR Scanner en temps real ──────────────────────────────────────────────
+let _qrScanner = null;
+
+function startQRScanner() {
+  const reader = document.getElementById('qr-reader');
+  reader.innerHTML = '';
+  document.getElementById('btn-start-scan').style.display = 'none';
+  document.getElementById('btn-stop-scan').style.display = 'inline-block';
+  _qrScanner = new Html5Qrcode('qr-reader');
+  _qrScanner.start(
+    { facingMode: 'environment' },
+    { fps: 12, qrbox: { width: 220, height: 220 } },
+    (decodedText) => {
+      stopQRScanner();
+      lookupToken(decodedText.trim());
+    },
+    () => {}
+  ).catch(() => {
+    stopQRScanner();
+    showToast('No s\'ha pogut accedir a la càmera. Usa el token manual.', 'err');
+  });
+}
+
+function stopQRScanner() {
+  if (_qrScanner) {
+    _qrScanner.stop().catch(() => {});
+    _qrScanner = null;
+  }
+  const reader = document.getElementById('qr-reader');
+  reader.innerHTML = '';
+  document.getElementById('btn-start-scan').style.display = '';
+  document.getElementById('btn-stop-scan').style.display = 'none';
+}
+
+async function lookupToken(token) {
+  if (!token) { showToast('Introdueix un token vàlid', 'err'); return; }
+
+  // Distingim val de regal (BLS-XXXX-XXXX, mig=4 chars) de token sessió (BLS-XXXXXXXX-XXXX, mig=8 chars)
+  if (token.toUpperCase().startsWith('BLS-')) {
+    const parts = token.toUpperCase().split('-');
+    if (parts.length === 3 && parts[1].length === 4) {
+      lookupBon(token.toUpperCase());
+      return;
+    }
+    // Token de sessió: continua cap a cita_tokens
+  }
+
+  showLoading('Llegint token...');
+  try {
+    const rows = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?token=eq.${encodeURIComponent(token)}&select=*`,
+      { headers: hdrs() }
+    );
+    hideLoading();
+    if (!rows || rows.length === 0) {
+      showToast('Token no trobat o expirat', 'err'); return;
+    }
+    const t = rows[0];
+    if (t.usat) { showToast('⛔ Aquest QR ja ha estat gravat. No es pot reutilitzar.', 'err'); return; }
+    if (new Date(t.expires_at) < new Date()) { showToast('QR caducat (més de 8h)', 'err'); return; }
+
+    state.token   = token;
+    state.citaId  = t.cita_id || null;
+    state.client  = { telefon: t.client_telefon, nom: t.client_nom, cognom: t.client_cognom || null };
+    state.deposit       = { import: t.deposit_import || 0, cobrat: t.deposit_cobrat || false };
+    state.bon           = { id: t.bon_id, codi: t.bon_codi, import: t.bon_import || 0 };
+    state.aplicarDeposit = t.aplicar_deposit !== false;
+    state.aplicarBon     = t.aplicar_bon !== false;
+
+    const { esMenor, alertaMedica } = await loadConsentiments(t.client_telefon);
+    state.esMenor = esMenor;
+    state.alertaMedica = alertaMedica;
+
+    stopQRScanner();
+    document.getElementById('overlay-qr').style.display = 'none';
+    showClientBanner();
+    showExtras();
+  } catch(e) {
+    hideLoading();
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ── Cerca per telèfon ──────────────────────────────────────────────────────
+// Guardem el context per al botó "ja s'ha registrat"
+window._pendingLookup = null;
+
+async function buscarPerTelefon() {
+  const prefix = document.getElementById('sel-country').value;
+  const num = document.getElementById('inp-phone-search').value.trim().replace(/\s+/g, '');
+  const msgEl = document.getElementById('phone-search-msg');
+  msgEl.textContent = '';
+
+  if (!num || num.length < 6) {
+    msgEl.textContent = 'Introdueix un número de telèfon vàlid';
+    return;
+  }
+
+  // Generem variants: amb prefix, sense, o ja té prefix
+  const phones = [];
+  const full = prefix + num;
+  phones.push(full);                             // +34612345678
+  if (!num.startsWith(prefix)) phones.push(num); // 612345678
+
+  showLoading('Cercant client...');
+  const client = await loadClientByPhone(phones);
+  hideLoading();
+
+  if (!client) {
+    // Client no trobat → s'ha de registrar
+    window._pendingLookup = { type: 'phone', phone: full };
+    showMustRegister(
+      full,
+      '⚠️ Client no registrat',
+      'Aquest número no té compte a l\'app. El client ha d\'escanejar el QR, registrar-se i signar els consentiments.'
+    );
+    return;
+  }
+
+  // Client trobat → carrega bon actiu si en té
+  let bon = { id: null, codi: null, import: 0 };
+  try {
+    const bons = await apiFetch(
+      `${SUPA_URL}/rest/v1/bons_regal?beneficiari_telefon=eq.${encodeURIComponent(client.telefon)}&estat=eq.actiu&select=id,codi,import&limit=1`,
+      { headers: hdrs() }
+    );
+    if (bons && bons[0]) bon = { id: bons[0].id, codi: bons[0].codi, import: bons[0].import || 0 };
+  } catch(_) {}
+
+  const { esMenor, alertaMedica } = await loadConsentiments(client.telefon);
+  finishClientLoad(client, bon, esMenor, alertaMedica);
+}
+
+async function loadClientByPhone(phones) {
+  for (const phone of phones) {
+    try {
+      const rows = await apiFetch(
+        `${SUPA_URL}/rest/v1/clients?telefon=eq.${encodeURIComponent(phone)}&select=telefon,nom,cognom&limit=1`,
+        { headers: hdrs() }
+      );
+      if (rows && rows[0]) return rows[0];
+    } catch(_) {}
+  }
+  return null;
+}
+
+// ── Val de regal ───────────────────────────────────────────────────────────
+async function lookupBon(codi) {
+  showLoading('Cercant val de regal...');
+  try {
+    const bons = await apiFetch(
+      `${SUPA_URL}/rest/v1/bons_regal?codi=eq.${encodeURIComponent(codi)}&select=id,codi,import,estat,beneficiari_telefon&limit=1`,
+      { headers: hdrs() }
+    );
+    hideLoading();
+
+    if (!bons || bons.length === 0) {
+      showToast('Val de regal no trobat', 'err'); return;
+    }
+    const b = bons[0];
+    if (b.estat === 'bescanviat') {
+      showToast('Aquest val ja ha estat bescanviat', 'err'); return;
+    }
+    if (b.estat !== 'actiu') {
+      showToast('Val de regal no vàlid o expirat', 'err'); return;
+    }
+
+    const bon = { id: b.id, codi: b.codi, import: b.import || 0 };
+    const telefon = b.beneficiari_telefon;
+
+    if (!telefon) {
+      // No hi ha beneficiari → s'ha de registrar
+      window._pendingLookup = { type: 'bon', bon: codi, phone: null };
+      showMustRegister(
+        null,
+        '⚠️ Beneficiari no registrat',
+        'El beneficiari d\'aquest val no s\'ha registrat a l\'app. Ha d\'escanejar el QR, registrar-se i signar els consentiments.'
+      );
+      return;
+    }
+
+    // Cerquem el client per telèfon
+    showLoading('Carregant client...');
+    const client = await loadClientByPhone([telefon]);
+    hideLoading();
+
+    if (!client) {
+      // Beneficiari no registrat, però tenim el telèfon
+      window._pendingLookup = { type: 'bon', bon: codi, phone: telefon };
+      showMustRegister(
+        telefon,
+        '⚠️ Beneficiari no registrat',
+        'El beneficiari d\'aquest val no s\'ha registrat a l\'app. Ha d\'escanejar el QR, registrar-se i signar els consentiments.'
+      );
+      return;
+    }
+
+    const { esMenor, alertaMedica } = await loadConsentiments(client.telefon);
+    finishClientLoad(client, bon, esMenor, alertaMedica);
+
+  } catch(e) {
+    hideLoading();
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ── Helper consentiments (compartit) ──────────────────────────────────────
+async function loadConsentiments(telefon) {
+  if (!telefon) return { esMenor: false, alertaMedica: [] };
+  try {
+    const cons = await apiFetch(
+      `${SUPA_URL}/rest/v1/consentiments?client_telefon=eq.${encodeURIComponent(telefon)}&select=es_menor,respostes&order=created_at.desc&limit=1`,
+      { headers: hdrs() }
+    );
+    if (cons && cons[0]) {
+      const esMenor = !!cons[0].es_menor;
+      const r = cons[0].respostes || {};
+      const LABELS = {
+        allergies:        'Al·lèrgies',
+        anticoagulants:   'Anticoagulants',
+        diabetis:         'Diabetis / immunitat',
+        dermatologiques:  'Condició dermatològica',
+        embaras:          'Embaràs / lactància',
+        reaccions_previes:'Reaccions prèvies a tatuatges'
+      };
+      const alertaMedica = Object.keys(LABELS).filter(k => r[k] === true).map(k => LABELS[k]);
+      return { esMenor, alertaMedica };
+    }
+  } catch(_) {}
+  return { esMenor: false, alertaMedica: [] };
+}
+
+// ── Finalitzar càrrega client (compartit) ─────────────────────────────────
+function finishClientLoad(client, bon, esMenor, alertaMedica) {
+  state.token  = null;
+  state.citaId = null;
+  state.client = { telefon: client.telefon, nom: client.nom, cognom: client.cognom || null };
+  state.deposit      = { import: 0, cobrat: false };
+  state.bon          = bon || { id: null, codi: null, import: 0 };
+  state.aplicarDeposit = false;
+  state.aplicarBon     = !!(bon && bon.id);
+  state.esMenor      = esMenor;
+  state.alertaMedica = alertaMedica;
+
+  stopQRScanner();
+  document.getElementById('overlay-qr').style.display = 'none';
+  hideMustRegister();
+  showClientBanner();
+  showExtras();
+}
+
+// ── Panel "s'ha de registrar" ─────────────────────────────────────────────
+function showMustRegister(phone, title, sub) {
+  // Amaguem el contingut principal i mostrem el panel
+  document.getElementById('qr-main-content').style.display = 'none';
+  document.getElementById('must-register-panel').style.display = 'flex';
+  document.getElementById('must-reg-title').textContent = title;
+  document.getElementById('must-reg-sub').textContent = sub;
+
+  // QR apunta a l'app de check-in amb el telèfon pre-emplenat (si en tenim)
+  const url = phone
+    ? CLIENT_APP_URL + '?phone=' + encodeURIComponent(phone)
+    : CLIENT_APP_URL;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=1a1a1a&margin=10`;
+  document.getElementById('must-reg-qr-img').src = qrSrc;
+}
+
+function hideMustRegister() {
+  document.getElementById('must-register-panel').style.display = 'none';
+  document.getElementById('qr-main-content').style.display = 'flex';
+  document.getElementById('phone-search-msg').textContent = '';
+}
+
+async function retrySearch() {
+  const p = window._pendingLookup;
+  if (!p) { hideMustRegister(); return; }
+
+  if (p.type === 'phone') {
+    showLoading('Tornant a cercar...');
+    const client = await loadClientByPhone([p.phone]);
+    hideLoading();
+    if (!client) {
+      showToast('Encara no s\'ha registrat', 'err'); return;
+    }
+    let bon = { id: null, codi: null, import: 0 };
+    try {
+      const bons = await apiFetch(
+        `${SUPA_URL}/rest/v1/bons_regal?beneficiari_telefon=eq.${encodeURIComponent(client.telefon)}&estat=eq.actiu&select=id,codi,import&limit=1`,
+        { headers: hdrs() }
+      );
+      if (bons && bons[0]) bon = { id: bons[0].id, codi: bons[0].codi, import: bons[0].import || 0 };
+    } catch(_) {}
+    const { esMenor, alertaMedica } = await loadConsentiments(client.telefon);
+    window._pendingLookup = null;
+    finishClientLoad(client, bon, esMenor, alertaMedica);
+
+  } else if (p.type === 'bon') {
+    window._pendingLookup = null;
+    lookupBon(p.bon);
+  }
+}
+
+function skipQR() {
+  stopQRScanner();
+  document.getElementById('overlay-qr').style.display = 'none';
+  showExtras();
+}
+
+// ── QR per al client ──────────────────────────────────────────────────────
+const CLIENT_APP_URL = 'https://blessed-checkin.esparkic.workers.dev/';
+function showClientQR() {
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(CLIENT_APP_URL)}&bgcolor=ffffff&color=1a1a1a&margin=14`;
+  document.getElementById('img-client-qr').src = qrUrl;
+  document.getElementById('overlay-qr-client').style.display = 'flex';
+}
+function hideClientQR() {
+  document.getElementById('overlay-qr-client').style.display = 'none';
+}
+
+// ── Client banner ────────────────────────────────────────────────────────
+function showClientBanner() {
+  const banner = document.getElementById('client-banner');
+  document.getElementById('cb-nom').textContent = [state.client.nom, state.client.cognom].filter(Boolean).join(' ') || '—';
+  document.getElementById('cb-tel').textContent = state.client.telefon || '';
+
+  const badges = document.getElementById('cb-badges');
+  badges.innerHTML = '';
+
+  if (state.deposit.import > 0) {
+    const b = document.createElement('span');
+    b.className = 'badge badge-dep';
+    b.textContent = `Dipòsit ${state.deposit.cobrat ? '✓' : '!'} ${state.deposit.import}€`;
+    badges.appendChild(b);
+  }
+  if (state.bon.codi) {
+    const b = document.createElement('span');
+    b.className = 'badge badge-bon';
+    b.textContent = `🎁 ${state.bon.import}€`;
+    badges.appendChild(b);
+  }
+  if (!state.deposit.import && !state.bon.codi) {
+    const b = document.createElement('span');
+    b.className = 'badge badge-walkin';
+    b.textContent = 'Walk-in';
+    badges.appendChild(b);
+  }
+
+  banner.style.display = 'flex';
+  saveSession();
+
+  const alertMenor = document.getElementById('alert-menor');
+  alertMenor.style.display = state.esMenor ? 'flex' : 'none';
+
+  // Badge mèdic al banner
+  const existingMedic = badges.querySelector('.badge-medic');
+  if (existingMedic) existingMedic.remove();
+  if (state.alertaMedica && state.alertaMedica.length > 0) {
+    const bm = document.createElement('span');
+    bm.className = 'badge badge-medic';
+    bm.textContent = '🩺 Afecció mèdica';
+    badges.appendChild(bm);
+    // Alert detallat
+    document.getElementById('alert-medica-detail').textContent = state.alertaMedica.join(' · ');
+    document.getElementById('alert-medica').style.display = 'flex';
+  } else {
+    document.getElementById('alert-medica').style.display = 'none';
+  }
+}
+
+function showExtras() {
+  document.getElementById('card-extras').style.display = '';
+  document.getElementById('btn-enviar').style.display = '';
+}
+
+// ── Construcció de la fila econòmica (compartida entre gravar nou i editar) ─
+// Reutilitza calcEconomia() perquè el que es desa sigui SEMPRE exactament
+// el mateix que el que s'ha mostrat en pantalla (i el mateix que calcularia l'App Blessed).
+function buildDiariRow(dataOverride) {
+  const preu = parseFloat(document.getElementById('preu').value) || 0;
+  const pctTatBase = parseFloat(document.getElementById('pctTatBase').value) || 0;
+  const pctCom     = parseFloat(document.getElementById('pctCom').value) || 0;
+  const cobrament  = document.getElementById('sel-cobrament').value;
+  const concepte   = document.getElementById('sel-concepte').value;
+
+  const c = calcEconomia(preu, pctTatBase, pctCom, state.esAutonom, cobrament);
+  const percIVAval = cobrament === 'Comptat' ? 0 : 21;
+
+  return {
+    data:                 dataOverride || new Date().toISOString().slice(0, 10),
+    telefon:              state.client.telefon || null,
+    tatuador:             state.tatuador,
+    user_email:           state.email || null,
+    concepte:             concepte,
+    cobrament:            cobrament,
+    preu:                 preu,
+    preu_base:            parseFloat(c.preuBase.toFixed(2)),
+    iva:                  parseFloat(c.iva.toFixed(2)),
+    perc_iva:             percIVAval,
+    perc_tatuador:        parseFloat(c.tatEff.toFixed(2)),
+    perc_com_ext:         parseFloat(pctCom.toFixed(2)),
+    perc_blessed:         parseFloat(c.bleEff.toFixed(2)),
+    total_tatuador:       parseFloat(c.totalTat.toFixed(2)),
+    total_com_ext:        parseFloat(c.totalCom.toFixed(2)),
+    total_blessed:        parseFloat(c.totalBlessed.toFixed(2)),
+    tot_blessed_iva:      parseFloat(c.totBlessedIva.toFixed(2)),
+    es_autonom:           state.esAutonom,
+    irpf_pct:             c.irpfPct,
+    irpf_import:          parseFloat(c.irpfImport.toFixed(2)),
+    iva_tatuador:         parseFloat(c.ivaTatuador.toFixed(2)),
+    total_tatuador_brut:  parseFloat(c.totalTatBrut.toFixed(2)),
+    feina_tatuador:       state.feina,
+    deposit_import:       state.deposit.import,
+    deposit_cobrat:       state.deposit.cobrat,
+    bon_id:               state.bon.id || null,
+    bon_codi:             state.bon.codi || null,
+    bon_import:           state.bon.import
+  };
+}
+
+// ── Gravar tattoo (des de l'overlay de fotos) ────────────────────────────
+async function gravaTattoo() {
+  if (state.editingDiariId) { return desaEdicioTattoo(); }
+
+  const fotosValides = state.fotos.filter(Boolean);
+  if (fotosValides.length === 0) { showToast('Cal mínim 1 foto del tatuatge', 'err'); return; }
+
+  const preu = parseFloat(document.getElementById('preu').value) || 0;
+  if (preu <= 0) { showToast('Introdueix el preu del tatuatge', 'err'); return; }
+
+  const row = buildDiariRow();
+
+  // Desactivar botó per evitar doble enviament
+  const btnGravar = document.getElementById('btn-gravar-tattoo');
+  btnGravar.disabled = true;
+  btnGravar.textContent = 'Gravant...';
+
+  showLoading('Gravant tattoo...');
+  try {
+    const diariRes = await apiFetch(`${SUPA_URL}/rest/v1/diari`, {
+      method: 'POST',
+      headers: hdrs({ 'Prefer': 'return=representation' }),
+      body: JSON.stringify(row)
+    });
+    const tattooId = diariRes?.[0]?.id || null;
+
+    // Marcar token com usat
+    if (state.token) {
+      try {
+        await apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?token=eq.${encodeURIComponent(state.token)}`, {
+          method: 'PATCH',
+          headers: hdrs({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify({ usat: true })
+        });
+      } catch(_) {}
+    }
+
+    // B: Marcar cita com a completada (si ve de QR amb cita_id)
+    if (state.citaId) {
+      try {
+        await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(state.citaId)}`, {
+          method: 'PATCH',
+          headers: hdrs({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify({ estat: 'completada' })
+        });
+      } catch(_) {}
+    }
+
+    // C: Marcar val de regal com a bescanviat (si ve de QR amb bon_codi)
+    if (state.bon && state.bon.codi) {
+      try {
+        await apiFetch(`${SUPA_URL}/rest/v1/bons_regal?codi=eq.${encodeURIComponent(state.bon.codi)}`, {
+          method: 'PATCH',
+          headers: hdrs({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify({ estat: 'bescanviat', bescanviat_at: new Date().toISOString() })
+        });
+      } catch(_) {}
+    }
+
+    // Desar fotos a tattoo_fotos amb tattoo_id correcte
+    for (const f of fotosValides) {
+      try {
+        await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos`, {
+          method: 'POST',
+          headers: hdrs({ 'Prefer': 'return=minimal' }),
+          body: JSON.stringify({
+            client_telefon: (state.client.telefon || '').replace(/\s/g, '') || null,
+            storage_path: f.path,
+            public_url: f.url,
+            uploaded_by: state.tatuador,
+            tattoo_id: tattooId,
+            is_video: !!f.isVideo
+          })
+        });
+      } catch(e) {
+        console.warn('Error guardant foto:', e.message);
+      }
+    }
+
+    hideLoading();
+    clearSession();
+    showToast(`✓ Tattoo gravat! (${fotosValides.length} foto${fotosValides.length > 1 ? 's' : ''})`, 'ok');
+
+    // Tancar overlay i reiniciar app (o tornar a l'App Client si venim del PIN de l'iPad)
+    setTimeout(() => finishAndReturn(), 2000);
+
+  } catch(e) {
+    hideLoading();
+    btnGravar.disabled = false;
+    btnGravar.textContent = 'Gravar tattoo ✓';
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ── Punt 7: editar un tatuatge ja gravat (des de la Sala d'espera) ─────────
+async function editarTattooDesSala(diariId) {
+  showLoading('Carregant tatuatge...');
+  try {
+    const rows = await apiFetch(`${SUPA_URL}/rest/v1/diari?id=eq.${diariId}&select=*`, { headers: hdrs() });
+    const t = rows?.[0];
+    if (!t) { hideLoading(); showToast('No s\'ha trobat el registre', 'err'); return; }
+
+    // Nom del client és opcional (diari només guarda telèfon)
+    let clientNom = null, clientCognom = null;
+    if (t.telefon) {
+      try {
+        const c = await apiFetch(`${SUPA_URL}/rest/v1/clients?telefon=eq.${encodeURIComponent(t.telefon)}&select=nom,cognom`, { headers: hdrs() });
+        if (c?.[0]) { clientNom = c[0].nom; clientCognom = c[0].cognom; }
+      } catch(_) {}
+    }
+
+    state.editingDiariId   = t.id;
+    state.editingDiariData = t.data;
+    state.token    = null;
+    state.citaId   = null;
+    state.client   = { telefon: t.telefon, nom: clientNom, cognom: clientCognom };
+    state.deposit  = { import: t.deposit_import || 0, cobrat: t.deposit_cobrat || false };
+    state.bon      = { id: t.bon_id, codi: t.bon_codi, import: t.bon_import || 0 };
+    state.aplicarDeposit = true;
+    state.aplicarBon     = true;
+    state.esMenor      = false;
+    state.alertaMedica  = [];
+    state.feina = t.feina_tatuador || 'No';
+
+    document.getElementById('preu').value = t.preu;
+    document.getElementById('sel-cobrament').value = t.cobrament || '';
+    document.getElementById('sel-concepte').value  = t.concepte || 'Tatuatge';
+    document.getElementById('pctTatBase').value = (t.perc_tatuador != null ? t.perc_tatuador : 60);
+    document.getElementById('sel-com-ext').value = ''; // el diari no guarda quin extern va ser, només l'import
+    document.getElementById('pctCom').value = t.perc_com_ext || 0;
+    setFeina(state.feina);
+    calc();
+
+    hideLoading();
+    document.getElementById('overlay-sala-espera').style.display = 'none';
+    showClientBanner();
+    showExtras();
+    document.getElementById('btn-enviar').textContent = '💾 Desar canvis';
+  } catch(e) {
+    hideLoading();
+    showToast('Error carregant el tatuatge: ' + e.message, 'err');
+  }
+}
+
+async function desaEdicioTattoo() {
+  const preu = parseFloat(document.getElementById('preu').value) || 0;
+  if (preu <= 0) { showToast('Introdueix el preu del tatuatge', 'err'); return; }
+  if (!document.getElementById('sel-cobrament').value) { showToast('Selecciona un mètode de cobrament', 'err'); return; }
+
+  const row = buildDiariRow(state.editingDiariData);
+  const btnEnviar = document.getElementById('btn-enviar');
+  btnEnviar.disabled = true;
+  btnEnviar.textContent = 'Desant...';
+  showLoading('Desant canvis...');
+  try {
+    await apiFetch(`${SUPA_URL}/rest/v1/diari?id=eq.${state.editingDiariId}`, {
+      method: 'PATCH',
+      headers: hdrs({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify(row)
+    });
+    hideLoading();
+    showToast('✓ Canvis desats correctament', 'ok');
+    setTimeout(() => finishAndReturn(), 1500);
+  } catch(e) {
+    hideLoading();
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = '💾 Desar canvis';
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// Punt 8: si la sessió ve del botó+PIN de l'App Client (iPad compartit), en acabar
+// de gravar o editar tornem directament a la pantalla de check-in per al següent
+// client. Si no (dispositiu propi del tatuador), es queda a la Sala d'espera.
+function finishAndReturn() {
+  if (state.viaClientPin) {
+    window.location.href = CLIENT_URL;
+    return;
+  }
+  resetApp();
+}
+
+// ── Reset ────────────────────────────────────────────────────────────────
+function resetApp() {
+  clearSession();
+
+  // Netejar overlay fotos
+  document.getElementById('overlay-fotos').style.display = 'none';
+  document.getElementById('fotos-ov-grid').innerHTML = '';
+  const btnGravar = document.getElementById('btn-gravar-tattoo');
+  btnGravar.disabled = false;
+  btnGravar.style.display = 'none';
+  btnGravar.textContent = 'Gravar tattoo ✓';
+  document.getElementById('fotos-ov-empty').style.display = 'block';
+  document.getElementById('fotos-ov-count').textContent = '';
+  const _ic = document.getElementById('inp-fotos-camera');
+  if (_ic) _ic.value = '';
+  const _ig = document.getElementById('inp-fotos-galeria');
+  if (_ig) _ig.value = '';
+
+  const btnEnviar = document.getElementById('btn-enviar');
+  if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = '📷 Fotos'; }
+
+  // Conservem les dades d'identitat del tatuador (nom, email, autònom, percentatges,
+  // is_admin, externs) — abans es perdien en cada reset i només es recuperaven amb un
+  // nou login. Només es netegen els camps propis de la sessió amb el client actual.
+  state = { ...state, feina: 'No', token: null, citaId: null,
+    client: { telefon: null, nom: null, cognom: null }, cita: null,
+    deposit: { import: 0, cobrat: false }, bon: { id: null, codi: null, import: 0 },
+    esMenor: false, alertaMedica: [], fotos: [],
+    editingDiariId: null, editingDiariData: null
+  };
+
+  document.getElementById('alert-menor').style.display = 'none';
+  document.getElementById('alert-medica').style.display = 'none';
+  document.getElementById('preu').value       = '';
+  document.getElementById('pctTatBase').value = '60';
+  document.getElementById('pctCom').value     = '0';
+  document.getElementById('sel-cobrament').value = '';
+  document.getElementById('sel-concepte').value  = 'Tatuatge';
+  // Desbloquejar feina Sí (pot estar bloquejat per extern)
+  const togSiReset = document.getElementById('tog-si');
+  togSiReset.disabled = false; togSiReset.style.opacity = ''; togSiReset.style.cursor = ''; togSiReset.title = '';
+  setFeina('No');
+  calc();
+  pinBuffer = '';
+  updatePinDots();
+  document.getElementById('pin-err').textContent = '';
+  document.getElementById('client-banner').style.display = 'none';
+  document.getElementById('card-extras').style.display = 'none';
+  document.getElementById('btn-enviar').style.display = 'none';
+
+  document.getElementById('pin-step').style.display = '';
+  document.getElementById('bio-step').style.display = 'none';
+  if (state.tatuador) {
+    document.getElementById('overlay-pin').style.display = 'none';
+    goToSalaEspera(); // torna a la sala d'espera per al següent client
+  } else {
+    document.getElementById('overlay-pin').style.display = 'flex';
+    stopQRScanner();
+    document.getElementById('overlay-qr').style.display = 'none';
+  }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────
+// ══ SESSIÓ PERSISTENT (localStorage) ═══════════════════════════════════════
+const SESSION_KEY = 'tat:active_session';
+
+function saveSession() {
+  try {
+    const preuEl = document.getElementById('preu');
+    const s = {
+      client:   state.client,
+      fotos:    state.fotos.filter(Boolean),
+      deposit:  state.deposit,
+      bon:      state.bon,
+      token:    state.token,
+      citaId:   state.citaId,
+      feina:    state.feina,
+      preu:     preuEl ? preuEl.value : '',
+      savedAt:  new Date().toISOString()
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+  } catch(_) {}
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY); } catch(_) {}
+}
+
+// Retorna true si ha mostrat el banner de restauració
+function checkSavedSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (!s || !s.savedAt) return false;
+    // Ignora sessions de més de 24 h
+    if (Date.now() - new Date(s.savedAt).getTime() > 24 * 60 * 60 * 1000) {
+      clearSession(); return false;
+    }
+    const nomCli = s.client?.nom || s.client?.telefon || 'client';
+    const nFotos = (s.fotos || []).length;
+    document.getElementById('session-restore-info').textContent =
+      `Sessió anterior: ${nomCli} · ${nFotos} foto${nFotos !== 1 ? 's' : ''}`;
+    document.getElementById('session-restore-banner').style.display = 'flex';
+    window._pendingSession = s;
+    return true;
+  } catch(_) { return false; }
+}
+
+function restoreSession() {
+  const s = window._pendingSession;
+  if (!s) return;
+  state.client  = s.client  || state.client;
+  state.fotos   = s.fotos   || [];
+  state.deposit = s.deposit || state.deposit;
+  state.bon     = s.bon     || state.bon;
+  state.token   = s.token   || null;
+  state.citaId  = s.citaId  || null;
+  state.feina   = s.feina   || 'No';
+  // Restaura preu
+  if (s.preu) { const el = document.getElementById('preu'); if (el) { el.value = s.preu; calc(); } }
+  // Reconstrueix grid de fotos
+  const grid = document.getElementById('fotos-ov-grid');
+  grid.innerHTML = '';
+  state.fotos.forEach((f, idx) => {
+    if (!f) return;
+    const div = document.createElement('div');
+    div.className = 'foto-thumb'; div.dataset.idx = idx;
+    if (f.isVideo) {
+      div.innerHTML = `<video src="${f.url}" muted playsinline preload="metadata"></video><span class="video-badge">▶ vídeo</span><button class="foto-del" onclick="delFotoOverlay(${idx})">✕</button>`;
+    } else {
+      div.innerHTML = `<img src="${f.url}"><button class="foto-del" onclick="delFotoOverlay(${idx})">✕</button>`;
+    }
+    grid.appendChild(div);
+  });
+  updateFotosOverlay();
+  showClientBanner();
+  showExtras();
+  document.getElementById('session-restore-banner').style.display = 'none';
+  window._pendingSession = null;
+}
+
+function discardSession() {
+  clearSession();
+  window._pendingSession = null;
+  document.getElementById('session-restore-banner').style.display = 'none';
+  goToSalaEspera();
+}
+
+// ══ CITES ═════════════════════════════════════════════════════════════════════
+let citesTab = 'avui';
+
+let _citesData = [];
+
+function showCites() {
+  document.getElementById('overlay-cites').style.display = 'flex';
+  setCitesTab('avui');
+}
+function hideCites() {
+  document.getElementById('overlay-cites').style.display = 'none';
+}
+function setCitesTab(tab) {
+  citesTab = tab;
+  ['avui','dema','tot'].forEach(t => {
+    const btn = document.getElementById('cites-tab-' + t);
+    if (t === tab) {
+      btn.style.borderBottomColor = '#6366f1';
+      btn.style.color = '#6366f1';
+      btn.style.background = '#1a1a1a';
+    } else {
+      btn.style.borderBottomColor = 'transparent';
+      btn.style.color = '#666';
+      btn.style.background = 'none';
+    }
+  });
+  loadCites();
+}
+async function loadCites() {
+  if (!state.tatuador) return;
+
+  // Pestanya walk-ins en espera: tokens del dia sense cita_id
+  if (citesTab === 'espera') {
+    loadWalkins();
+    return;
+  }
+
+  const list = document.getElementById('cites-list');
+  list.innerHTML = '';
+  document.getElementById('cites-loading').style.display = 'block';
+  const today = new Date().toISOString().slice(0,10);
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0,10);
+  let dateFilter = '';
+  if (citesTab === 'avui')    dateFilter = `&data=eq.${today}`;
+  else if (citesTab === 'dema') dateFilter = `&data=eq.${tomorrow}`;
+  else dateFilter = `&data=gte.${today}&data=lte.` + new Date(Date.now() + 14*86400000).toISOString().slice(0,10);
+  try {
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/cites?tatuador=eq.${encodeURIComponent(state.tatuador)}&estat=neq.cancel·lada${dateFilter}&order=data.asc,hora_inici.asc&limit=50`,
+      { headers: hdrs() }
+    );
+    document.getElementById('cites-loading').style.display = 'none';
+    if (!data || !data.length) {
+      _citesData = [];
+      list.innerHTML = `<div style="color:#666;text-align:center;padding:30px;font-size:13px;">Cap cita${citesTab==='avui'?' avui':citesTab==='dema'?' demà':' les pròximes 2 setmanes'}</div>`;
+      return;
+    }
+    _citesData = data;
+    data.forEach((c, i) => {
+      const div = document.createElement('div');
+      div.className = 'hist-item';
+      div.style.cursor = 'default';
+      const estatColor = c.estat==='completada'?'#4ade80':c.estat==='confirmada'?'#6366f1':'#888';
+      const checkinOk = !!c.checkin_at;
+      const checkinIcon = checkinOk ? '✅' : '⬜';
+      const depIcon = c.deposit_import>0 ? (c.deposit_cobrat ? '💰✓' : `💰⏳ ${Number(c.deposit_import).toFixed(0)}€`) : '';
+      const btnColor = checkinOk ? '#6366f1' : '#333';
+      const btnTextColor = checkinOk ? '#fff' : '#666';
+      const btnLabel = checkinOk ? '📋 Registrar tatuatge' : '📋 Registrar (pendent check-in)';
+      div.innerHTML = `
+        <div class="hist-item-info" style="flex:1;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span style="font-size:12px;font-weight:700;color:#e0e0e0;">${c.hora_inici?c.hora_inici.slice(0,5):'—'}</span>
+            ${citesTab==='tot'?`<span style="font-size:10px;color:#888;">${c.data}</span>`:''}
+            <span style="font-size:10px;font-weight:700;color:${estatColor};margin-left:auto;">${c.estat||'—'}</span>
+          </div>
+          <div style="font-size:12px;color:#c9a84c;font-weight:700;">${c.client_nom||c.client_telefon||'Client'}</div>
+          <div style="font-size:11px;color:#888;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap;">
+            ${c.client_telefon?`<span>📞 ${c.client_telefon}</span>`:''}
+            ${c.durada_min?`<span>⏱ ${c.durada_min}min</span>`:''}
+            ${depIcon?`<span>${depIcon}</span>`:''}
+            <span title="${checkinOk?'Check-in fet':'Sense check-in'}">${checkinIcon} check-in</span>
+          </div>
+          ${c.notes?`<div style="font-size:10px;color:#555;margin-top:3px;font-style:italic;">${c.notes}</div>`:''}
+          <div style="margin-top:8px;">
+            <button onclick="registrarDesCita(_citesData[${i}])"
+              style="background:${btnColor};border:none;border-radius:6px;color:${btnTextColor};font-size:12px;font-weight:600;padding:7px 14px;cursor:pointer;width:100%;text-align:center;">
+              ${btnLabel}
+            </button>
+          </div>
+        </div>`;
+      list.appendChild(div);
+    });
+  } catch(e) {
+    document.getElementById('cites-loading').style.display = 'none';
+    list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${e.message}</div>`;
+  }
+}
+
+// ── Walk-ins en espera ────────────────────────────────────────────────────
+// ── Desplegable clients en espera (pantalla QR) ───────────────────────────
+let _tokensEspera = [];
+
+async function loadClientsEnEspera() {
+  const sel = document.getElementById('sel-clients-espera');
+  const msg = document.getElementById('clients-espera-msg');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— carregant... —</option>';
+  msg.textContent = '';
+  // Finestra de 7 dies: el client es manté fins que es grava el tatuatge (usat=true)
+  const fa7dies = new Date();
+  fa7dies.setDate(fa7dies.getDate() - 7);
+  fa7dies.setHours(0, 0, 0, 0);
+  try {
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?usat=eq.false&created_at=gte.${fa7dies.toISOString()}&order=created_at.desc&limit=50`,
+      { headers: hdrs() }
+    );
+    _tokensEspera = data || [];
+    sel.innerHTML = '';
+    if (!_tokensEspera.length) {
+      sel.innerHTML = '<option value="">— Cap client en espera —</option>';
+      msg.textContent = 'Cap check-in pendent els últims 7 dies';
+      return;
+    }
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = `— ${_tokensEspera.length} client${_tokensEspera.length !== 1 ? 's' : ''} en espera —`;
+    sel.appendChild(opt0);
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    _tokensEspera.forEach((t, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      const created = new Date(t.created_at);
+      const hora = created < todayStart
+        ? created.toLocaleString('ca', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+        : created.toLocaleTimeString('ca', { hour: '2-digit', minute: '2-digit' });
+      const cognom = t.client_cognom ? ` ${t.client_cognom}` : '';
+      const tat = (t.tatuador && t.tatuador !== state.tatuador) ? ` · ${t.tatuador}` : '';
+      opt.textContent = `${t.client_nom || ''}${cognom} · ${t.client_telefon || ''} (${hora})${tat}`;
+      if (t.tatuador === state.tatuador) opt.style.color = '#a5b4fc';
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    sel.innerHTML = '<option value="">— Error carregant —</option>';
+    msg.style.color = '#ef4444';
+    msg.textContent = e.message;
+  }
+}
+
+async function seleccionarClientEspera() {
+  const sel = document.getElementById('sel-clients-espera');
+  const msg = document.getElementById('clients-espera-msg');
+  const idx = sel.value;
+  if (idx === '' || idx === undefined) {
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Selecciona un client de la llista';
+    setTimeout(() => { msg.textContent = ''; msg.style.color = '#888'; }, 2000);
+    return;
+  }
+  const t = _tokensEspera[parseInt(idx, 10)];
+  if (!t) return;
+  await registrarDesToken(t);
+}
+
+let _walkinsData = [];
+
+async function loadWalkins() {
+  const list = document.getElementById('cites-list');
+  list.innerHTML = '';
+  document.getElementById('cites-loading').style.display = 'block';
+  const todayStart = new Date();
+  todayStart.setHours(0,0,0,0);
+  try {
+    // Tots els tokens d'avui sense cita_id (walk-ins), no usats
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?cita_id=is.null&usat=eq.false&created_at=gte.${todayStart.toISOString()}&order=created_at.asc&limit=50`,
+      { headers: hdrs() }
+    );
+    document.getElementById('cites-loading').style.display = 'none';
+    _walkinsData = data || [];
+    if (!_walkinsData.length) {
+      list.innerHTML = `<div style="color:#666;text-align:center;padding:30px;font-size:13px;">Cap walk-in en espera avui</div>`;
+      return;
+    }
+    _walkinsData.forEach((t, i) => {
+      const div = document.createElement('div');
+      div.className = 'hist-item';
+      div.style.cursor = 'default';
+      const isMine = t.tatuador === state.tatuador;
+      const dotColor = isMine ? '#6366f1' : '#444';
+      const dotTitle = isMine ? 'Assignat a tu' : `Assignat a ${t.tatuador||'?'}`;
+      const hora = new Date(t.created_at).toLocaleTimeString('ca',{hour:'2-digit',minute:'2-digit'});
+      div.innerHTML = `
+        <div class="hist-item-info" style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0;" title="${dotTitle}"></span>
+            <span style="font-size:12px;color:#888;">⏱ Check-in ${hora}</span>
+            ${t.tatuador?`<span style="font-size:10px;color:${isMine?'#6366f1':'#555'};margin-left:auto;">${t.tatuador}</span>`:''}
+          </div>
+          <div style="font-size:13px;color:#c9a84c;font-weight:700;">${t.client_nom||t.client_telefon||'Client'}</div>
+          <div style="font-size:11px;color:#888;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap;">
+            ${t.client_telefon?`<span>📞 ${t.client_telefon}</span>`:''}
+            ${t.bon_codi?`<span>🎁 ${t.bon_codi}</span>`:''}
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;">
+            <button onclick="registrarDesToken(_walkinsData[${i}])"
+              style="flex:2;background:${isMine?'#6366f1':'#333'};border:none;border-radius:6px;color:${isMine?'#fff':'#888'};font-size:12px;font-weight:600;padding:7px 10px;cursor:pointer;">
+              📋 Registrar
+            </button>
+            ${!isMine?`<button onclick="reasignarMe(_walkinsData[${i}], ${i})"
+              style="flex:1;background:none;border:1px solid #555;border-radius:6px;color:#aaa;font-size:11px;padding:7px 8px;cursor:pointer;">
+              ↔ Reasignar-me
+            </button>`:''}
+          </div>
+        </div>`;
+      list.appendChild(div);
+    });
+  } catch(e) {
+    document.getElementById('cites-loading').style.display = 'none';
+    list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${e.message}</div>`;
+  }
+}
+
+async function reasignarMe(token, idx) {
+  if (!confirm(`Reasignar "${token.client_nom||token.client_telefon||'client'}" a ${state.tatuador}?`)) return;
+  try {
+    await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?token=eq.${encodeURIComponent(token.token)}`,
+      { method: 'PATCH', headers: hdrs({'Prefer':'return=minimal'}), body: JSON.stringify({ tatuador: state.tatuador }) }
+    );
+    showToast(`✅ Reasignat a ${state.tatuador}`);
+    loadWalkins();
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+}
+
+async function registrarDesToken(t) {
+  if (!t) return;
+  if (t.usat) {
+    const ok = confirm('⚠️ El check-in d\'aquest client ja va ser processat.\n\nVols obrir igualment un nou registre?');
+    if (!ok) return;
+  }
+  if (new Date(t.expires_at) < new Date()) {
+    const ok = confirm('⚠️ El token de check-in és de fa més de 8 hores.\n\nVols continuar igualment?');
+    if (!ok) return;
+  }
+  state.token          = t.token;
+  state.citaId         = t.cita_id || null;
+  state.client         = { telefon: t.client_telefon, nom: t.client_nom, cognom: t.client_cognom || null };
+  state.deposit        = { import: t.deposit_import || 0, cobrat: t.deposit_cobrat || false };
+  state.bon            = { id: t.bon_id, codi: t.bon_codi, import: t.bon_import || 0 };
+  state.aplicarDeposit = t.aplicar_deposit !== false;
+  state.aplicarBon     = t.aplicar_bon !== false;
+  showLoading('Carregant consentiments...');
+  const { esMenor, alertaMedica } = await loadConsentiments(t.client_telefon);
+  hideLoading();
+  state.esMenor      = esMenor;
+  state.alertaMedica = alertaMedica;
+  hideCites();
+  document.getElementById('overlay-qr').style.display = 'none';
+  document.getElementById('overlay-sala-espera').style.display = 'none';
+  showClientBanner();
+  showExtras();
+}
+
+// ── Registrar tatuatge des de la llista de cites ──────────────────────────
+async function registrarDesCita(cita) {
+  if (!cita || !cita.id) return;
+
+  // Si no ha fet check-in, avisem però no bloquejem (podria haver token igualment)
+  if (!cita.checkin_at) {
+    const ok = confirm(`⏳ El client "${cita.client_nom||cita.client_telefon||'?'}" no ha fet check-in.\n\nAixò significa que possiblement no ha signat el consentiment.\n\nVols intentar-ho igualment? (per si ha fet check-in per un altre canal)`);
+    if (!ok) return;
+  }
+
+  showLoading('Cercant check-in...');
+  try {
+    const rows = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?cita_id=eq.${encodeURIComponent(cita.id)}&select=*&order=created_at.desc&limit=1`,
+      { headers: hdrs() }
+    );
+    hideLoading();
+
+    if (!rows || rows.length === 0) {
+      showToast('No s\'ha trobat el check-in d\'aquest client. Usa l\'escàner QR quan arribi.', 'err');
+      return;
+    }
+
+    const t = rows[0];
+
+    if (t.usat) {
+      const ok = confirm('⚠️ El check-in d\'aquest client ja va ser processat anteriorment.\n\nVols obrir igualment un nou registre?');
+      if (!ok) return;
+    }
+
+    if (new Date(t.expires_at) < new Date()) {
+      const ok = confirm('⚠️ El token de check-in és de fa més de 8 hores.\n\nVols continuar igualment?');
+      if (!ok) return;
+    }
+
+    state.token          = t.token;
+    state.citaId         = t.cita_id || cita.id;
+    state.client         = { telefon: t.client_telefon, nom: t.client_nom, cognom: t.client_cognom || null };
+    state.deposit        = { import: t.deposit_import || 0, cobrat: t.deposit_cobrat || false };
+    state.bon            = { id: t.bon_id, codi: t.bon_codi, import: t.bon_import || 0 };
+    state.aplicarDeposit = t.aplicar_deposit !== false;
+    state.aplicarBon     = t.aplicar_bon !== false;
+
+    showLoading('Carregant consentiments...');
+    const { esMenor, alertaMedica } = await loadConsentiments(t.client_telefon);
+    hideLoading();
+    state.esMenor      = esMenor;
+    state.alertaMedica = alertaMedica;
+
+    // Tancar overlay cites → anar al formulari principal
+    hideCites();
+    document.getElementById('overlay-qr').style.display = 'none';
+    showClientBanner();
+    showExtras();
+
+  } catch(e) {
+    hideLoading();
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ══ HISTORIAL ════════════════════════════════════════════════════════════════
+let historialData     = [];
+let historialTattooId = null;
+
+function showHistorial() {
+  document.getElementById('overlay-historial').style.display = 'flex';
+  document.getElementById('hist-detail').style.display       = 'none';
+  document.getElementById('hist-filters').style.display      = 'flex';
+  document.getElementById('hist-list-section').style.display = 'flex';
+  loadHistorial();
+}
+function hideHistorial() {
+  document.getElementById('overlay-historial').style.display = 'none';
+}
+function backToHistorialList() {
+  historialTattooId = null;
+  document.getElementById('hist-detail').style.display       = 'none';
+  document.getElementById('hist-filters').style.display      = 'flex';
+  document.getElementById('hist-list-section').style.display = 'flex';
+}
+
+function aplicarFiltreHistorial() {
+  loadHistorial({
+    phone: document.getElementById('hist-f-phone').value.trim().replace(/\s+/g,''),
+    from:  document.getElementById('hist-f-from').value,
+    to:    document.getElementById('hist-f-to').value,
+  });
+}
+
+function netejarFiltreHistorial() {
+  document.getElementById('hist-f-phone').value = '';
+  document.getElementById('hist-f-from').value  = '';
+  document.getElementById('hist-f-to').value    = '';
+  document.getElementById('hist-f-info').textContent = '';
+  loadHistorial();
+}
+
+async function loadHistorial(filtres = {}) {
+  if (!state.tatuador) return;
+  document.getElementById('hist-loading').style.display = 'block';
+  document.getElementById('hist-list').innerHTML = '';
+
+  // Construir query amb filtres opcionals
+  let q = `tatuador=eq.${encodeURIComponent(state.tatuador)}`;
+  if (filtres.phone) q += `&telefon=like.*${encodeURIComponent(filtres.phone)}*`;
+  if (filtres.from)  q += `&data=gte.${filtres.from}`;
+  if (filtres.to)    q += `&data=lte.${filtres.to}`;
+  const limit = (filtres.phone || filtres.from || filtres.to) ? 200 : 40;
+
+  try {
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/diari?${q}&select=id,data,telefon,concepte,cobrament,preu,total_tatuador_brut,deposit_import,deposit_cobrat,bon_codi,bon_import,es_autonom,irpf_import,irpf_pct,feina_tatuador&order=created_at.desc&limit=${limit}`,
+      { headers: hdrs() }
+    );
+    historialData = data || [];
+    const info = document.getElementById('hist-f-info');
+    if (filtres.phone || filtres.from || filtres.to) {
+      info.textContent = `${historialData.length} resultat${historialData.length !== 1 ? 's' : ''} trobat${historialData.length !== 1 ? 's' : ''}`;
+      info.style.color = historialData.length ? '#c9a84c' : '#ef4444';
+    } else {
+      info.textContent = '';
+    }
+    renderHistorialList(historialData);
+  } catch(e) {
+    document.getElementById('hist-list').innerHTML = `<div style="color:#666;text-align:center;padding:30px;font-size:13px;">Error: ${e.message}</div>`;
+  }
+  document.getElementById('hist-loading').style.display = 'none';
+}
+
+function renderHistorialList(tattoos) {
+  const list = document.getElementById('hist-list');
+  list.innerHTML = '';
+  if (!tattoos.length) {
+    list.innerHTML = '<div style="color:#666;text-align:center;padding:30px;font-size:13px;">Cap tattoo trobat</div>';
+    return;
+  }
+  tattoos.forEach(t => {
+    const nFotos = (t.tattoo_fotos || []).length;
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.onclick   = () => openTattooDetail(t);
+    div.innerHTML = `
+      <div class="hist-item-info">
+        <div class="hist-item-date">${t.data || '—'}</div>
+        <div class="hist-item-desc">${t.concepte || 'Tattoo'} · ${t.preu ? parseFloat(t.preu).toFixed(0) + ' €' : '—'}</div>
+        <div class="hist-item-client">${t.telefon ? '📞 ' + t.telefon : 'Walk-in'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="hist-foto-badge">📷 ${nFotos}</span>
+        <span style="color:#555;font-size:16px;">›</span>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function openTattooDetail(t) {
+  const tattooId = t?.id;
+  historialTattooId = tattooId;
+
+  // Amaga la llista i els filtres, mostra el detall
+  document.getElementById('hist-list-section').style.display  = 'none';
+  document.getElementById('hist-filters').style.display       = 'none';
+  document.getElementById('hist-detail').style.display        = 'flex';
+  document.getElementById('hist-detail-empty').style.display  = 'none';
+  document.getElementById('hist-detail-grid').innerHTML       = '';
+  const ihcf = document.getElementById('inp-hist-camera-foto'); if (ihcf) ihcf.value = '';
+  const ihcv = document.getElementById('inp-hist-camera-video'); if (ihcv) ihcv.value = '';
+
+  // Capçalera: data i telèfon mentre es carrega el nom
+  document.getElementById('hist-detail-title').textContent  = t.data || '—';
+  document.getElementById('hist-detail-client').textContent = t.telefon ? `📞 ${t.telefon}` : 'Walk-in';
+  document.getElementById('hist-detail-data').style.display = 'none';
+
+  // Fotos + nom client en paral·lel
+  document.getElementById('hist-detail-loading').style.display = 'block';
+  try {
+    const [fotosArr, clientArr] = await Promise.all([
+      apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos?tattoo_id=eq.${tattooId}&select=id,public_url,storage_path,is_video&order=created_at.asc`, { headers: hdrs() }),
+      t.telefon ? apiFetch(`${SUPA_URL}/rest/v1/clients?telefon=eq.${encodeURIComponent(t.telefon)}&select=nom,cognom&limit=1`, { headers: hdrs() }).catch(() => []) : Promise.resolve([]),
+    ]);
+
+    // Nom del client
+    const cl = clientArr?.[0];
+    const nomClient = cl ? [cl.nom, cl.cognom].filter(Boolean).join(' ') : null;
+    document.getElementById('hist-detail-client').textContent = nomClient || (t.telefon ? `📞 ${t.telefon}` : 'Walk-in');
+
+    // Fotos
+    const fotos = fotosArr || [];
+    const idx = historialData.findIndex(x => x.id === tattooId);
+    if (idx >= 0) historialData[idx].tattoo_fotos = fotos;
+    document.getElementById('hist-detail-loading').style.display = 'none';
+    renderDetailGrid(fotos, tattooId);
+  } catch(e) {
+    document.getElementById('hist-detail-loading').style.display = 'none';
+    document.getElementById('hist-detail-grid').innerHTML =
+      `<div style="color:#ef4444;padding:16px;font-size:12px;text-align:center;">Error: ${e.message}</div>`;
+  }
+}
+
+function renderDetailGrid(fotos, tattooId) {
+  const grid  = document.getElementById('hist-detail-grid');
+  const empty = document.getElementById('hist-detail-empty');
+  grid.innerHTML = '';
+  if (!fotos.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  fotos.forEach(f => {
+    const isVideo = f.is_video || (f.public_url || '').match(/\.(mp4|mov|webm)/i);
+    const div = document.createElement('div');
+    div.className = 'foto-thumb'; div.dataset.fotoid = f.id;
+    if (isVideo) {
+      div.innerHTML = `<video src="${f.public_url}" muted playsinline preload="metadata"></video><span class="video-badge">▶</span><button class="foto-del" onclick="delFotoHistorial(${f.id},'${(f.storage_path||'').replace(/'/g,"\\'")}',${tattooId})">✕</button>`;
+    } else {
+      div.innerHTML = `<img src="${f.public_url}"><button class="foto-del" onclick="delFotoHistorial(${f.id},'${(f.storage_path||'').replace(/'/g,"\\'")}',${tattooId})">✕</button>`;
+    }
+    grid.appendChild(div);
+  });
+}
+
+async function addFotoHistorial(files) {
+  if (!files || !files.length || !historialTattooId) return;
+  const t = historialData.find(x => x.id === historialTattooId);
+  if (!t) return;
+  showLoading('Pujant arxiu...');
+  const folder = (t.telefon || 'walkin').replace(/\D/g, '');
+  try {
+    for (const file of Array.from(files)) {
+      const isVideo = file.type.startsWith('video/');
+      const blob = isVideo ? file : await compressImg(file);
+      const { url, path } = await uploadMedia(blob, folder, isVideo);
+      const res = await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos`, {
+        method: 'POST',
+        headers: hdrs({ 'Prefer': 'return=representation' }),
+        body: JSON.stringify({
+          client_telefon: (t.telefon || '').replace(/\s/g, '') || null,
+          storage_path: path, public_url: url,
+          uploaded_by: state.tatuador,
+          tattoo_id: historialTattooId,
+          is_video: !!isVideo
+        })
+      });
+      const nova = res?.[0];
+      if (nova) { if (!t.tattoo_fotos) t.tattoo_fotos = []; t.tattoo_fotos.push(nova); }
+    }
+    renderDetailGrid(t.tattoo_fotos || [], historialTattooId);
+    showToast('✓ Arxiu afegit', 'ok');
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+  hideLoading();
+  const ihc = document.getElementById('inp-hist-camera');
+  if (ihc) ihc.value = '';
+  const ihg = document.getElementById('inp-hist-galeria');
+  if (ihg) ihg.value = '';
+}
+
+async function delFotoHistorial(fotoId, storagePath, tattooId) {
+  if (!confirm('Eliminar aquesta foto?')) return;
+  showLoading('Eliminant...');
+  try {
+    if (storagePath) {
+      await fetch(`${QNAP_URL}/api/media?path=${encodeURIComponent(storagePath)}`, {
+        method: 'DELETE', headers: { 'Authorization': `Bearer ${state.mediaToken}` }
+      }).catch(() => {});
+    }
+    await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos?id=eq.${fotoId}`, {
+      method: 'DELETE', headers: hdrs()
+    });
+    const t = historialData.find(x => x.id === tattooId);
+    if (t && t.tattoo_fotos) {
+      t.tattoo_fotos = t.tattoo_fotos.filter(f => f.id !== fotoId);
+      renderDetailGrid(t.tattoo_fotos, tattooId);
+    }
+    showToast('✓ Foto eliminada', 'ok');
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+  hideLoading();
+}
+
+// Accés directe des de l'App Client (botó + PIN) via ?pin=XXXX a la URL.
+// Netegem la URL immediatament (mai deixar el PIN visible ni a l'historial),
+// i reutilitzem exactament la mateixa validació que l'entrada manual (checkPin).
+function tryAutoLoginFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const urlPin = params.get('pin');
+  if (!urlPin) return;
+  history.replaceState(null, '', location.pathname);
+  if (!/^\d{4}$/.test(urlPin)) return;
+  state.viaClientPin = true; // Punt 8: recorda que ve del botó+PIN de l'App Client
+  pinBuffer = urlPin;
+  updatePinDots();
+  checkPin();
+}
+
+initPin().then(tryAutoLoginFromUrl);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Comprova actualitzacions cada 2 minuts
+    setInterval(() => reg.update(), 2 * 60 * 1000);
+    // Comprova quan l'app torna al primer pla
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) reg.update();
+    });
+  });
+  // Auto-reload quan el SW envia signal d'actualització (postMessage)
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data && e.data.type === 'SW_UPDATED') window.location.reload();
+  });
+  // Fallback: auto-reload quan canvia el controlador
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
+
+// ── Verificació de versió JS (independent del SW, fiable a iOS Safari) ───────
+(function(){
+  const VER = APP_VER;
+  async function checkVer(){
+    if(document.hidden) return;
+    try{
+      const r = await fetch('./?_cb='+Date.now(), {cache:'no-store'});
+      const text = (await r.text()).substring(0,300);
+      const m = text.match(/Versió\s+([0-9]+\.[0-9]+\.[0-9]+)/);
+      if(m && m[1] !== VER) window.location.reload(true);
+    }catch(_){}
+  }
+  setInterval(checkVer, 2*60*1000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) setTimeout(checkVer,1000); });
+  setTimeout(checkVer, 8*1000);
+})();
+</script>
+</body>
+</html>

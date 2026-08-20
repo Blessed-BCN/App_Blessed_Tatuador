@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fons negre -->
+  <rect width="512" height="512" rx="110" fill="#1a1a1a"/>
+  <!-- Vora daurada -->
+  <rect x="18" y="18" width="476" height="476" rx="96" fill="none" stroke="#c9a84c" stroke-width="7"/>
+  <!-- Text "Tatuador" mida reduïda -->
+  <text x="256" y="220"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="88"
+        font-weight="bold"
+        fill="#ffffff"
+        text-anchor="middle"
+        letter-spacing="-1">Tatuador</text>
+  <!-- Línia separadora daurada -->
+  <line x1="90" y1="255" x2="422" y2="255" stroke="#c9a84c" stroke-width="2" opacity="0.6"/>
+  <!-- Text "Blessed" petit -->
+  <text x="256" y="330"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="72"
+        font-weight="bold"
+        fill="#c9a84c"
+        text-anchor="middle"
+        letter-spacing="3">Blessed</text>
+</svg>
