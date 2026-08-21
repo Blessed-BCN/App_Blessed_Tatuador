@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.15.4 | Data: 2026-07-19 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.16.0 | Data: 2026-08-21 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1105,7 +1105,7 @@ const SUPA_KEY = TEST_MODE
 // només quan la sessió ha vingut del botó+PIN de l'App Client (dispositiu iPad compartit)
 const CLIENT_URL = TEST_MODE
   ? 'https://jlpdespatx.myqnapcloud.com:8446/client/'
-  : 'https://blessed-checkin.puyaltoworks.workers.dev/';
+  : 'https://blessed-bcn.github.io/App_Blessed_Client/';
 
 // ── QNAP Media Storage ──────────────────────────────────────────────────────
 const QNAP_URL    = 'https://jlpdespatx.myqnapcloud.com:8444';
@@ -1314,7 +1314,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.15.4", APP_DATE="2026-07-19";
+const APP_VER="2.16.0", APP_DATE="2026-08-21";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
