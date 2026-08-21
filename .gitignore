@@ -1,0 +1,17 @@
+# Backups locals amb versions antigues (poden contenir secrets històrics)
+backs/
+
+# Sessions/config local de Claude Code
+.claude/
+
+# Fitxers de desenvolupament local sense ús a producció
+serve.ps1
+screenshot_preview.jpg
+
+# Documentació de negoci / infraestructura — aniran al repositori privat (Fase 6, punt 2)
+CLAUDE.md
+nginx.conf
+
+# Sistema
+.DS_Store
+Thumbs.db
