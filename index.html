@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.16.0 | Data: 2026-08-21 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.0 | Data: 2026-08-22 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -210,6 +210,7 @@
     .badge-cita  { background: #1e3a5f; color: #60a5fa; }
     .badge-medic { background: #7f1d1d; color: #fca5a5; }
     .badge-dep   { background: #14532d; color: var(--green); }
+    .badge-dep-btn { background: var(--gold); color: #1a1a1a; border: none; cursor: pointer; font: inherit; letter-spacing: .5px; }
     .badge-bon   { background: #2e1065; color: #a78bfa; }
     .badge-walkin{ background: #3a2a00; color: var(--gold); }
 
@@ -1314,7 +1315,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.16.0", APP_DATE="2026-08-21";
+const APP_VER="2.17.0", APP_DATE="2026-08-22";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2400,6 +2401,24 @@ function hideClientQR() {
   document.getElementById('overlay-qr-client').style.display = 'none';
 }
 
+// ── Marcar dipòsit com a cobrat (confirmació ràpida, no crea ni edita imports) ─
+async function marcarDepositCobrat() {
+  if (!state.citaId || !state.deposit || state.deposit.cobrat) return;
+  try {
+    await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(state.citaId)}`, {
+      method: 'PATCH',
+      headers: hdrs({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ deposit_cobrat: true })
+    });
+    state.deposit.cobrat = true;
+    showToast('✓ Dipòsit marcat com a cobrat', 'ok');
+    showClientBanner();
+    saveSession();
+  } catch (e) {
+    showToast('Error marcant el dipòsit: ' + e.message, 'err');
+  }
+}
+
 // ── Client banner ────────────────────────────────────────────────────────
 function showClientBanner() {
   const banner = document.getElementById('client-banner');
@@ -2410,10 +2429,18 @@ function showClientBanner() {
   badges.innerHTML = '';
 
   if (state.deposit.import > 0) {
-    const b = document.createElement('span');
-    b.className = 'badge badge-dep';
-    b.textContent = `Dipòsit ${state.deposit.cobrat ? '✓' : '!'} ${state.deposit.import}€`;
-    badges.appendChild(b);
+    if (!state.deposit.cobrat && state.citaId) {
+      const b = document.createElement('button');
+      b.className = 'badge badge-dep badge-dep-btn';
+      b.textContent = `! He rebut el dipòsit (${state.deposit.import}€)`;
+      b.onclick = marcarDepositCobrat;
+      badges.appendChild(b);
+    } else {
+      const b = document.createElement('span');
+      b.className = 'badge badge-dep';
+      b.textContent = `Dipòsit ${state.deposit.cobrat ? '✓' : '!'} ${state.deposit.import}€`;
+      badges.appendChild(b);
+    }
   }
   if (state.bon.codi) {
     const b = document.createElement('span');
