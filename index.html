@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.0 | Data: 2026-08-22 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.1 | Data: 2026-08-22 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1315,7 +1315,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.17.0", APP_DATE="2026-08-22";
+const APP_VER="2.17.1", APP_DATE="2026-08-22";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -1839,11 +1839,12 @@ async function sendPinRecovery() {
   try {
     const [users, opts] = await Promise.all([
       apiFetch(`${SUPA_URL}/rest/v1/allowed_users?nom=eq.${encodeURIComponent(nomKey)}&select=nom,email`, { headers: hdrs() }),
-      apiFetch(`${SUPA_URL}/rest/v1/opcions?limit=1`, { headers: hdrs() })
+      apiFetch(`${SUPA_URL}/rest/v1/opcions?select=id,valors&id=in.(mailer_url,mailer_key)`, { headers: hdrs() })
     ]);
     const email     = users?.[0]?.email;
-    const mailerUrl = opts?.[0]?.mailer_url;
-    const mailerKey = opts?.[0]?.mailer_key || '';
+    const optsById  = Object.fromEntries((opts || []).map(o => [o.id, o.valors]));
+    const mailerUrl = optsById.mailer_url;
+    const mailerKey = optsById.mailer_key || '';
     if (!email) {
       msgEl.style.color = '#ef4444';
       msgEl.textContent = 'No hi ha email configurat per a aquest nom. Contacta amb l\'administrador.';
