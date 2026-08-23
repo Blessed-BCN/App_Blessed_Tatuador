@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.2 | Data: 2026-08-23 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.3 | Data: 2026-08-23 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1255,8 +1255,10 @@ async function handleFotosOverlay(files) {
   hideLoading();
   updateFotosOverlay();
   saveSession();
-  const ic = document.getElementById('inp-fotos-camera');
-  if (ic) ic.value = '';
+  const icFoto = document.getElementById('inp-fotos-camera-foto');
+  if (icFoto) icFoto.value = '';
+  const icVideo = document.getElementById('inp-fotos-camera-video');
+  if (icVideo) icVideo.value = '';
   const ig = document.getElementById('inp-fotos-galeria');
   if (ig) ig.value = '';
 }
@@ -1291,7 +1293,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.17.2", APP_DATE="2026-08-23";
+const APP_VER="2.17.3", APP_DATE="2026-08-23";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2699,8 +2701,10 @@ function resetApp() {
   btnGravar.textContent = 'Gravar tattoo ✓';
   document.getElementById('fotos-ov-empty').style.display = 'block';
   document.getElementById('fotos-ov-count').textContent = '';
-  const _ic = document.getElementById('inp-fotos-camera');
-  if (_ic) _ic.value = '';
+  const _icFoto = document.getElementById('inp-fotos-camera-foto');
+  if (_icFoto) _icFoto.value = '';
+  const _icVideo = document.getElementById('inp-fotos-camera-video');
+  if (_icVideo) _icVideo.value = '';
   const _ig = document.getElementById('inp-fotos-galeria');
   if (_ig) _ig.value = '';
 
