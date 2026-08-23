@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.1 | Data: 2026-08-22 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.2 | Data: 2026-08-23 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -207,7 +207,6 @@
       font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
       letter-spacing: .5px; white-space: nowrap;
     }
-    .badge-cita  { background: #1e3a5f; color: #60a5fa; }
     .badge-medic { background: #7f1d1d; color: #fca5a5; }
     .badge-dep   { background: #14532d; color: var(--green); }
     .badge-dep-btn { background: var(--gold); color: #1a1a1a; border: none; cursor: pointer; font: inherit; letter-spacing: .5px; }
@@ -326,7 +325,6 @@
     .res-grid-3-2 .res-cell.cell-total .r-lbl { color: #a0927a; }
     .res-grid-3-2 .res-cell.cell-total .r-val { color: #6b5320; }
     .r-val.negative { color: var(--red) !important; font-weight: 700; }
-    .ble-badge { font-size:11px; line-height:1.7; color:#6b5320; background:#fdf6e3; border:1px solid #ddc97a; border-radius:8px; padding:7px 10px; margin-bottom:8px; }
     .wrap.editable, .col-pct .wrap.editable, .col-pct-2 .pct-part .wrap.editable { background: #fdf9ee; border-color: #ddc97a; }
     .wrap.editable:focus-within, .col-pct .wrap.editable:focus-within, .col-pct-2 .pct-part .wrap.editable:focus-within { border-color: var(--gold); }
 
@@ -341,7 +339,6 @@
     }
     .tog.active-si  { background: #dcfce7; border-color: var(--green); color: #15803d; }
     .tog.active-no  { background: #fee2e2; border-color: var(--red);   color: #b91c1c; }
-    .tog.active-sel { background: #fdf9ee; border-color: var(--gold);  color: var(--black); }
 
     /* ── GRAVAR DADES BUTTON ── */
     #btn-enviar {
@@ -1074,9 +1071,6 @@
           <span class="r-lbl" id="lbl-totBleIva">Total Blessed IVA inclòs</span>
           <span class="r-val" id="totBleIva">—</span>
         </div>
-        <!-- E: elements auxiliars ocults (usats per calc interna) -->
-        <div id="ble-ja-cobrat" style="display:none;"></div>
-        <div id="row-ble-avui" style="display:none;"><span id="lbl-ble-avui"></span><span id="bleAvui"></span></div>
       </div>
     </div>
   </div>
@@ -1232,24 +1226,6 @@ function goToFotos() {
   document.getElementById('overlay-fotos').style.display = 'flex';
 }
 
-function _obrirCameraDinamica(callback) {
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'image/*,video/*';
-  inp.setAttribute('capture', 'environment');
-  inp.style.position = 'fixed';
-  inp.style.top = '-9999px';
-  inp.style.opacity = '0';
-  document.body.appendChild(inp);
-  inp.onchange = function() {
-    if (inp.files && inp.files.length) callback(inp.files);
-    document.body.removeChild(inp);
-  };
-  inp.click();
-}
-function obrirCameraOverlay() { _obrirCameraDinamica(handleFotosOverlay); }
-function obrirCameraHistorial() { _obrirCameraDinamica(addFotoHistorial); }
-
 function backToForm() {
   document.getElementById('overlay-fotos').style.display = 'none';
 }
@@ -1315,7 +1291,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.17.1", APP_DATE="2026-08-22";
+const APP_VER="2.17.2", APP_DATE="2026-08-23";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 

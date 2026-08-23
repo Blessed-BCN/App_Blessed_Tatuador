@@ -1,4 +1,4 @@
-const CACHE = 'blessed-tatuador-v2.17.1';
+const CACHE = 'blessed-tatuador-v2.17.2';
 const ASSETS = ['/tatuador/', '/tatuador/index.html', '/tatuador/manifest.json', '/tatuador/icon.svg', '/tatuador/icons/icon-192.png', '/tatuador/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
