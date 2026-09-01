@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.3 | Data: 2026-08-23 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.4 | Data: 2026-08-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -665,7 +665,7 @@
     <div class="must-reg-title" id="must-reg-title">Client no registrat</div>
     <div class="must-reg-sub" id="must-reg-sub">Aquest client no té compte. Ha de registrar-se i signar els consentiments abans de fer el tattoo.</div>
     <img id="must-reg-qr-img" class="must-reg-qr" src="" alt="QR registre">
-    <div class="must-reg-url">blessed-checkin.esparkic.workers.dev</div>
+    <div class="must-reg-url">blessed-checkin.puyaltoworks.workers.dev</div>
     <button class="must-reg-retry" onclick="retrySearch()">✓ Ja s'ha registrat</button>
     <button class="must-reg-back" onclick="hideMustRegister()">← Tornar enrere</button>
   </div>
@@ -677,7 +677,7 @@
   <div class="overlay-title">QR per al client</div>
   <div class="overlay-sub">El client escaneja aquest QR<br>per obrir l'app de check-in al seu mòbil</div>
   <img id="img-client-qr" src="" alt="QR App Client" style="width:240px;height:240px;border-radius:12px;border:4px solid var(--gold);margin-bottom:20px;background:#fff;">
-  <div style="color:#888;font-size:11px;text-align:center;margin-bottom:28px;">blessed-checkin.esparkic.workers.dev</div>
+  <div style="color:#888;font-size:11px;text-align:center;margin-bottom:28px;">blessed-checkin.puyaltoworks.workers.dev</div>
   <button onclick="hideClientQR()" style="background:var(--gold);border:none;border-radius:10px;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 40px;cursor:pointer;">✓ Tancar</button>
 </div>
 
@@ -1293,7 +1293,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.17.3", APP_DATE="2026-08-23";
+const APP_VER="2.17.4", APP_DATE="2026-08-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2370,7 +2370,7 @@ function skipQR() {
 }
 
 // ── QR per al client ──────────────────────────────────────────────────────
-const CLIENT_APP_URL = 'https://blessed-checkin.esparkic.workers.dev/';
+const CLIENT_APP_URL = 'https://blessed-checkin.puyaltoworks.workers.dev/';
 function showClientQR() {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(CLIENT_APP_URL)}&bgcolor=ffffff&color=1a1a1a&margin=14`;
   document.getElementById('img-client-qr').src = qrUrl;
