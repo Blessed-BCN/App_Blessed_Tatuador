@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.17.4 | Data: 2026-08-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.19.1 | Data: 2026-10-25 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -523,6 +523,68 @@
       margin-top: 8px; background: none; border: 1px solid #444; color: #888;
       font-size: 12px; padding: 8px 20px; border-radius: 8px; cursor: pointer; width: 100%;
     }
+
+    /* ── Taula de pendents (omplir-los tots de cop) ── mòbil: targetes · ≥900px: taula */
+    #overlay-lots { position: fixed; inset: 0; z-index: 150; background: #111; display: none; flex-direction: column; }
+    .lots-scroll { flex: 1; overflow-y: auto; padding: 10px 12px 96px; -webkit-overflow-scrolling: touch; }
+    .lots-sum { display: flex; gap: 8px; margin-bottom: 10px; }
+    .lots-sum > div { flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 9px; padding: 6px 10px; }
+    .lots-sum .k { font-size: 10px; color: #888; text-transform: uppercase; }
+    .lots-sum .v { font-size: 16px; font-weight: 800; color: #e0e0e0; }
+    .lots-hdr { display: none; }
+    .lots-row { background: #1a1a1a; border: 1px solid #2a2a2a; border-left: 4px solid #ef4444; border-radius: 12px;
+      padding: 10px; margin-bottom: 9px; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px 10px; }
+    .lots-row.ok { border-left-color: #4ade80; }
+    .lots-row.mig { border-left-color: #c9a84c; }
+    .lots-row.desat { opacity: .55; border-left-color: #4ade80; }
+    .lots-row.descartat { opacity: .4; border-left-color: #555; }
+    .lots-row .lc-full { grid-column: 1 / -1; }
+    .lots-row .lc-buit { display: none; }
+    .lots-row .lc[data-l]::before { content: attr(data-l); display: block; font-size: 10px; font-weight: 700;
+      color: #c9a84c; text-transform: uppercase; margin-bottom: 3px; }
+    .lots-in { width: 100%; background: #232327; border: 1px solid #38383e; border-radius: 8px; color: #e0e0e0;
+      font-size: 15px; padding: 8px; font-family: inherit; }
+    .lots-in.err { border-color: #ef4444; }
+    .lots-seg { display: flex; border: 1px solid #38383e; border-radius: 8px; overflow: hidden; }
+    .lots-seg button { flex: 1; background: none; border: none; color: #888; padding: 8px 0; font-size: 13px; cursor: pointer; }
+    .lots-seg button.on { background: #c9a84c; color: #111; font-weight: 800; }
+    .lots-seg button:disabled { opacity: .35; cursor: not-allowed; }
+    .lots-calc { background: #13261a; border-radius: 8px; padding: 7px 9px; font-weight: 800; color: #e0e0e0; font-size: 14px; }
+    .lots-nom { font-weight: 700; color: #e0e0e0; font-size: 14px; }
+    .lots-sub { font-size: 11px; color: #888; }
+    .lots-badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 999px; margin: 3px 3px 0 0; }
+    .lots-fotos { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .lots-th { position: relative; width: 44px; height: 44px; border-radius: 7px; overflow: hidden; background: #2a2a2e; }
+    .lots-th img, .lots-th video { width: 100%; height: 100%; object-fit: cover; }
+    .lots-th button { position: absolute; top: 0; right: 0; background: rgba(0,0,0,.7); border: none; color: #fff;
+      font-size: 10px; width: 17px; height: 17px; padding: 0; cursor: pointer; }
+    .lots-cam { width: 44px; height: 44px; border: 1.5px dashed #c9a84c; border-radius: 7px; color: #c9a84c;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
+    .lots-cam.err { border-color: #ef4444; }
+    .lots-acts { display: flex; gap: 8px; }
+    .lots-acts button { border-radius: 9px; font-weight: 800; font-size: 14px; padding: 10px 0; cursor: pointer; }
+    .lots-desa { flex: 1; background: #4ade80; color: #0b1a10; border: none; }
+    .lots-desa:disabled { background: #2a2a2e; color: #666; cursor: not-allowed; }
+    .lots-desc { flex: 0 0 56px; background: none; border: 1px solid #5a2424; color: #ffb4b4; }
+    .lots-st { font-size: 11px; font-weight: 700; margin-top: 5px; }
+    .lots-foot { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; padding: 10px 12px;
+      background: linear-gradient(transparent, #111 30%); }
+    .lots-foot button { border-radius: 10px; font-weight: 800; font-size: 14px; padding: 12px 14px; cursor: pointer; white-space: nowrap; }
+    @media (min-width: 900px) {
+      .lots-hdr, .lots-row { display: grid; align-items: center; gap: 0 8px;
+        grid-template-columns: minmax(170px,1.6fr) 90px 110px 110px 92px minmax(110px,1fr) 64px 74px 120px 88px 88px 130px; }
+      .lots-hdr { font-size: 10px; font-weight: 700; color: #c9a84c; text-transform: uppercase; padding: 0 10px 6px 14px; }
+      .lots-row { border-radius: 8px; margin-bottom: 5px; padding: 8px 10px; }
+      .lots-row .lc-full { grid-column: auto; }
+      .lots-row .lc-buit { display: block; }
+      .lots-row .lc[data-l]::before { display: none; }
+      .lots-in { font-size: 13px; padding: 6px; }
+      .lots-seg button { padding: 6px 0; }
+      .lots-th, .lots-cam { width: 36px; height: 36px; }
+      .lots-calc { background: none; padding: 0; }
+      .lots-acts button { font-size: 13px; padding: 7px 0; }
+      .lots-desc { flex-basis: 40px; }
+    }
   </style>
 </head>
 <body>
@@ -760,9 +822,47 @@
     <button id="cites-tab-dema" onclick="setCitesTab('dema')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">Demà</button>
     <button id="cites-tab-tot" onclick="setCitesTab('tot')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">Properes</button>
     <button id="cites-tab-espera" onclick="setCitesTab('espera')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">🚶 Espera</button>
+    <button id="cites-tab-pendents" onclick="setCitesTab('pendents')" style="flex:1;background:none;border:none;border-bottom:2px solid transparent;color:#666;font-size:13px;font-weight:700;padding:10px 0;cursor:pointer;">🔴 Pendents</button>
+  </div>
+  <div id="pendents-pref-row" style="display:none;padding:10px 14px;border-bottom:1px solid #2a2a2a;background:#111;">
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#888;cursor:pointer;">
+      <input type="checkbox" id="chk-pendents-pref" onchange="togglePendentsPref(this.checked)" style="width:16px;height:16px;">
+      Obrir sempre aquesta pantalla en entrar (mode per lots)
+    </label>
+    <button onclick="showLots()" style="width:100%;margin-top:10px;background:#c9a84c;border:none;border-radius:8px;color:#111;font-size:13px;font-weight:800;padding:11px;cursor:pointer;">📋 Omplir-los tots de cop (taula)</button>
   </div>
   <div id="cites-loading" style="display:none;padding:20px;text-align:center;color:#666;font-size:13px;">⏳ Carregant...</div>
   <div id="cites-list" class="hist-list"></div>
+  <div id="pendents-manual-row" style="display:none;padding:14px;">
+    <button onclick="hideCites();goToQR();" style="width:100%;background:none;border:1px dashed #444;border-radius:8px;color:#888;font-size:12px;font-weight:600;padding:12px;cursor:pointer;">+ Afegir tatuatge sense check-in previ</button>
+  </div>
+</div>
+
+<!-- ── TAULA DE PENDENTS (omplir-los tots de cop) ── -->
+<div id="overlay-lots">
+  <div class="fotos-ov-header">
+    <button class="fotos-ov-back" onclick="hideLots()">← Pendents</button>
+    <div class="fotos-ov-title">🔴 Pendents d'avui</div>
+    <button onclick="loadLots()" style="background:none;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;padding:6px 10px;cursor:pointer;">↻</button>
+  </div>
+  <div class="lots-scroll">
+    <div class="lots-sum">
+      <div><div class="k">Cobrar avui</div><div class="v" id="lots-tot-net">—</div></div>
+      <div><div class="k">Per al tatuador</div><div class="v" id="lots-tot-tat">—</div></div>
+      <div><div class="k">Desats</div><div class="v" id="lots-tot-n">—</div></div>
+    </div>
+    <div class="lots-hdr">
+      <div>Client</div><div>Preu €</div><div>Cobrament</div><div>Concepte</div><div>Feina tat.</div>
+      <div>Col·laborador</div><div>% base</div><div>Dip. rebut</div><div>Fotos</div>
+      <div>Cobrar avui</div><div>Per al tatuador</div><div></div>
+    </div>
+    <div id="lots-list"></div>
+  </div>
+  <div class="lots-foot">
+    <button onclick="hideLots();hideCites();goToQR();" title="Afegir tatuatge sense check-in previ"
+      style="background:#1a1a1a;border:1px dashed #c9a84c;color:#c9a84c;">+ Sense check-in</button>
+    <button id="lots-btn-tot" onclick="lotsDesaTot()" style="flex:1;background:#c9a84c;border:none;color:#111;">💾 Desa tot</button>
+  </div>
 </div>
 
 <!-- ── FOTOS OVERLAY ── -->
@@ -810,6 +910,7 @@
   </div>
   <div style="display:flex;gap:6px;align-items:center;">
     <button class="btn-historial" id="btn-historial" style="display:none;" onclick="showHistorial()" title="Els meus tattoos">📋</button>
+    <button class="btn-historial" id="btn-pendents" style="display:none;" onclick="showCites('pendents')" title="Tattoos pendents (check-in fet)">🔴</button>
     <button class="btn-reset" onclick="resetApp()">Nou</button>
   </div>
 </header>
@@ -1293,7 +1394,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.17.4", APP_DATE="2026-08-26";
+const APP_VER="2.19.1", APP_DATE="2026-10-25";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -1994,6 +2095,7 @@ function onPinOk() {
   document.getElementById('btn-historial').style.display = '';
   document.getElementById('btn-historial-qr').style.display = '';
   document.getElementById('btn-cites-qr').style.display = '';
+  document.getElementById('btn-pendents').style.display = '';
   // Badges autònom/no autònom
   document.getElementById('badge-autonom').style.display    = state.esAutonom ? '' : 'none';
   document.getElementById('badge-assalariat').style.display = state.esAutonom ? 'none' : '';
@@ -2009,8 +2111,22 @@ function onPinOk() {
     document.getElementById('bio-step').style.display = 'flex';
   } else {
     document.getElementById('overlay-pin').style.display = 'none';
-    if (!checkSavedSession()) goToSalaEspera();
+    if (!checkSavedSession()) goToHomeAfterLogin();
   }
+}
+
+// ── Pantalla d'inici configurable (sala d'espera vs. pendents) — a producció des de v2.19.1 ──
+function goToHomeAfterLogin() {
+  if (state.tatuador && localStorage.getItem('tat_default_pendents_' + state.tatuador) === '1') {
+    showCites('pendents');
+  } else {
+    goToSalaEspera();
+  }
+}
+function togglePendentsPref(checked) {
+  if (!state.tatuador) return;
+  const key = 'tat_default_pendents_' + state.tatuador;
+  if (checked) localStorage.setItem(key, '1'); else localStorage.removeItem(key);
 }
 
 async function doBioAuth() {
@@ -2052,13 +2168,13 @@ async function doBioRegister() {
   }
   document.getElementById('bio-step').style.display = 'none';
   document.getElementById('overlay-pin').style.display = 'none';
-  goToSalaEspera();
+  goToHomeAfterLogin();
 }
 
 function closeBioOffer() {
   document.getElementById('bio-step').style.display = 'none';
   document.getElementById('overlay-pin').style.display = 'none';
-  goToSalaEspera();
+  goToHomeAfterLogin();
 }
 
 // ── QR Scanner en temps real ──────────────────────────────────────────────
@@ -2465,21 +2581,35 @@ function showExtras() {
 // Reutilitza calcEconomia() perquè el que es desa sigui SEMPRE exactament
 // el mateix que el que s'ha mostrat en pantalla (i el mateix que calcularia l'App Blessed).
 function buildDiariRow(dataOverride) {
-  const preu = parseFloat(document.getElementById('preu').value) || 0;
-  const pctTatBase = parseFloat(document.getElementById('pctTatBase').value) || 0;
-  const pctCom     = parseFloat(document.getElementById('pctCom').value) || 0;
-  const cobrament  = document.getElementById('sel-cobrament').value;
-  const concepte   = document.getElementById('sel-concepte').value;
+  return buildDiariRowFrom({
+    data:       dataOverride,
+    preu:       parseFloat(document.getElementById('preu').value) || 0,
+    pctTatBase: parseFloat(document.getElementById('pctTatBase').value) || 0,
+    pctCom:     parseFloat(document.getElementById('pctCom').value) || 0,
+    cobrament:  document.getElementById('sel-cobrament').value,
+    concepte:   document.getElementById('sel-concepte').value,
+    esAutonom:  state.esAutonom,
+    tatuador:   state.tatuador,
+    email:      state.email,
+    telefon:    state.client.telefon,
+    feina:      state.feina,
+    deposit:    state.deposit,
+    bon:        state.bon
+  });
+}
 
-  const c = calcEconomia(preu, pctTatBase, pctCom, state.esAutonom, cobrament);
+// Versió sense DOM: la fa servir també la taula de pendents (cada fila té les seves dades).
+function buildDiariRowFrom(p) {
+  const { preu, pctTatBase, pctCom, cobrament } = p;
+  const c = calcEconomia(preu, pctTatBase, pctCom, p.esAutonom, cobrament);
   const percIVAval = cobrament === 'Comptat' ? 0 : 21;
 
   return {
-    data:                 dataOverride || new Date().toISOString().slice(0, 10),
-    telefon:              state.client.telefon || null,
-    tatuador:             state.tatuador,
-    user_email:           state.email || null,
-    concepte:             concepte,
+    data:                 p.data || new Date().toISOString().slice(0, 10),
+    telefon:              p.telefon || null,
+    tatuador:             p.tatuador,
+    user_email:           p.email || null,
+    concepte:             p.concepte,
     cobrament:            cobrament,
     preu:                 preu,
     preu_base:            parseFloat(c.preuBase.toFixed(2)),
@@ -2492,18 +2622,82 @@ function buildDiariRow(dataOverride) {
     total_com_ext:        parseFloat(c.totalCom.toFixed(2)),
     total_blessed:        parseFloat(c.totalBlessed.toFixed(2)),
     tot_blessed_iva:      parseFloat(c.totBlessedIva.toFixed(2)),
-    es_autonom:           state.esAutonom,
+    es_autonom:           p.esAutonom,
     irpf_pct:             c.irpfPct,
     irpf_import:          parseFloat(c.irpfImport.toFixed(2)),
     iva_tatuador:         parseFloat(c.ivaTatuador.toFixed(2)),
     total_tatuador_brut:  parseFloat(c.totalTatBrut.toFixed(2)),
-    feina_tatuador:       state.feina,
-    deposit_import:       state.deposit.import,
-    deposit_cobrat:       state.deposit.cobrat,
-    bon_id:               state.bon.id || null,
-    bon_codi:             state.bon.codi || null,
-    bon_import:           state.bon.import
+    feina_tatuador:       p.feina,
+    deposit_import:       p.deposit.import,
+    deposit_cobrat:       p.deposit.cobrat,
+    bon_id:               p.bon.id || null,
+    bon_codi:             p.bon.codi || null,
+    bon_import:           p.bon.import
   };
+}
+
+// ── Desar un tatuatge nou i els seus efectes (compartit: formulari i taula de pendents) ─
+async function persistTattoo(row, { token, citaId, bonCodi, telefon, uploadedBy, fotos }) {
+  const diariRes = await apiFetch(`${SUPA_URL}/rest/v1/diari`, {
+    method: 'POST',
+    headers: hdrs({ 'Prefer': 'return=representation' }),
+    body: JSON.stringify(row)
+  });
+  const tattooId = diariRes?.[0]?.id || null;
+
+  // Marcar token com usat
+  if (token) {
+    try {
+      await apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?token=eq.${encodeURIComponent(token)}`, {
+        method: 'PATCH',
+        headers: hdrs({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ usat: true })
+      });
+    } catch(_) {}
+  }
+
+  // B: Marcar cita com a completada (si ve de QR amb cita_id)
+  if (citaId) {
+    try {
+      await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(citaId)}`, {
+        method: 'PATCH',
+        headers: hdrs({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ estat: 'completada' })
+      });
+    } catch(_) {}
+  }
+
+  // C: Marcar val de regal com a bescanviat (si ve de QR amb bon_codi)
+  if (bonCodi) {
+    try {
+      await apiFetch(`${SUPA_URL}/rest/v1/bons_regal?codi=eq.${encodeURIComponent(bonCodi)}`, {
+        method: 'PATCH',
+        headers: hdrs({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ estat: 'bescanviat', bescanviat_at: new Date().toISOString() })
+      });
+    } catch(_) {}
+  }
+
+  // Desar fotos a tattoo_fotos amb tattoo_id correcte
+  for (const f of fotos) {
+    try {
+      await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos`, {
+        method: 'POST',
+        headers: hdrs({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({
+          client_telefon: (telefon || '').replace(/\s/g, '') || null,
+          storage_path: f.path,
+          public_url: f.url,
+          uploaded_by: uploadedBy,
+          tattoo_id: tattooId,
+          is_video: !!f.isVideo
+        })
+      });
+    } catch(e) {
+      console.warn('Error guardant foto:', e.message);
+    }
+  }
+  return tattooId;
 }
 
 // ── Gravar tattoo (des de l'overlay de fotos) ────────────────────────────
@@ -2525,65 +2719,14 @@ async function gravaTattoo() {
 
   showLoading('Gravant tattoo...');
   try {
-    const diariRes = await apiFetch(`${SUPA_URL}/rest/v1/diari`, {
-      method: 'POST',
-      headers: hdrs({ 'Prefer': 'return=representation' }),
-      body: JSON.stringify(row)
+    await persistTattoo(row, {
+      token:      state.token,
+      citaId:     state.citaId,
+      bonCodi:    state.bon && state.bon.codi,
+      telefon:    state.client.telefon,
+      uploadedBy: state.tatuador,
+      fotos:      fotosValides
     });
-    const tattooId = diariRes?.[0]?.id || null;
-
-    // Marcar token com usat
-    if (state.token) {
-      try {
-        await apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?token=eq.${encodeURIComponent(state.token)}`, {
-          method: 'PATCH',
-          headers: hdrs({ 'Prefer': 'return=minimal' }),
-          body: JSON.stringify({ usat: true })
-        });
-      } catch(_) {}
-    }
-
-    // B: Marcar cita com a completada (si ve de QR amb cita_id)
-    if (state.citaId) {
-      try {
-        await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(state.citaId)}`, {
-          method: 'PATCH',
-          headers: hdrs({ 'Prefer': 'return=minimal' }),
-          body: JSON.stringify({ estat: 'completada' })
-        });
-      } catch(_) {}
-    }
-
-    // C: Marcar val de regal com a bescanviat (si ve de QR amb bon_codi)
-    if (state.bon && state.bon.codi) {
-      try {
-        await apiFetch(`${SUPA_URL}/rest/v1/bons_regal?codi=eq.${encodeURIComponent(state.bon.codi)}`, {
-          method: 'PATCH',
-          headers: hdrs({ 'Prefer': 'return=minimal' }),
-          body: JSON.stringify({ estat: 'bescanviat', bescanviat_at: new Date().toISOString() })
-        });
-      } catch(_) {}
-    }
-
-    // Desar fotos a tattoo_fotos amb tattoo_id correcte
-    for (const f of fotosValides) {
-      try {
-        await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos`, {
-          method: 'POST',
-          headers: hdrs({ 'Prefer': 'return=minimal' }),
-          body: JSON.stringify({
-            client_telefon: (state.client.telefon || '').replace(/\s/g, '') || null,
-            storage_path: f.path,
-            public_url: f.url,
-            uploaded_by: state.tatuador,
-            tattoo_id: tattooId,
-            is_video: !!f.isVideo
-          })
-        });
-      } catch(e) {
-        console.warn('Error guardant foto:', e.message);
-      }
-    }
 
     hideLoading();
     clearSession();
@@ -2711,6 +2854,23 @@ function resetApp() {
   const btnEnviar = document.getElementById('btn-enviar');
   if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.textContent = '📷 Fotos'; }
 
+  // Si un admin havia omplert temporalment el pendent d'un altre tatuador (§ PENDENTS),
+  // restaurem la seva pròpia identitat abans de continuar (èxit o cancel·lació).
+  if (_adminOrigIdentity) {
+    state.tatuador     = _adminOrigIdentity.tatuador;
+    state.email        = _adminOrigIdentity.email;
+    state.esAutonom     = _adminOrigIdentity.esAutonom;
+    state.pctComtatSi  = _adminOrigIdentity.pctComtatSi;
+    state.pctComtatNo  = _adminOrigIdentity.pctComtatNo;
+    state.pctDiferitSi = _adminOrigIdentity.pctDiferitSi;
+    state.pctDiferitNo = _adminOrigIdentity.pctDiferitNo;
+    state.isAdmin      = _adminOrigIdentity.isAdmin;
+    _adminOrigIdentity = null;
+    document.getElementById('hdr-artist').textContent = state.tatuador;
+    document.getElementById('badge-autonom').style.display    = state.esAutonom ? '' : 'none';
+    document.getElementById('badge-assalariat').style.display = state.esAutonom ? 'none' : '';
+  }
+
   // Conservem les dades d'identitat del tatuador (nom, email, autònom, percentatges,
   // is_admin, externs) — abans es perdien en cada reset i només es recuperaven amb un
   // nou login. Només es netegen els camps propis de la sessió amb el client actual.
@@ -2744,7 +2904,12 @@ function resetApp() {
   document.getElementById('bio-step').style.display = 'none';
   if (state.tatuador) {
     document.getElementById('overlay-pin').style.display = 'none';
-    goToSalaEspera(); // torna a la sala d'espera per al següent client
+    if (_returnToPendents) {
+      _returnToPendents = false;
+      showCites('pendents');
+    } else {
+      goToSalaEspera(); // torna a la sala d'espera per al següent client
+    }
   } else {
     document.getElementById('overlay-pin').style.display = 'flex';
     stopQRScanner();
@@ -2844,17 +3009,18 @@ let citesTab = 'avui';
 
 let _citesData = [];
 
-function showCites() {
+function showCites(tab) {
   document.getElementById('overlay-cites').style.display = 'flex';
-  setCitesTab('avui');
+  setCitesTab(tab || 'avui');
 }
 function hideCites() {
   document.getElementById('overlay-cites').style.display = 'none';
 }
 function setCitesTab(tab) {
   citesTab = tab;
-  ['avui','dema','tot'].forEach(t => {
+  ['avui','dema','tot','espera','pendents'].forEach(t => {
     const btn = document.getElementById('cites-tab-' + t);
+    if (!btn) return;
     if (t === tab) {
       btn.style.borderBottomColor = '#6366f1';
       btn.style.color = '#6366f1';
@@ -2865,6 +3031,17 @@ function setCitesTab(tab) {
       btn.style.background = 'none';
     }
   });
+  const prefRow = document.getElementById('pendents-pref-row');
+  const manualRow = document.getElementById('pendents-manual-row');
+  if (tab === 'pendents') {
+    prefRow.style.display = '';
+    manualRow.style.display = '';
+    document.getElementById('chk-pendents-pref').checked =
+      state.tatuador && localStorage.getItem('tat_default_pendents_' + state.tatuador) === '1';
+  } else {
+    prefRow.style.display = 'none';
+    manualRow.style.display = 'none';
+  }
   loadCites();
 }
 async function loadCites() {
@@ -2873,6 +3050,12 @@ async function loadCites() {
   // Pestanya walk-ins en espera: tokens del dia sense cita_id
   if (citesTab === 'espera') {
     loadWalkins();
+    return;
+  }
+
+  // Pestanya pendents (mode per lots): check-ins fets encara sense tatuatge gravat
+  if (citesTab === 'pendents') {
+    loadPendents();
     return;
   }
 
@@ -3162,6 +3345,438 @@ async function registrarDesCita(cita) {
 
   } catch(e) {
     hideLoading();
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ══ PENDENTS (mode per lots) ════════════════════════════════════════════════
+// Petició d'Enric (2026-08-25), mode de proves: els tatuadors poden esperar a
+// omplir els tattoos del dia al vespre. Aquesta pestanya llista els check-ins
+// (App Client) que encara no tenen tatuatge gravat, i reutilitza exactament el
+// mateix formulari/flux que registrarDesCita() — cap lògica econòmica nova.
+let _adminOrigIdentity = null; // guarda identitat de l'admin quan omple un pendent d'un altre tatuador
+let _returnToPendents  = false; // si true, resetApp() torna a la pestanya Pendents en comptes de la sala d'espera
+
+async function loadPendents() {
+  if (!state.tatuador) return;
+  const list = document.getElementById('cites-list');
+  list.innerHTML = '';
+  document.getElementById('cites-loading').style.display = 'block';
+  const today = new Date().toISOString().slice(0, 10);
+  const tatFilter = state.isAdmin ? '' : `&tatuador=eq.${encodeURIComponent(state.tatuador)}`;
+  try {
+    const data = await apiFetch(
+      `${SUPA_URL}/rest/v1/cites?data=eq.${today}&checkin_at=not.is.null&checkin_descartat=eq.false&estat=eq.confirmada${tatFilter}&order=checkin_at.asc&limit=50`,
+      { headers: hdrs() }
+    );
+    document.getElementById('cites-loading').style.display = 'none';
+    _citesData = data || [];
+    renderPendentsList(_citesData);
+  } catch(e) {
+    document.getElementById('cites-loading').style.display = 'none';
+    list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${e.message}</div>`;
+  }
+}
+
+function renderPendentsList(data) {
+  const list = document.getElementById('cites-list');
+  list.innerHTML = '';
+  if (!data || !data.length) {
+    list.innerHTML = `<div style="color:#666;text-align:center;padding:30px;font-size:13px;">✅ Cap check-in pendent d'introduir</div>`;
+    return;
+  }
+  data.forEach((c, i) => {
+    const hores = (Date.now() - new Date(c.checkin_at).getTime()) / 3600000;
+    const color = hores < 2 ? '#4ade80' : hores < 4 ? '#c9a84c' : '#ef4444';
+    const temps = hores < 1 ? Math.round(hores * 60) + ' min' : hores.toFixed(1) + ' h';
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.style.cursor = 'default';
+    div.style.borderLeft = `4px solid ${color}`;
+    div.innerHTML = `
+      <div class="hist-item-info" style="flex:1;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+          <span style="font-size:12px;font-weight:700;color:#e0e0e0;">${c.hora_inici ? c.hora_inici.slice(0,5) : '—'}</span>
+          <span style="font-size:10px;color:${color};margin-left:auto;font-weight:700;">check-in fa ${temps}</span>
+        </div>
+        <div style="font-size:12px;color:#c9a84c;font-weight:700;">${c.client_nom || c.client_telefon || 'Client'}</div>
+        <div style="font-size:11px;color:#888;margin-top:1px;display:flex;gap:8px;flex-wrap:wrap;">
+          ${c.client_telefon ? `<span>📞 ${c.client_telefon}</span>` : ''}
+          ${state.isAdmin ? `<span>👤 ${c.tatuador}</span>` : ''}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button onclick="omplirPendent(_citesData[${i}])"
+            style="flex:1;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer;">
+            📋 Omplir tattoo
+          </button>
+          <button onclick="descartaCheckin('${c.id}')"
+            style="background:none;border:1px solid #444;border-radius:6px;color:#888;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer;">
+            ✕ Descartar
+          </button>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function omplirPendent(cita) {
+  if (!cita || !cita.id) return;
+  _returnToPendents = true;
+  // Si un admin omple el pendent d'un altre tatuador, cal carregar TEMPORALMENT
+  // la identitat (email, % comissió, autònom) d'aquell tatuador — si no, el
+  // registre quedaria atribuït econòmicament a l'admin en lloc del tatuador real.
+  // Es restaura automàticament a resetApp() en acabar (èxit o cancel·lació).
+  if (state.isAdmin && cita.tatuador && cita.tatuador !== state.tatuador) {
+    _adminOrigIdentity = {
+      tatuador: state.tatuador, email: state.email, esAutonom: state.esAutonom,
+      pctComtatSi: state.pctComtatSi, pctComtatNo: state.pctComtatNo,
+      pctDiferitSi: state.pctDiferitSi, pctDiferitNo: state.pctDiferitNo,
+      isAdmin: state.isAdmin
+    };
+    state.tatuador = cita.tatuador;
+    await fetchDadesUsuari(cita.tatuador);
+    document.getElementById('hdr-artist').textContent = state.tatuador + ' (com a admin)';
+    document.getElementById('badge-autonom').style.display    = state.esAutonom ? '' : 'none';
+    document.getElementById('badge-assalariat').style.display = state.esAutonom ? 'none' : '';
+  } else {
+    _adminOrigIdentity = null;
+  }
+  document.getElementById('overlay-sala-espera').style.display = 'none';
+  await registrarDesCita(cita);
+}
+
+async function descartaCheckin(citaId) {
+  if (!confirm('Marcar aquest check-in com a "no realitzat"?\n\nNo es crearà cap tatuatge i desapareixerà d\'aquesta llista.')) return;
+  try {
+    await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(citaId)}`, {
+      method: 'PATCH',
+      headers: hdrs({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ checkin_descartat: true })
+    });
+    showToast('Check-in descartat', 'ok');
+    loadPendents();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ══ TAULA DE PENDENTS (omplir-los tots de cop) ════════════════════════════════
+// Proposta del fill (2026-10-25): en lloc d'obrir els pendents d'un en un, es mostren
+// tots junts — taula a ordinador/iPad, targetes al mòbil — amb els mateixos camps que
+// el formulari. Cada fila es desa amb buildDiariRowFrom() + persistTattoo(), és a dir,
+// exactament el mateix càlcul i els mateixos efectes que gravaTattoo(). Cada fila porta
+// la identitat econòmica del seu tatuador (l'admin pot veure'n de diversos alhora).
+let _lots = [];
+let _lotsUsuaris = {};
+
+const lotsEsc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+
+async function showLots() {
+  document.getElementById('overlay-lots').style.display = 'flex';
+  await loadLots();
+}
+
+function hideLots() {
+  document.getElementById('overlay-lots').style.display = 'none';
+  if (document.getElementById('overlay-cites').style.display !== 'none' && citesTab === 'pendents') loadPendents();
+}
+
+async function lotsUsuari(nom) {
+  if (_lotsUsuaris[nom]) return _lotsUsuaris[nom];
+  const data = await apiFetch(
+    `${SUPA_URL}/rest/v1/allowed_users?nom=eq.${encodeURIComponent(nom)}&select=email,es_autonom,pct_comptat_si,pct_comptat_no,pct_diferit_si,pct_diferit_no`,
+    { headers: hdrs() }
+  );
+  const u = data?.[0] || {};
+  return _lotsUsuaris[nom] = {
+    email: u.email || null, esAutonom: !!u.es_autonom,
+    pctComtatSi: u.pct_comptat_si ?? 60, pctComtatNo: u.pct_comptat_no ?? 60,
+    pctDiferitSi: u.pct_diferit_si ?? 60, pctDiferitNo: u.pct_diferit_no ?? 60
+  };
+}
+
+async function loadLots() {
+  if (!state.tatuador) return;
+  const list = document.getElementById('lots-list');
+  list.innerHTML = '<div style="color:#666;text-align:center;padding:30px;font-size:13px;">⏳ Carregant...</div>';
+  _lotsUsuaris = {};
+  const today = new Date().toISOString().slice(0, 10);
+  const tatFilter = state.isAdmin ? '' : `&tatuador=eq.${encodeURIComponent(state.tatuador)}`;
+  try {
+    const cites = await apiFetch(
+      `${SUPA_URL}/rest/v1/cites?data=eq.${today}&checkin_at=not.is.null&checkin_descartat=eq.false&estat=eq.confirmada${tatFilter}&order=checkin_at.asc&limit=50`,
+      { headers: hdrs() }
+    ) || [];
+    const toks = cites.length ? await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?cita_id=in.(${cites.map(c => encodeURIComponent(c.id)).join(',')})&select=*&order=created_at.desc`,
+      { headers: hdrs() }
+    ) || [] : [];
+    const tokPerCita = {};
+    toks.forEach(t => { if (!tokPerCita[t.cita_id]) tokPerCita[t.cita_id] = t; });
+
+    _lots = await Promise.all(cites.map(async c => {
+      const t = tokPerCita[c.id] || null;
+      const telefon = t?.client_telefon || c.client_telefon || null;
+      const [u, cons] = await Promise.all([lotsUsuari(c.tatuador), loadConsentiments(telefon)]);
+      return {
+        cita: c, token: t ? t.token : null, u, telefon,
+        nom: [t?.client_nom || c.client_nom, t?.client_cognom].filter(Boolean).join(' ') || telefon || 'Client',
+        esMenor: cons.esMenor, alertaMedica: cons.alertaMedica,
+        // El dipòsit es pot haver marcat com a cobrat a la cita després del check-in (marcarDepositCobrat)
+        deposit: { import: (t ? t.deposit_import : c.deposit_import) || 0, cobrat: !!(t?.deposit_cobrat || c.deposit_cobrat) },
+        bon: { id: t?.bon_id ?? c.bon_id ?? null, codi: t?.bon_codi ?? c.bon_codi ?? null, import: (t?.bon_import ?? c.bon_import) || 0 },
+        aplicarDeposit: t ? t.aplicar_deposit !== false : true,
+        aplicarBon:     t ? t.aplicar_bon !== false : true,
+        preu: '', cobrament: '', concepte: 'Tatuatge', feina: 'No', extId: '', pctBase: null, depRebut: false,
+        fotos: [], estat: 'pendent', saving: false, error: null
+      };
+    }));
+    renderLots();
+  } catch(e) {
+    list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${lotsEsc(e.message)}</div>`;
+  }
+}
+
+// Mateixa regla que getPctBase(), però amb els percentatges del tatuador de la fila
+function lotsPctAuto(r) {
+  const esFeina = r.feina === 'Sí';
+  if (r.cobrament === 'Comptat') return esFeina ? (r.u.pctComtatSi || 60) : (r.u.pctComtatNo || 60);
+  return esFeina ? (r.u.pctDiferitSi || 60) : (r.u.pctDiferitNo || 60);
+}
+
+function lotsExt(r) { return (state.externs || []).find(e => String(e.id) === r.extId) || null; }
+
+function lotsCalc(r) {
+  const preu = parseFloat(r.preu) || 0;
+  const pctBase = r.pctBase ?? lotsPctAuto(r);
+  const ext = lotsExt(r);
+  const pctCom = ext ? (parseFloat(ext.pct) || 0) : 0;
+  if (!r.cobrament || preu <= 0) return { pctBase, pctCom, c: null };
+  const c = calcEconomia(preu, pctBase, pctCom, r.u.esAutonom, r.cobrament);
+  // Net a cobrar: mateixa regla que calc() del formulari
+  const depDesc = ((r.deposit.cobrat || r.depRebut) && r.aplicarDeposit) ? (r.deposit.import || 0) : 0;
+  const bonDesc = (r.bon.codi && r.aplicarBon) ? (r.bon.import || 0) : 0;
+  return { pctBase, pctCom, c,
+    net: Math.max(0, preu - depDesc - bonDesc),
+    perTat: r.u.esAutonom ? c.totalTatNet : c.totalTat };
+}
+
+function lotsFalta(r) {
+  const f = [];
+  if (!((parseFloat(r.preu) || 0) > 0)) f.push('preu');
+  if (!r.cobrament) f.push('cobrament');
+  if (!r.fotos.length) f.push('foto');
+  return f;
+}
+
+function lotsRowHtml(i) {
+  const r = _lots[i];
+  const tancada = r.estat !== 'pendent';
+  const dis = (tancada || r.saving) ? 'disabled' : '';
+  const k = lotsCalc(r);
+  const falta = lotsFalta(r);
+  const hores = (Date.now() - new Date(r.cita.checkin_at).getTime()) / 3600000;
+  const color = hores < 2 ? '#4ade80' : hores < 4 ? '#c9a84c' : '#ef4444';
+  const temps = hores < 1 ? Math.round(hores * 60) + ' min' : hores.toFixed(1) + ' h';
+  const cls = r.estat === 'desat' ? 'desat' : r.estat === 'descartat' ? 'descartat'
+            : !falta.length ? 'ok' : falta.length === 1 ? 'mig' : '';
+  const badges = [
+    r.esMenor ? `<span class="lots-badge" style="background:#3a2a10;color:#ffd38a;">🔞 Menor</span>` : '',
+    r.alertaMedica.length ? `<span class="lots-badge" style="background:#3a1717;color:#ffb4b4;" title="${lotsEsc(r.alertaMedica.join(' · '))}">🩺 Afecció mèdica</span>` : '',
+    r.deposit.import ? `<span class="lots-badge" style="background:${r.deposit.cobrat ? '#13261a;color:#8fe3a8' : '#3a2a10;color:#ffd38a'};">Dipòsit ${r.deposit.import}€ ${r.deposit.cobrat ? '✓' : '!'}</span>` : '',
+    r.bon.codi ? `<span class="lots-badge" style="background:#2a1838;color:#e1b8ff;">🎁 Val ${r.bon.import}€</span>` : '',
+    (!r.deposit.import && !r.bon.codi) ? `<span class="lots-badge" style="background:#26262a;color:#aaa;">Walk-in</span>` : ''
+  ].join('');
+  const ext = lotsExt(r);
+  const extOpts = ['<option value="">—</option>'].concat((state.externs || []).map(e =>
+    `<option value="${e.id}" ${String(e.id) === r.extId ? 'selected' : ''}>${lotsEsc(e.nom)} (${e.pct}%)</option>`)).join('');
+  const opt = (v, txt, cur) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${txt}</option>`;
+  const fotos = r.fotos.map((f, j) => `<div class="lots-th">${f.isVideo ? `<video src="${f.url}" muted playsinline preload="metadata"></video>` : `<img src="${f.url}">`}${tancada ? '' : `<button onclick="lotsDelFoto(${i},${j})">✕</button>`}</div>`).join('');
+  let st;
+  if (r.saving) st = `<span style="color:#c9a84c;">⏳ Desant...</span>`;
+  else if (r.estat === 'desat') st = `<span style="color:#4ade80;">✓ Desat</span>`;
+  else if (r.estat === 'descartat') st = `<span style="color:#888;">Descartat</span>`;
+  else if (r.error) st = `<span style="color:#ffb4b4;">${lotsEsc(r.error)}</span>`;
+  else st = falta.length ? `<span style="color:#ffb4b4;">Falta: ${falta.join(', ')}</span>` : `<span style="color:#4ade80;">Llest per desar</span>`;
+
+  return `<div class="lots-row ${cls}" id="lots-row-${i}">
+    <div class="lc lc-full">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;"></span>
+        <span class="lots-nom">${lotsEsc(r.nom)}</span>
+        <span class="lots-sub" style="margin-left:auto;">${r.cita.hora_inici ? r.cita.hora_inici.slice(0, 5) + ' · ' : ''}fa ${temps}</span>
+      </div>
+      <div class="lots-sub">${r.telefon ? '📞 ' + lotsEsc(r.telefon) : ''}${state.isAdmin ? ' · 👤 ' + lotsEsc(r.cita.tatuador) : ''}</div>
+      <div>${badges}</div>
+    </div>
+    <div class="lc" data-l="Preu €"><input class="lots-in ${!tancada && !(parseFloat(r.preu) > 0) ? 'err' : ''}" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,00"
+      value="${lotsEsc(r.preu)}" ${dis} oninput="lotsSet(${i},'preu',this.value,false)" onchange="lotsSet(${i},'preu',this.value,true)"></div>
+    <div class="lc" data-l="Cobrament"><select class="lots-in ${!tancada && !r.cobrament ? 'err' : ''}" ${dis} onchange="lotsSet(${i},'cobrament',this.value,true)">
+      <option value="" ${r.cobrament ? '' : 'selected'} disabled>— Tria —</option>${opt('Targeta', 'Targeta', r.cobrament)}${opt('Comptat', 'Comptat', r.cobrament)}${opt('Bizum', 'Bizum', r.cobrament)}</select></div>
+    <div class="lc" data-l="Concepte"><select class="lots-in" ${dis} onchange="lotsSet(${i},'concepte',this.value,true)">
+      ${opt('Tatuatge', 'Tatuatge', r.concepte)}${opt('Gemmes dentals', 'Gemmes', r.concepte)}${opt('Cremes', 'Cremes', r.concepte)}${opt('Altre', 'Altre', r.concepte)}</select></div>
+    <div class="lc" data-l="Feina tat."><div class="lots-seg">
+      <button class="${r.feina === 'Sí' ? 'on' : ''}" ${dis || (ext ? 'disabled title="No disponible amb comissió externa"' : '')} onclick="lotsSet(${i},'feina','Sí',true)">Sí</button>
+      <button class="${r.feina === 'No' ? 'on' : ''}" ${dis} onclick="lotsSet(${i},'feina','No',true)">No</button></div></div>
+    <div class="lc" data-l="Col·laborador"><select class="lots-in" ${dis} onchange="lotsSet(${i},'extId',this.value,true)">${extOpts}</select></div>
+    <div class="lc" data-l="% base"><input class="lots-in" type="number" inputmode="decimal" min="0" max="100" step="0.1"
+      value="${k.pctBase}" ${dis} oninput="lotsSet(${i},'pctBase',this.value,false)"></div>
+    ${(r.deposit.import && !r.deposit.cobrat)
+      ? `<div class="lc lc-full" data-l="Dipòsit"><label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#ffd38a;cursor:pointer;">
+          <input type="checkbox" ${r.depRebut ? 'checked' : ''} ${dis} onchange="lotsSet(${i},'depRebut',this.checked,true)" style="width:18px;height:18px;">rebut ${r.deposit.import}€</label></div>`
+      : `<div class="lc lc-buit"><span class="lots-sub">—</span></div>`}
+    <div class="lc lc-full" data-l="Fotos (mínim 1)"><div class="lots-fotos">${fotos}
+      ${tancada ? '' : `<label class="lots-cam ${r.fotos.length ? '' : 'err'}">📷<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)"></label>`}</div></div>
+    <div class="lc" data-l="Cobrar avui"><div class="lots-calc" id="lots-net-${i}">${k.c ? fmt(k.net) : '—'}</div></div>
+    <div class="lc" data-l="Per al tatuador"><div class="lots-calc" id="lots-tat-${i}">${k.c ? fmt(k.perTat) : '—'}</div></div>
+    <div class="lc lc-full">
+      ${tancada ? '' : `<div class="lots-acts">
+        <button class="lots-desa" ${falta.length || r.saving ? 'disabled' : ''} onclick="lotsDesa(${i}).then(lotsTotals)">✓ Desa</button>
+        <button class="lots-desc" ${r.saving ? 'disabled' : ''} onclick="lotsDescarta(${i})">✕</button></div>`}
+      <div class="lots-st" id="lots-st-${i}">${st}</div>
+    </div>
+  </div>`;
+}
+
+function renderLots() {
+  const list = document.getElementById('lots-list');
+  if (!_lots.length) {
+    list.innerHTML = `<div style="color:#666;text-align:center;padding:30px;font-size:13px;">✅ Cap check-in pendent d'introduir</div>`;
+  } else {
+    list.innerHTML = _lots.map((_, i) => lotsRowHtml(i)).join('');
+  }
+  lotsTotals();
+}
+
+function lotsRenderRow(i) {
+  const el = document.getElementById('lots-row-' + i);
+  if (el) el.outerHTML = lotsRowHtml(i);
+  lotsTotals();
+}
+
+function lotsTotals() {
+  let net = 0, tat = 0, desats = 0, llestos = 0;
+  _lots.forEach(r => {
+    if (r.estat === 'descartat') return;
+    const k = lotsCalc(r);
+    if (k.c) { net += k.net; tat += k.perTat; }
+    if (r.estat === 'desat') desats++;
+    else if (!lotsFalta(r).length) llestos++;
+  });
+  const vius = _lots.filter(r => r.estat !== 'descartat').length;
+  document.getElementById('lots-tot-net').textContent = fmt(net);
+  document.getElementById('lots-tot-tat').textContent = fmt(tat);
+  document.getElementById('lots-tot-n').textContent   = `${desats}/${vius}`;
+  const btn = document.getElementById('lots-btn-tot');
+  btn.textContent = `💾 Desa tot (${llestos} llest${llestos === 1 ? '' : 's'})`;
+  btn.disabled = !llestos;
+  btn.style.opacity = llestos ? '' : '0.5';
+}
+
+// rerender=false mentre s'escriu (no es perd el focus): només s'actualitzen imports i estat
+function lotsSet(i, camp, val, rerender) {
+  const r = _lots[i];
+  if (!r || r.estat !== 'pendent') return;
+  if (camp === 'pctBase') r.pctBase = val === '' ? null : (parseFloat(val) || 0);
+  else r[camp] = val;
+  // Com al formulari: canviar cobrament o feina recalcula el % base del tatuador
+  if (camp === 'cobrament' || camp === 'feina') r.pctBase = null;
+  // Com al formulari: amb comissió externa no es pot marcar "Feina Sí"
+  if (camp === 'extId' && val && r.feina === 'Sí') { r.feina = 'No'; r.pctBase = null; }
+  r.error = null;
+  if (rerender) { lotsRenderRow(i); return; }
+  const k = lotsCalc(r);
+  document.getElementById('lots-net-' + i).textContent = k.c ? fmt(k.net) : '—';
+  document.getElementById('lots-tat-' + i).textContent = k.c ? fmt(k.perTat) : '—';
+  lotsTotals();
+}
+
+async function lotsFotos(i, input) {
+  const r = _lots[i];
+  const files = Array.from(input.files || []);
+  input.value = '';
+  if (!r || !files.length) return;
+  showLoading('Pujant arxiu...');
+  const folder = (r.telefon || 'walkin').replace(/\D/g, '');
+  for (const file of files) {
+    const isVideo = file.type.startsWith('video/');
+    try {
+      const blob = isVideo ? file : await compressImg(file);
+      const { url, path } = await uploadMedia(blob, folder, isVideo);
+      r.fotos.push({ url, path, isVideo });
+    } catch(e) { showToast('Error: ' + e.message, 'err'); }
+  }
+  hideLoading();
+  lotsRenderRow(i);
+}
+
+function lotsDelFoto(i, j) {
+  const r = _lots[i];
+  if (!r || r.estat !== 'pendent') return;
+  r.fotos.splice(j, 1);
+  lotsRenderRow(i);
+}
+
+async function lotsDesa(i) {
+  const r = _lots[i];
+  if (!r || r.estat !== 'pendent' || r.saving) return false;
+  const falta = lotsFalta(r);
+  if (falta.length) { r.error = 'Falta: ' + falta.join(', '); lotsRenderRow(i); return false; }
+  const k = lotsCalc(r);
+  r.saving = true; r.error = null;
+  lotsRenderRow(i);
+  try {
+    // "Dipòsit rebut" marcat a la fila: mateix PATCH que marcarDepositCobrat()
+    if (r.depRebut && !r.deposit.cobrat) {
+      await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(r.cita.id)}`, {
+        method: 'PATCH',
+        headers: hdrs({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ deposit_cobrat: true })
+      });
+      r.deposit.cobrat = true;
+    }
+    const row = buildDiariRowFrom({
+      preu: parseFloat(r.preu) || 0, pctTatBase: k.pctBase, pctCom: k.pctCom,
+      cobrament: r.cobrament, concepte: r.concepte, esAutonom: r.u.esAutonom,
+      tatuador: r.cita.tatuador, email: r.u.email, telefon: r.telefon,
+      feina: r.feina, deposit: r.deposit, bon: r.bon
+    });
+    await persistTattoo(row, {
+      token: r.token, citaId: r.cita.id, bonCodi: r.bon.codi,
+      telefon: r.telefon, uploadedBy: r.cita.tatuador, fotos: r.fotos
+    });
+    r.estat = 'desat';
+  } catch(e) {
+    r.error = 'Error: ' + e.message;
+  }
+  r.saving = false;
+  lotsRenderRow(i);
+  return r.estat === 'desat';
+}
+
+async function lotsDesaTot() {
+  const idx = _lots.map((_, i) => i).filter(i => _lots[i].estat === 'pendent' && !lotsFalta(_lots[i]).length);
+  if (!idx.length) { showToast('Cap fila completa per desar', 'err'); return; }
+  if (!confirm(`Desar ${idx.length} tatuatge${idx.length > 1 ? 's' : ''}?`)) return;
+  let ok = 0;
+  for (const i of idx) { if (await lotsDesa(i)) ok++; }
+  const resta = _lots.filter(r => r.estat === 'pendent').length;
+  showToast(`✓ ${ok} de ${idx.length} desats` + (resta ? ` · en queden ${resta} per completar` : ''), ok === idx.length ? 'ok' : 'err', 4000);
+}
+
+async function lotsDescarta(i) {
+  const r = _lots[i];
+  if (!r || r.estat !== 'pendent') return;
+  if (!confirm(`Marcar el check-in de ${r.nom} com a "no realitzat"?\n\nNo es crearà cap tatuatge.`)) return;
+  try {
+    await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(r.cita.id)}`, {
+      method: 'PATCH',
+      headers: hdrs({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ checkin_descartat: true })
+    });
+    r.estat = 'descartat';
+    lotsRenderRow(i);
+  } catch(e) {
     showToast('Error: ' + e.message, 'err');
   }
 }
