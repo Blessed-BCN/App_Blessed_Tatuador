@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.4 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.5 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1517,7 +1517,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.21.4", APP_DATE="2026-10-26";
+const APP_VER="2.21.5", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3790,7 +3790,7 @@ function lotsFalta(r) {
   const f = [];
   if (!((parseFloat(r.preu) || 0) > 0)) f.push('preu');
   if (!r.cobrament) f.push('cobrament');
-  if (!r.fotos.length) f.push('foto');
+  // Fotos opcionals en aquesta pantalla (decisió de l'usuari, 2026-10-26); el formulari normal encara en demana 1
   return f;
 }
 
@@ -3908,7 +3908,7 @@ function lotsRowHtml(i) {
     <div><div class="ent-lab"><span class="lab-l">Repartiment</span><span class="lab-c">Repart.</span></div>
       <button class="ent-chip set${oberta('rep')}" ${dis} onclick="lotsMenu(event,${i},'rep')">${ico('users', 14)}<span>${lotsEsc(repTxt)}</span>${ico(oberta('rep') ? 'up' : 'down', 12, 'dn')}</button></div>
     <div><div class="ent-lab">Fotos</div>
-      <label class="ent-chip ent-fchip ${!tancada && !r.fotos.length ? 'err' : r.fotos.length ? 'set' : ''}" title="Fotos del tatuatge (mínim 1)">${ico('cam', 16)}<b>${r.fotos.length}</b>
+      <label class="ent-chip ent-fchip ${r.fotos.length ? 'set' : ''}" title="Fotos del tatuatge (opcionals)">${ico('cam', 16)}<b>${r.fotos.length}</b>
         ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label></div>
     <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
     ${r.fotos.length ? `<div class="ent-fotos">${fotos}</div>` : ''}
