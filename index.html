@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.3 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.4 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -595,11 +595,25 @@
     .ent-pop button .ico { color: #c9a84c; }
     .ent-pop button.on { background: #2a2414; color: #f3e6bf; }
     .ent-pop button:disabled { opacity: .35; cursor: not-allowed; }
-    .ent-sum { display: grid; grid-template-columns: 1fr 1.3fr 1fr; background: #151517; border: 1px solid #26262a; border-radius: 14px;
+    .ent-sum { display: grid; grid-template-columns: .8fr 1.25fr 1.25fr .8fr; background: #151517; border: 1px solid #26262a; border-radius: 14px;
       padding: 13px 6px; margin: 12px 0; }
     .ent-sum > div { display: flex; align-items: center; gap: 8px; padding: 0 7px; min-width: 0; }
     .ent-sum > div + div { border-left: 1px solid #2a2a2d; }
     .ent-sum .ico { color: #c9a84c; }
+    .ent-pt { background: #151517; border: 1px solid #26262a; border-radius: 12px; padding: 8px 12px; margin: -4px 0 12px; }
+    .ent-pt > div { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; font-size: 14px; color: #ece7da; }
+    .ent-pt > div + div { border-top: 1px solid #222225; }
+    .ent-pt b { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ent-pt .m { color: #a8a396; font-size: 12.5px; white-space: nowrap; }
+    .ent-pt .t { color: #c9a84c; font-weight: 800; white-space: nowrap; }
+    @media (max-width: 699px) {
+      .ent-sum { grid-template-columns: 1fr 1fr; row-gap: 12px; padding: 12px 4px; }
+      .ent-sum > div { padding: 0 8px; }
+      .ent-sum > div + div { border-left: none; }
+      .ent-sum > div:nth-child(1) { order: 1; } .ent-sum > div:nth-child(4) { order: 2; border-left: 1px solid #2a2a2d; }
+      .ent-sum > div:nth-child(2) { order: 3; } .ent-sum > div:nth-child(3) { order: 4; border-left: 1px solid #2a2a2d; }
+      .ent-sum .v { font-size: 20px; }
+    }
     .ent-sum .v { white-space: nowrap; font-size: 24px; font-weight: 700; color: #f5efe0; line-height: 1.1; }
     .ent-sum .k { font-size: 12.5px; color: #a8a396; }
     .ent-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 58px; border-radius: 15px;
@@ -647,9 +661,6 @@
       .ent-chip { font-size: 14.5px; }
       .ent-lab { font-size: 11px; }
       .ent-nav { gap: 4px; padding-left: 6px; padding-right: 6px; }
-      .ent-sum { grid-template-columns: .8fr 1.5fr .8fr; }
-      .ent-sum > div { gap: 6px; padding: 0 5px; }
-      .ent-sum .v { font-size: 20px; }
       .ent-nav button { font-size: 13px; }
     }
     @media (max-width: 699px) {
@@ -952,8 +963,10 @@
       <div class="ent-sum">
         <div><span data-ico="clip" data-s="24"></span><div><div class="v" id="lots-tot-n">—</div><div class="k">entrades</div></div></div>
         <div><span data-ico="euro" data-s="24"></span><div><div class="v" id="lots-tot-net">—</div><div class="k">import total (estimació)</div></div></div>
+        <div><span data-ico="users" data-s="24"></span><div><div class="v" id="lots-tot-tat">—</div><div class="k" id="lots-tot-tat-k">per al tatuador</div></div></div>
         <div><span data-ico="pie" data-s="24"></span><div><div class="v" id="lots-tot-pend">—</div><div class="k">sense revisar</div></div></div>
       </div>
+      <div id="lots-per-tat"></div>
       <button id="lots-btn-tot" class="ent-btn or" onclick="lotsDesaTot()">Desa tot</button>
       <button class="ent-btn sec" onclick="tatAnar('qr')"><span data-ico="plus" data-s="20"></span>Afegir entrada manual<span data-ico="right" data-s="18"></span></button>
     </div>
@@ -1504,7 +1517,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.21.3", APP_DATE="2026-10-26";
+const APP_VER="2.21.4", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3731,7 +3744,7 @@ function lotsConsentEstat(t, info) {
 async function lotsCarregaDesats(today, tatFilter) {
   try {
     const rows = await apiFetch(
-      `${SUPA_URL}/rest/v1/diari?data=eq.${today}&deleted_at=is.null${tatFilter}&order=created_at.asc&limit=100&select=id,tatuador,telefon,concepte,cobrament,preu,perc_tatuador`,
+      `${SUPA_URL}/rest/v1/diari?data=eq.${today}&deleted_at=is.null${tatFilter}&order=created_at.asc&limit=100&select=id,tatuador,telefon,concepte,cobrament,preu,perc_tatuador,total_tatuador,total_tatuador_brut,irpf_import`,
       { headers: hdrs() }
     ) || [];
     const tels = [...new Set(rows.map(d => d.telefon).filter(Boolean))];
@@ -4030,10 +4043,49 @@ function lotsTotals() {
   _lotsDesats.forEach(d => { total += parseFloat(d.preu) || 0; });
   document.getElementById('lots-tot-n').textContent    = String(vius + _lotsDesats.length);
   document.getElementById('lots-tot-net').textContent  = fmt(total);
+  lotsTotalsTatuador();
   document.getElementById('lots-tot-pend').textContent = String(pend);
   const btn = document.getElementById('lots-btn-tot');
   btn.innerHTML = `${ico('save', 20)}Desa tot (${llestos} llest${llestos === 1 ? '' : 's'})`;
   btn.disabled = !llestos;
+}
+
+// «Per al tatuador» del resum, i desglossament si hi ha diversos tatuadors (vista d'admin).
+// Cap càlcul nou: pendents = lotsCalc().perTat (calcEconomia, el mateix que «Per al tatuador» de la fila);
+// desats = imports ja desats al diari amb la mateixa fórmula que la columna «Pagat Tatuador Net» de
+// l'export del Diari de l'App Blessed: brut − IRPF si hi ha IRPF retingut (autònom), si no total_tatuador.
+function lotsPagatNet(d) {
+  return (d.total_tatuador_brut && d.irpf_import)
+    ? (parseFloat(d.total_tatuador_brut) - parseFloat(d.irpf_import))
+    : (parseFloat(d.total_tatuador) || 0);
+}
+function lotsTotalsTatuador() {
+  const per = {};
+  const fila = nom => per[nom] || (per[nom] = { recollit: 0, perTat: 0, sensePagament: 0 });
+  _lots.forEach(r => {
+    if (r.estat === 'descartat') return;
+    const preu = parseFloat(r.preu) || 0;
+    if (!preu) return;
+    const f = fila(r.cita.tatuador);
+    f.recollit += preu;
+    const k = lotsCalc(r);
+    if (k.c) f.perTat += k.perTat; else f.sensePagament++;
+  });
+  _lotsDesats.forEach(d => {
+    const f = fila(d.tatuador);
+    f.recollit += parseFloat(d.preu) || 0;
+    f.perTat += lotsPagatNet(d);
+  });
+  const noms = Object.keys(per);
+  const tot = noms.reduce((a, n) => a + per[n].perTat, 0);
+  const falta = noms.reduce((a, n) => a + per[n].sensePagament, 0);
+  document.getElementById('lots-tot-tat').textContent = fmt(tot) + (falta ? '*' : '');
+  document.getElementById('lots-tot-tat-k').textContent = noms.length > 1 ? 'per als tatuadors' : 'per al tatuador';
+  const box = document.getElementById('lots-per-tat');
+  box.innerHTML = noms.length > 1
+    ? `<div class="ent-pt">${noms.sort().map(n => `<div><b>${lotsEsc(n)}</b><span class="m">recollit ${fmt(per[n].recollit)}</span><span class="t">${fmt(per[n].perTat)}${per[n].sensePagament ? '*' : ''}</span></div>`).join('')}</div>`
+    : '';
+  if (falta) box.insertAdjacentHTML('beforeend', `<div class="lots-sub" style="margin:-6px 2px 12px;">* ${falta} entrada${falta > 1 ? 'es' : ''} sense forma de pagament: encara no se'n pot calcular la part del tatuador.</div>`);
 }
 
 // rerender=false mentre s'escriu (no es perd el focus): només s'actualitzen imports i estat
