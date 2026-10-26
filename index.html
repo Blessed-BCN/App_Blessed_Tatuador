@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.20.1 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.0 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -524,92 +524,122 @@
       font-size: 12px; padding: 8px 20px; border-radius: 8px; cursor: pointer; width: 100%;
     }
 
-    /* ── Entrades del dia (omplir els pendents de cop) ── v2.20.0: fila compacta amb "xips"
-       (Preu · Tipus · Pagament · Repartiment · Fotos) + menú ⋮ amb la resta de camps.
-       Disseny proposat pel fill (2026-10-26), amb els colors de Blessed. */
-    #overlay-lots { position: fixed; inset: 0; z-index: 150; background: #111; display: none; flex-direction: column; }
-    .lots-scroll { flex: 1; overflow-y: auto; padding: 10px 12px 96px; -webkit-overflow-scrolling: touch; }
-    .lots-wrap { max-width: 760px; margin: 0 auto; }
-    .lots-dia { font-size: 12px; color: #888; margin: 2px 2px 10px; }
-    .lots-sum { display: flex; gap: 8px; margin-bottom: 12px; }
-    .lots-sum > div { flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 8px 10px; }
-    .lots-sum .k { font-size: 10px; color: #888; text-transform: uppercase; }
-    .lots-sum .v { font-size: 18px; font-weight: 800; color: #e0e0e0; }
-    .lots-row { background: #1a1a1a; border: 1px solid #2a2a2a; border-left: 4px solid #ef4444; border-radius: 10px;
-      padding: 8px 8px 8px 9px; margin-bottom: 7px; display: grid; grid-template-columns: 88px minmax(0,1fr) 30px;
-      gap: 5px 8px; align-items: start; }
-    .lots-row.ok { border-left-color: #4ade80; }
-    .lots-row.mig { border-left-color: #c9a84c; }
-    .lots-row.desat { opacity: .55; border-left-color: #4ade80; }
-    .lots-row.descartat { opacity: .4; border-left-color: #555; }
-    .lr-left { min-width: 0; }
-    .lots-nom { display: block; font-weight: 800; color: #e0e0e0; font-size: 14px; line-height: 1.15; overflow-wrap: anywhere; }
-    .lots-sub { font-size: 10.5px; color: #888; }
-    .lr-hora { display: flex; align-items: center; gap: 4px; font-size: 10.5px; color: #888; margin-top: 2px; }
-    .lr-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px; }
-    .lr-cons { display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 9.5px; font-weight: 700;
-      color: #aaa; text-transform: uppercase; letter-spacing: .2px; cursor: help; }
-    .lr-llum { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 11px; }
-    .lr-llum.verd { background: #4ade80; box-shadow: 0 0 7px #4ade80; }
-    .lr-llum.groc { background: #f5b942; box-shadow: 0 0 7px #f5b942; }
-    .lr-llum.vermell { background: #2a1414; border: 1.5px solid #ef4444; }
-    .lr-foto { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 11.5px; font-weight: 800;
-      color: #e0e0e0; background: #232327; border: 1px solid #38383e; border-radius: 7px; padding: 3px 8px; cursor: pointer; }
-    .lr-foto.set { background: #2a2414; border-color: #6b5a2a; }
-    .lr-foto.err { border-color: #ef4444; color: #ffb4b4; }
-    .lr-more { background: none; border: 1px solid #38383e; border-radius: 8px; color: #c9a84c; font-size: 17px; line-height: 1;
-      width: 30px; height: 30px; padding: 0; cursor: pointer; }
-    .lr-more.on { background: #2a2414; border-color: #c9a84c; }
-    .lr-badges { grid-column: 1 / -1; }
-    .lr-badges:empty { display: none; }
-    .lots-badge { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 999px; margin: 0 3px 3px 0; }
-    .lr-chips { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 5px; }
-    .lr-chip { display: flex; flex-direction: column; justify-content: center; min-height: 38px; min-width: 0; background: #232327;
-      border: 1px solid #38383e; border-radius: 8px; padding: 2px 7px; position: relative; cursor: pointer; }
-    .lr-chip.set { background: #2a2414; border-color: #6b5a2a; }
-    .lr-chip.err { border-color: #ef4444; }
-    .lr-chip .k { font-size: 8.5px; font-weight: 700; color: #c9a84c; text-transform: uppercase; letter-spacing: .3px; }
-    .lr-chip select, .lr-chip input { width: 100%; background: none; border: none; color: #e0e0e0; font-size: 13.5px;
-      font-weight: 700; font-family: inherit; padding: 1px 0; outline: none; -webkit-appearance: none; appearance: none;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .lr-chip select { padding-right: 12px; cursor: pointer; }
-    .lr-chip select option { background: #232327; color: #e0e0e0; }
-    .lr-chip.sel::after { content: '▾'; position: absolute; right: 7px; bottom: 7px; color: #888; font-size: 10px; pointer-events: none; }
-    .lr-chip .euro { display: flex; align-items: center; gap: 2px; color: #e0e0e0; font-weight: 700; }
-    @media (min-width: 560px) {
-      .lots-row { grid-template-columns: 130px minmax(0,1fr) 30px; }
-      .lr-chips { grid-template-columns: minmax(0,.8fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
-    }
-    .lr-det { grid-column: 1 / -1; margin-top: 2px; padding-top: 8px; border-top: 1px dashed #333; display: grid;
+    /* ── Pantalla «Entrades» (v2.21.0) ── disseny proposat pel fill (2026-10-26), amb els colors de Blessed:
+       capçalera, títol + data, una fila per client (nom + consentiment + fotos | Preu · Tipus · Pagament · Repartiment | ⋮),
+       desplegables propis amb icones, resum del dia, botons i barra inferior. */
+    #overlay-lots { position: fixed; inset: 0; z-index: 150; background: #0e0e0f; display: none; flex-direction: column; color: #ece7da; }
+    .ent-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .ent-wrap { max-width: 720px; margin: 0 auto; padding: 0 12px 18px; }
+    .ico { display: inline-block; vertical-align: middle; flex: 0 0 auto; }
+    .ent-hdr { display: flex; align-items: center; gap: 10px; padding: 12px 2px; border-bottom: 1px solid #222225; }
+    .ent-ic { background: none; border: none; color: #ece7da; padding: 4px; cursor: pointer; line-height: 0; }
+    .ent-logo { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .ent-logo img { width: 30px; height: 30px; border-radius: 7px; }
+    .ent-logo .b1 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 3px; font-size: 14px; color: #c9a84c; line-height: 1.1; }
+    .ent-logo .b2 { font-size: 10px; letter-spacing: 2px; color: #9a968c; }
+    .ent-user { display: flex; align-items: center; gap: 7px; font-size: 14px; white-space: nowrap; }
+    .ent-av { width: 30px; height: 30px; border-radius: 50%; background: #2a2414; color: #c9a84c; display: flex; align-items: center;
+      justify-content: center; font-size: 13px; font-weight: 700; }
+    .ent-tit { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 16px 2px 2px; }
+    .ent-tit h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 34px; color: #f5efe0; margin: 0; }
+    .ent-data { position: relative; display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 11px; border-radius: 10px;
+      border: 1px solid #3a3a40; background: #1b1b1e; font-size: 13px; color: #ece7da; cursor: pointer; white-space: nowrap; }
+    .ent-data .ico { color: #c9a84c; }
+    .ent-data input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    .ent-sub { font-size: 13px; color: #a8a396; margin: 2px 2px 12px; }
+    .ent-row { background: #151517; border: 1px solid #26262a; border-radius: 14px; padding: 9px 7px 9px 9px; margin-bottom: 8px;
+      display: grid; grid-template-columns: 70px repeat(4, minmax(0,1fr)) 18px; gap: 4px 5px; align-items: end; }
+    .ent-row.ok { border-color: #5c4d24; }
+    .ent-row.desat { opacity: .5; }
+    .ent-row.descartat { opacity: .35; }
+    .ent-nomcol { align-self: center; min-width: 0; }
+    .ent-nom { font-size: 15px; font-weight: 700; color: #f5efe0; line-height: 1.15; overflow-wrap: anywhere; }
+    .ent-tat { font-size: 10px; color: #9a968c; }
+    .ent-cons { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: #a8a396; margin-top: 4px; cursor: help; }
+    .lr-llum { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; }
+    .lr-llum.verd { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+    .lr-llum.groc { background: #f5b942; box-shadow: 0 0 6px #f5b942; }
+    .lr-llum.vermell { background: #26262a; border: 1.5px solid #ef4444; }
+    .ent-mini { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 11.5px; color: #a8a396; }
+    .ent-cam { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; }
+    .ent-cam.err { color: #f87171; }
+    .ent-lab { font-size: 10.5px; color: #9a968c; margin: 0 0 3px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ent-chip { display: flex; align-items: center; gap: 4px; width: 100%; height: 36px; padding: 0 6px; border-radius: 9px;
+      border: 1px solid #34343a; background: #1b1b1e; color: #ece7da; font-size: 12.5px; font-family: inherit; cursor: pointer;
+      white-space: nowrap; overflow: hidden; text-align: left; }
+    .ent-chip > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .ent-chip .ico { color: #c9a84c; }
+    .ent-chip .ico.dn { color: #77736a; }
+    .ent-chip.set { background: #2a2414; border-color: #8a7333; color: #f3e6bf; }
+    .ent-chip.err { border-color: #ef4444; }
+    .ent-chip.oberta { border-color: #c9a84c; }
+    .ent-chip input { width: 100%; min-width: 0; background: none; border: none; color: inherit; font: inherit; font-size: 12.5px; padding: 0; outline: none; }
+    .ent-chip:disabled, .ent-chip:has(input:disabled) { cursor: default; }
+    .ent-more { background: none; border: none; color: #c9a84c; padding: 0; height: 36px; cursor: pointer; line-height: 0; }
+    .ent-st { grid-column: 1 / -1; font-size: 11px; font-weight: 700; }
+    .ent-pop { position: fixed; z-index: 160; min-width: 190px; max-width: 260px; background: #1d1d20; border: 1px solid #3a3a40;
+      border-radius: 12px; padding: 5px; box-shadow: 0 10px 28px rgba(0,0,0,.55); }
+    .ent-pop button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: none; border-radius: 8px;
+      background: none; color: #ece7da; font-size: 14px; font-family: inherit; text-align: left; cursor: pointer; }
+    .ent-pop button .ico { color: #c9a84c; }
+    .ent-pop button.on { background: #2a2414; color: #f3e6bf; }
+    .ent-pop button:disabled { opacity: .35; cursor: not-allowed; }
+    .ent-sum { display: grid; grid-template-columns: 1fr 1.3fr 1fr; background: #151517; border: 1px solid #26262a; border-radius: 14px;
+      padding: 13px 6px; margin: 12px 0; }
+    .ent-sum > div { display: flex; align-items: center; gap: 8px; padding: 0 7px; min-width: 0; }
+    .ent-sum > div + div { border-left: 1px solid #2a2a2d; }
+    .ent-sum .ico { color: #c9a84c; }
+    .ent-sum .v { font-size: 20px; font-weight: 700; color: #f5efe0; line-height: 1.1; }
+    .ent-sum .k { font-size: 10.5px; color: #a8a396; }
+    .ent-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 52px; border-radius: 14px;
+      font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 9px; }
+    .ent-btn.or { background: #c9a84c; color: #1a1408; border: none; }
+    .ent-btn.or:disabled { background: #2a2a2e; color: #77736a; cursor: not-allowed; }
+    .ent-btn.sec { background: none; color: #c9a84c; border: 1.5px solid #6b5a2a; }
+    .ent-nav { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #222225; background: #121214; padding: 7px 6px 10px; }
+    .ent-nav button { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; border-radius: 14px;
+      padding: 7px 0; color: #bdb8aa; font-size: 12px; font-family: inherit; cursor: pointer; }
+    .ent-nav button.on { background: #2a2414; color: #c9a84c; }
+    .ent-cfg { position: fixed; z-index: 165; left: 12px; right: 12px; bottom: 84px; max-width: 420px; margin: 0 auto; background: #1d1d20;
+      border: 1px solid #3a3a40; border-radius: 14px; padding: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.55); font-size: 14px; }
+    .lr-det { grid-column: 1 / -1; margin-top: 4px; padding-top: 8px; border-top: 1px dashed #333; display: grid;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px 10px; }
     .lr-det .full { grid-column: 1 / -1; }
     .lr-det .lab { display: block; font-size: 10px; font-weight: 700; color: #c9a84c; text-transform: uppercase; margin-bottom: 3px; }
     .lots-in { width: 100%; background: #232327; border: 1px solid #38383e; border-radius: 8px; color: #e0e0e0;
       font-size: 15px; padding: 8px; font-family: inherit; }
     .lots-calc { background: #13261a; border-radius: 8px; padding: 7px 9px; font-weight: 800; color: #e0e0e0; font-size: 14px; }
+    .lots-badge { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 999px; margin: 0 3px 3px 0; }
     .lots-fotos { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .lots-th { position: relative; width: 44px; height: 44px; border-radius: 7px; overflow: hidden; background: #2a2a2e; }
     .lots-th img, .lots-th video { width: 100%; height: 100%; object-fit: cover; }
     .lots-th button { position: absolute; top: 0; right: 0; background: rgba(0,0,0,.7); border: none; color: #fff;
       font-size: 10px; width: 17px; height: 17px; padding: 0; cursor: pointer; }
     .lots-cam { width: 44px; height: 44px; border: 1.5px dashed #c9a84c; border-radius: 7px; color: #c9a84c;
-      display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
-    .lots-desc { background: none; border: 1px solid #5a2424; color: #ffb4b4; border-radius: 9px; font-weight: 700;
-      font-size: 13px; padding: 9px 12px; cursor: pointer; }
-    .lr-foot { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; }
-    .lots-st { flex: 1; font-size: 11px; font-weight: 700; }
-    .lots-desa { background: #4ade80; color: #0b1a10; border: none; border-radius: 8px; font-weight: 800; font-size: 13px;
-      padding: 6px 14px; cursor: pointer; }
+      display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .ent-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+    .lots-desa { background: #c9a84c; color: #1a1408; border: none; border-radius: 9px; font-weight: 800; font-size: 13px; padding: 9px 14px; cursor: pointer; }
     .lots-desa:disabled { background: #2a2a2e; color: #666; cursor: not-allowed; }
-    .lots-sec { font-size: 11px; font-weight: 800; color: #4ade80; text-transform: uppercase; margin: 16px 2px 8px; }
-    .lots-fet { display: flex; align-items: center; gap: 8px; background: #161816; border: 1px solid #23302a;
-      border-left: 4px solid #4ade80; border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; font-size: 12px; color: #aaa; }
+    .lots-desc { background: none; border: 1px solid #5a2424; color: #ffb4b4; border-radius: 9px; font-weight: 700; font-size: 13px; padding: 9px 12px; cursor: pointer; }
+    .lots-sec { font-size: 11px; font-weight: 800; color: #c9a84c; text-transform: uppercase; margin: 14px 2px 8px; }
+    .lots-fet { display: flex; align-items: center; gap: 8px; background: #141414; border: 1px solid #26262a; border-radius: 10px;
+      padding: 8px 10px; margin-bottom: 6px; font-size: 12px; color: #aaa; }
     .lots-fet b { color: #e0e0e0; font-size: 13px; }
     .lots-fet .preu { margin-left: auto; font-weight: 800; color: #e0e0e0; white-space: nowrap; }
-    .lots-foot { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; padding: 10px 12px;
-      background: linear-gradient(transparent, #111 30%); max-width: 784px; margin: 0 auto; }
-    .lots-foot button { border-radius: 10px; font-weight: 800; font-size: 14px; padding: 12px 10px; cursor: pointer;
-      flex: 1 1 0; min-width: 0; line-height: 1.2; }
+    .lots-sub { font-size: 11px; color: #888; }
+    @media (max-width: 419px) {
+      .ent-row { grid-template-columns: 78px repeat(4, minmax(0,1fr)) 14px; gap: 4px; padding: 9px 5px 9px 8px; }
+      .ent-chip { padding: 0 5px; gap: 2px; }
+      .ent-chip > .ico:first-child, .ent-chip .ico.dn { display: none; }
+      .ent-cons { font-size: 9.5px; gap: 4px; }
+      .ent-lab { font-size: 10px; overflow: visible; text-overflow: clip; }
+    }
+    @media (min-width: 520px) {
+      .ent-row { grid-template-columns: 110px repeat(4, minmax(0,1fr)) 22px; gap: 4px 8px; padding: 10px 9px 10px 12px; }
+      .ent-nom { font-size: 17px; }
+      .ent-chip { font-size: 14px; padding: 0 9px; gap: 6px; height: 40px; }
+      .ent-chip input { font-size: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -865,27 +895,43 @@
 
 <!-- ── TAULA DE PENDENTS (omplir-los tots de cop) ── -->
 <div id="overlay-lots">
-  <div class="fotos-ov-header">
-    <button class="fotos-ov-back" onclick="hideLots()">← Pendents</button>
-    <div class="fotos-ov-title">📋 Entrades d'avui</div>
-    <button onclick="loadLots()" style="background:none;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;padding:6px 10px;cursor:pointer;">↻</button>
-  </div>
-  <div class="lots-scroll">
-    <div class="lots-wrap">
-      <div class="lots-dia" id="lots-dia">Clients, tatuatges i pagaments del dia</div>
-      <div class="lots-sum">
-        <div><div class="k">Entrades avui</div><div class="v" id="lots-tot-n">—</div></div>
-        <div><div class="k">Import total (estimació)</div><div class="v" id="lots-tot-net">—</div></div>
-        <div><div class="k">Sense revisar</div><div class="v" id="lots-tot-pend">—</div></div>
+  <div class="ent-scroll" onscroll="lotsTancaMenu()">
+    <div class="ent-wrap">
+      <div class="ent-hdr">
+        <button class="ent-ic" onclick="hideLots()" aria-label="Tornar" data-ico="menu" data-s="22"></button>
+        <div class="ent-logo"><img src="icons/icon-192.png" alt=""><div><div class="b1">BLESSED</div><div class="b2">ART TATTOO BCN</div></div></div>
+        <div class="ent-user"><span class="ent-av" id="ent-av">·</span><span id="ent-nom">—</span></div>
       </div>
+      <div class="ent-tit">
+        <h1>Entrades</h1>
+        <label class="ent-data"><span data-ico="cal" data-s="17"></span><span id="ent-data-txt">Avui</span><span data-ico="down" data-s="14"></span>
+          <input type="date" id="ent-data" onchange="lotsCanviaDia(this.value)" aria-label="Dia"></label>
+      </div>
+      <div class="ent-sub">Clients, tatuatges i pagaments del dia.</div>
       <div id="lots-list"></div>
       <div id="lots-desats"></div>
+      <div class="ent-sum">
+        <div><span data-ico="clip" data-s="24"></span><div><div class="v" id="lots-tot-n">—</div><div class="k">entrades</div></div></div>
+        <div><span data-ico="euro" data-s="24"></span><div><div class="v" id="lots-tot-net">—</div><div class="k">import total (estimació)</div></div></div>
+        <div><span data-ico="pie" data-s="24"></span><div><div class="v" id="lots-tot-pend">—</div><div class="k">sense revisar</div></div></div>
+      </div>
+      <button id="lots-btn-tot" class="ent-btn or" onclick="lotsDesaTot()">Desa tot</button>
+      <button class="ent-btn sec" onclick="hideLots();hideCites();goToQR();"><span data-ico="plus" data-s="20"></span>Afegir entrada manual<span data-ico="right" data-s="18"></span></button>
     </div>
   </div>
-  <div class="lots-foot">
-    <button onclick="hideLots();hideCites();goToQR();" title="Afegir una entrada sense check-in previ (QR o cerca de client)"
-      style="background:#1a1a1a;border:1px dashed #c9a84c;color:#c9a84c;">+ Afegir entrada manual</button>
-    <button id="lots-btn-tot" onclick="lotsDesaTot()" style="flex:1;background:#c9a84c;border:none;color:#111;">💾 Desa tot</button>
+  <nav class="ent-nav">
+    <button class="on" onclick="lotsTancaMenu()"><span data-ico="list" data-s="22"></span>Entrades</button>
+    <button onclick="hideLots();hideCites();goToQR();"><span data-ico="users" data-s="22"></span>Clients</button>
+    <button onclick="hideLots();showHistorial();"><span data-ico="bars" data-s="22"></span>Estadístiques</button>
+    <button onclick="lotsConfig()"><span data-ico="gear" data-s="22"></span>Configuració</button>
+  </nav>
+  <div id="lots-pop" class="ent-pop" style="display:none;"></div>
+  <div id="ent-cfg" class="ent-cfg" style="display:none;">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+      <input type="checkbox" id="ent-cfg-inici" onchange="togglePendentsPref(this.checked)" style="width:20px;height:20px;">
+      Obrir aquesta pantalla en entrar a l'app</label>
+    <div class="lots-sub" style="margin:10px 0 12px;" id="ent-cfg-ver"></div>
+    <button class="lots-desa" onclick="document.getElementById('ent-cfg').style.display='none'">Tancar</button>
   </div>
 </div>
 
@@ -1418,7 +1464,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.20.1", APP_DATE="2026-10-26";
+const APP_VER="2.21.0", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2183,7 +2229,7 @@ function onPinOk() {
 // ── Pantalla d'inici configurable (sala d'espera vs. pendents) — a producció des de v2.19.1 ──
 function goToHomeAfterLogin() {
   if (state.tatuador && localStorage.getItem('tat_default_pendents_' + state.tatuador) === '1') {
-    showCites('pendents');
+    showLots();
   } else {
     goToSalaEspera();
   }
@@ -3533,16 +3579,21 @@ async function descartaCheckin(citaId) {
 // la identitat econòmica del seu tatuador (l'admin pot veure'n de diversos alhora).
 let _lots = [];
 let _lotsDesats = [];   // entrades d'avui ja desades al diari (només lectura)
+let _lotsDia = null;    // dia que es mostra (AAAA-MM-DD); per defecte, avui
 let _lotsUsuaris = {};
 
 const lotsEsc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
 
 async function showLots() {
   document.getElementById('overlay-lots').style.display = 'flex';
+  lotsPintaIcones(document.getElementById('overlay-lots'));
+  if (!_lotsDia) _lotsDia = lotsAvui();
   await loadLots();
 }
 
 function hideLots() {
+  lotsTancaMenu();
+  document.getElementById('ent-cfg').style.display = 'none';
   document.getElementById('overlay-lots').style.display = 'none';
   if (document.getElementById('overlay-cites').style.display !== 'none' && citesTab === 'pendents') loadPendents();
 }
@@ -3566,7 +3617,7 @@ async function loadLots() {
   const list = document.getElementById('lots-list');
   list.innerHTML = '<div style="color:#666;text-align:center;padding:30px;font-size:13px;">⏳ Carregant...</div>';
   _lotsUsuaris = {};
-  const today = new Date().toISOString().slice(0, 10);
+  const today = _lotsDia || lotsAvui();
   const tatFilter = state.isAdmin ? '' : `&tatuador=eq.${encodeURIComponent(state.tatuador)}`;
   try {
     const cites = await apiFetch(
@@ -3690,23 +3741,54 @@ function lotsFalta(r) {
   return f;
 }
 
-// Opcions d'una llista (Tipus/Pagament). Si el valor actual ja no és a la llista, es manté visible.
-function lotsOpts(llista, cur, ambTria) {
-  const vals = (!cur || llista.includes(cur)) ? llista : [cur, ...llista];
-  return (ambTria ? `<option value="" ${cur ? '' : 'selected'} disabled>— Tria —</option>` : '') +
-    vals.map(v => `<option value="${lotsEsc(v)}" ${v === cur ? 'selected' : ''}>${lotsEsc(v)}</option>`).join('');
+// ── Icones (dibuixades aquí mateix: cap descàrrega externa) ─────────────────────
+const ICO = {
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', down: '<path d="M6 9l6 6 6-6"/>', up: '<path d="M6 15l6-6 6 6"/>',
+  right: '<path d="M9 6l6 6-6 6"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+  dots: '<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>',
+  cal: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/>',
+  tag: '<path d="M7.5 7.5h.01M3 6v5.2c0 .5.2 1 .6 1.4l7.8 7.8a2 2 0 0 0 2.8 0l5.2-5.2a2 2 0 0 0 0-2.8L11.6 4.6A2 2 0 0 0 10.2 4H5a2 2 0 0 0-2 2z"/>',
+  card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/>',
+  bolt: '<path d="M13 3v7h6l-8 11v-7H5z"/>',
+  cash: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 12h.01M17.5 12h.01"/>',
+  stripe: '<path d="M15.5 8.4c-1-.6-2.2-.9-3.3-.9-1.8 0-3 .8-3 2.1 0 3 6.6 2 6.6 5.1 0 1.5-1.4 2.4-3.4 2.4-1.3 0-2.7-.4-3.8-1.1"/>',
+  coin: '<circle cx="12" cy="12" r="9"/><path d="M14.5 9a3 3 0 1 0 0 6M9 11h4M9 13h4"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 5.6M18 14.3c1.6.6 2.5 2.4 2.5 4.7"/>',
+  cam: '<path d="M5 7h1.5L8 5h8l1.5 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="3.5"/>',
+  clip: '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>',
+  euro: '<circle cx="12" cy="12" r="9"/><path d="M15 8.6a4 4 0 1 0 0 6.8M8 11h5M8 13h5"/>',
+  pie: '<path d="M10 3.2A9 9 0 1 0 20.8 14H10z"/><path d="M14 3.3A9 9 0 0 1 20.7 10H14z"/>',
+  list: '<path d="M9 6h11M9 12h11M9 18h11M5 6h.01M5 12h.01M5 18h.01"/>',
+  bars: '<path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  warn: '<path d="M12 9v4M12 17h.01M10.3 3.9L2.4 17.5a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>',
+  gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+  save: '<path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 4v4h7"/><circle cx="12" cy="14" r="2"/>'
+};
+const ico = (n, s = 16, cls = '') => `<svg class="ico ${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n] || ''}</svg>`;
+function lotsPintaIcones(arrel) {
+  arrel.querySelectorAll('[data-ico]').forEach(e => { e.innerHTML = ico(e.dataset.ico, +e.dataset.s || 16); });
 }
+
+const lotsAvui = () => new Date().toISOString().slice(0, 10);
+// Noms curts als xips (com a la proposta: Tat, Biz, Tar, Efect) i noms llargs als desplegables
+const LOTS_CURT = { 'Tattoo': 'Tat', 'Tatuatge': 'Tat', 'Targeta': 'Tar', 'Bizum': 'Biz', 'Comptat': 'Efect', 'Gemmes dentals': 'Gemmes', 'Cremes': 'Crema', 'Piercings': 'Piercing' };
+const LOTS_LLARG = { 'Comptat': 'Efectiu' };
+const lotsCurt = v => LOTS_CURT[v] || v;
+const lotsLlarg = v => LOTS_LLARG[v] || v;
+const lotsIcoPag = v => ({ 'Targeta': 'card', 'Bizum': 'bolt', 'Comptat': 'cash', 'Stripe': 'stripe' }[v] || 'coin');
 
 // Repartiment tatuador/estudi: els dos que ja calcula l'app segons "Feina" (No / Sí) amb els % del tatuador
 // de la fila, i "Altre…" per posar-ne un de diferent (com el camp "% base" de sempre).
-function lotsRepOpts(r, ext) {
+function lotsRepLlista(r, ext) {
   const pNo = lotsPctAuto({ ...r, feina: 'No' });
   const pSi = lotsPctAuto({ ...r, feina: 'Sí' });
-  const cur = r.custom ? 'altre' : r.feina;
-  const o = (v, txt, extra) => `<option value="${v}" ${v === cur ? 'selected' : ''} ${extra || ''}>${txt}</option>`;
-  return o('No', `${pNo}/${100 - pNo}`) +
-    o('Sí', `${pSi}/${100 - pSi}` + (pNo === pSi ? ' · feina' : ''), ext ? 'disabled' : '') +
-    o('altre', r.custom ? `Altre (${r.pctBase ?? pNo}%)` : 'Altre…');
+  return [
+    { v: 'No', t: `${pNo}/${100 - pNo}` },
+    { v: 'Sí', t: `${pSi}/${100 - pSi}` + (pNo === pSi ? ' · feina' : ''), off: !!ext },
+    { v: 'altre', t: r.custom ? `Altre (${r.pctBase ?? pNo}%)` : 'Altre…' }
+  ];
 }
 
 function lotsRowHtml(i) {
@@ -3716,79 +3798,136 @@ function lotsRowHtml(i) {
   const k = lotsCalc(r);
   const falta = lotsFalta(r);
   const hores = (Date.now() - new Date(r.cita.checkin_at).getTime()) / 3600000;
-  const color = hores < 2 ? '#4ade80' : hores < 4 ? '#c9a84c' : '#ef4444';
-  const temps = hores < 1 ? Math.round(hores * 60) + ' min' : hores.toFixed(1) + ' h';
-  const cls = r.estat === 'desat' ? 'desat' : r.estat === 'descartat' ? 'descartat'
-            : !falta.length ? 'ok' : falta.length === 1 ? 'mig' : '';
-  const badges = [
-    r.esMenor ? `<span class="lots-badge" style="background:#3a2a10;color:#ffd38a;">🔞 Menor</span>` : '',
-    r.alertaMedica.length ? `<span class="lots-badge" style="background:#3a1717;color:#ffb4b4;" title="${lotsEsc(r.alertaMedica.join(' · '))}">🩺 Afecció mèdica</span>` : '',
-    r.deposit.import ? `<span class="lots-badge" style="background:${r.deposit.cobrat || r.depRebut ? '#13261a;color:#8fe3a8' : '#3a2a10;color:#ffd38a'};">Dipòsit ${r.deposit.import}€ ${r.deposit.cobrat || r.depRebut ? '✓' : '! (⋮)'}</span>` : '',
-    r.bon.codi ? `<span class="lots-badge" style="background:#2a1838;color:#e1b8ff;">🎁 Val ${r.bon.import}€</span>` : '',
-    (r.consent && r.consent.cls !== 'verd') ? `<span class="lots-badge" style="background:${r.consent.cls === 'vermell' ? '#3a1717;color:#ffb4b4' : '#3a2a10;color:#ffd38a'};">${r.consent.cls === 'vermell' ? '✕' : '⚠'} ${lotsEsc(r.consent.txt)}</span>` : ''
-  ].join('');
-  const cons = r.consent || { cls: 'groc', txt: 'Consentiment no comprovat' };
+  const temps = hores < 1 ? Math.round(hores * 60) + ' min' : hores < 48 ? hores.toFixed(1) + ' h' : Math.round(hores / 24) + ' dies';
+  const cls = r.estat === 'desat' ? 'desat' : r.estat === 'descartat' ? 'descartat' : !falta.length ? 'ok' : '';
   const ext = lotsExt(r);
+  const cons = r.consent || { cls: 'groc', txt: 'Consentiment no comprovat' };
+  const preuOk = (parseFloat(r.preu) || 0) > 0;
+  const rep = lotsRepLlista(r, ext);
+  const repTxt = (rep.find(o => o.v === (r.custom ? 'altre' : r.feina)) || rep[0]).t.replace(' · feina', '');
+  const oberta = camp => _lotsMenu && _lotsMenu.i === i && _lotsMenu.camp === camp ? ' oberta' : '';
+  const avisos = [
+    r.esMenor ? `<span title="Menor d'edat" style="color:#f5b942;">${ico('user', 14)}</span>` : '',
+    r.alertaMedica.length ? `<span title="Afecció mèdica: ${lotsEsc(r.alertaMedica.join(' · '))}" style="color:#f87171;">${ico('warn', 14)}</span>` : '',
+    (r.deposit.import && !(r.deposit.cobrat || r.depRebut)) ? `<span title="Dipòsit de ${r.deposit.import}€ pendent (⋮)" style="color:#f5b942;">${ico('coin', 14)}</span>` : '',
+    r.bon.codi ? `<span title="Val de regal ${r.bon.import}€" style="color:#c9a0ff;">${ico('gift', 14)}</span>` : ''
+  ].join('');
   const extOpts = ['<option value="">— Cap —</option>'].concat((state.externs || []).map(e =>
     `<option value="${e.id}" ${String(e.id) === r.extId ? 'selected' : ''}>${lotsEsc(e.nom)} (${e.pct}%)</option>`)).join('');
   const fotos = r.fotos.map((f, j) => `<div class="lots-th">${f.isVideo ? `<video src="${f.url}" muted playsinline preload="metadata"></video>` : `<img src="${f.url}">`}${tancada ? '' : `<button onclick="lotsDelFoto(${i},${j})">✕</button>`}</div>`).join('');
-  const preuOk = (parseFloat(r.preu) || 0) > 0;
-  let st;
-  if (r.saving) st = `<span style="color:#c9a84c;">⏳ Desant...</span>`;
+  let st = '';
+  if (r.saving) st = `<span style="color:#c9a84c;">Desant...</span>`;
   else if (r.estat === 'desat') st = `<span style="color:#4ade80;">✓ Desat</span>`;
   else if (r.estat === 'descartat') st = `<span style="color:#888;">Descartat</span>`;
   else if (r.error) st = `<span style="color:#ffb4b4;">${lotsEsc(r.error)}</span>`;
-  else st = falta.length ? `<span style="color:#ffb4b4;">Falta: ${falta.join(', ')}</span>` : `<span style="color:#4ade80;">Llest per desar · ${k.c ? fmt(k.perTat) + ' per al tatuador' : ''}</span>`;
 
   const det = !r.obert ? '' : `<div class="lr-det">
+      <div class="full lots-sub">Check-in fa ${temps}${r.cita.hora_inici ? ' · cita ' + r.cita.hora_inici.slice(0, 5) : ''}${r.telefon ? ' · ' + lotsEsc(r.telefon) : ''} · <span style="color:${cons.cls === 'verd' ? '#4ade80' : cons.cls === 'groc' ? '#f5b942' : '#f87171'};">${lotsEsc(cons.txt)}</span>${r.alertaMedica.length ? ' · <span style="color:#f87171;">' + lotsEsc(r.alertaMedica.join(', ')) + '</span>' : ''}</div>
       ${r.custom ? `<div><span class="lab">% per al tatuador</span><input class="lots-in" type="number" inputmode="decimal" min="0" max="100" step="0.1"
         value="${k.pctBase}" ${dis} oninput="lotsSet(${i},'pctBase',this.value,false)" onchange="lotsSet(${i},'pctBase',this.value,true)"></div>` : ''}
       <div class="${r.custom ? '' : 'full'}"><span class="lab">Col·laborador extern</span><select class="lots-in" ${dis} onchange="lotsSet(${i},'extId',this.value,true)">${extOpts}</select></div>
       ${(r.deposit.import && !r.deposit.cobrat) ? `<div class="full"><label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#ffd38a;cursor:pointer;">
         <input type="checkbox" ${r.depRebut ? 'checked' : ''} ${dis} onchange="lotsSet(${i},'depRebut',this.checked,true)" style="width:18px;height:18px;">Dipòsit de ${r.deposit.import}€ rebut</label></div>` : ''}
       <div class="full"><span class="lab">Fotos (mínim 1)</span><div class="lots-fotos">${fotos}
-        ${tancada ? '' : `<label class="lots-cam">📷<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)"></label>`}</div></div>
+        ${tancada ? '' : `<label class="lots-cam">${ico('cam', 20)}<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)"></label>`}</div></div>
       <div><span class="lab">Cobrar avui</span><div class="lots-calc" id="lots-net-${i}">${k.c ? fmt(k.net) : '—'}</div></div>
       <div><span class="lab">Per al tatuador</span><div class="lots-calc" id="lots-tat-${i}">${k.c ? fmt(k.perTat) : '—'}</div></div>
-      ${tancada ? '' : `<div class="full"><button class="lots-desc" ${r.saving ? 'disabled' : ''} onclick="lotsDescarta(${i})">✕ No s'ha fet (descartar el check-in)</button></div>`}
+      ${tancada ? '' : `<div class="full ent-acts">
+        <button class="lots-desa" ${falta.length || r.saving ? 'disabled' : ''} onclick="lotsDesa(${i}).then(lotsTotals)">✓ Desa aquesta entrada</button>
+        <button class="lots-desc" ${r.saving ? 'disabled' : ''} onclick="lotsDescarta(${i})">✕ No s'ha fet</button>
+        ${falta.length ? `<span class="lots-sub" style="align-self:center;color:#ffb4b4;">Falta: ${falta.join(', ')}</span>` : ''}</div>`}
     </div>`;
 
-  return `<div class="lots-row ${cls}" id="lots-row-${i}">
-    <div class="lr-left">
-      <span class="lots-nom">${lotsEsc(r.nom)}</span>
-      <div class="lr-hora"><span class="lr-dot" style="background:${color};"></span>${r.cita.hora_inici ? r.cita.hora_inici.slice(0, 5) + ' · ' : ''}${temps}</div>
-      ${state.isAdmin ? `<div class="lots-sub">👤 ${lotsEsc(r.cita.tatuador)}</div>` : ''}
-      <div class="lr-cons" title="${lotsEsc(cons.txt)}"><span class="lr-llum ${cons.cls}"></span>Consentiment</div>
-      <label class="lr-foto ${!tancada && !r.fotos.length ? 'err' : r.fotos.length ? 'set' : ''}" title="Fotos (mínim 1)">📷 ${r.fotos.length}
-        ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label>
+  return `<div class="ent-row ${cls}" id="lots-row-${i}">
+    <div class="ent-nomcol">
+      <div class="ent-nom">${lotsEsc(r.nom)}</div>
+      ${state.isAdmin ? `<div class="ent-tat">${lotsEsc(r.cita.tatuador)}</div>` : ''}
+      <div class="ent-cons" title="${lotsEsc(cons.txt)}"><span class="lr-llum ${cons.cls}"></span>Consentiment</div>
+      <div class="ent-mini">
+        <label class="ent-cam ${!tancada && !r.fotos.length ? 'err' : ''}" title="Fotos (mínim 1)">${ico('cam', 14)}${r.fotos.length}
+          ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label>
+        ${avisos}
+      </div>
     </div>
-    <div class="lr-chips">
-      <label class="lr-chip ${!tancada && !preuOk ? 'err' : preuOk ? 'set' : ''}"><span class="k">Preu</span>
-        <span class="euro"><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" value="${lotsEsc(r.preu)}" ${dis}
-          oninput="lotsSet(${i},'preu',this.value,false)" onchange="lotsSet(${i},'preu',this.value,true)">€</span></label>
-      <label class="lr-chip sel set"><span class="k">Tipus</span>
-        <select ${dis} onchange="lotsSet(${i},'concepte',this.value,true)">${lotsOpts(_llistes.concepte, r.concepte, false)}</select></label>
-      <label class="lr-chip sel ${!tancada && !r.cobrament ? 'err' : r.cobrament ? 'set' : ''}"><span class="k">Pagament</span>
-        <select ${dis} onchange="lotsSet(${i},'cobrament',this.value,true)">${lotsOpts(_llistes.cobrament, r.cobrament, true)}</select></label>
-      <label class="lr-chip sel set"><span class="k">Repartiment</span>
-        <select ${dis} onchange="lotsRep(${i},this.value)">${lotsRepOpts(r, ext)}</select></label>
-    </div>
-    <button class="lr-more ${r.obert ? 'on' : ''}" onclick="lotsToggle(${i})" title="Més opcions: col·laborador, dipòsit, fotos, imports, descartar">⋮</button>
-    <div class="lr-badges">${badges}</div>
+    <div><div class="ent-lab">Preu</div>
+      <label class="ent-chip ${!tancada && !preuOk ? 'err' : preuOk ? 'set' : ''}"><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" value="${lotsEsc(r.preu)}" ${dis}
+        oninput="lotsSet(${i},'preu',this.value,false)" onchange="lotsSet(${i},'preu',this.value,true)"><span style="flex:0;">€</span></label></div>
+    <div><div class="ent-lab">Tipus</div>
+      <button class="ent-chip set${oberta('concepte')}" ${dis} onclick="lotsMenu(event,${i},'concepte')">${ico('tag', 14)}<span>${lotsEsc(lotsCurt(r.concepte))}</span>${ico(oberta('concepte') ? 'up' : 'down', 12, 'dn')}</button></div>
+    <div><div class="ent-lab">Pagament</div>
+      <button class="ent-chip ${!tancada && !r.cobrament ? 'err' : r.cobrament ? 'set' : ''}${oberta('cobrament')}" ${dis} onclick="lotsMenu(event,${i},'cobrament')">${r.cobrament ? ico(lotsIcoPag(r.cobrament), 14) : ''}<span>${r.cobrament ? lotsEsc(lotsCurt(r.cobrament)) : 'Tria'}</span>${ico(oberta('cobrament') ? 'up' : 'down', 12, 'dn')}</button></div>
+    <div><div class="ent-lab">Repartiment</div>
+      <button class="ent-chip set${oberta('rep')}" ${dis} onclick="lotsMenu(event,${i},'rep')">${ico('users', 14)}<span>${lotsEsc(repTxt)}</span>${ico(oberta('rep') ? 'up' : 'down', 12, 'dn')}</button></div>
+    <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
+    ${st ? `<div class="ent-st" id="lots-st-${i}">${st}</div>` : ''}
     ${det}
-    <div class="lr-foot">
-      <div class="lots-st" id="lots-st-${i}">${st}</div>
-      ${tancada ? '' : `<button class="lots-desa" ${falta.length || r.saving ? 'disabled' : ''} onclick="lotsDesa(${i}).then(lotsTotals)">✓ Desa</button>`}
-    </div>
   </div>`;
+}
+
+// ── Desplegables propis (com a la proposta: llista amb icones, l'opció triada ressaltada) ──
+let _lotsMenu = null;
+function lotsMenu(ev, i, camp) {
+  ev.stopPropagation();
+  const r = _lots[i];
+  if (!r || r.estat !== 'pendent') return;
+  if (_lotsMenu && _lotsMenu.i === i && _lotsMenu.camp === camp) { lotsTancaMenu(); return; }
+  const ext = lotsExt(r);
+  let ops;
+  if (camp === 'concepte') ops = _llistes.concepte.map(v => ({ v, t: v, ic: 'tag' }));
+  else if (camp === 'cobrament') ops = _llistes.cobrament.map(v => ({ v, t: lotsLlarg(v), ic: lotsIcoPag(v) }));
+  else ops = lotsRepLlista(r, ext).map(o => ({ ...o, ic: 'users' }));
+  const cur = camp === 'rep' ? (r.custom ? 'altre' : r.feina) : r[camp];
+  const pop = document.getElementById('lots-pop');
+  pop.innerHTML = ops.map((o, n) => `<button class="${o.v === cur ? 'on' : ''}" ${o.off ? 'disabled title="No disponible amb col·laborador extern"' : ''} onclick="lotsTria(${i},'${camp}',${n})">${ico(o.ic, 18)}${lotsEsc(o.t)}</button>`).join('');
+  pop._ops = ops;
+  _lotsMenu = { i, camp };
+  lotsRenderRow(i);
+  const chip = document.querySelector(`#lots-row-${i} .ent-chip.oberta`);
+  const rc = chip.getBoundingClientRect();
+  pop.style.display = 'block';
+  const w = pop.offsetWidth, h = pop.offsetHeight;
+  pop.style.left = Math.max(8, Math.min(rc.left, window.innerWidth - w - 8)) + 'px';
+  pop.style.top = (rc.bottom + h + 8 > window.innerHeight ? Math.max(8, rc.top - h - 4) : rc.bottom + 4) + 'px';
+}
+function lotsTria(i, camp, n) {
+  const o = (document.getElementById('lots-pop')._ops || [])[n];
+  lotsTancaMenu(true);
+  if (!o || o.off) return;
+  if (camp === 'rep') lotsRep(i, o.v); else lotsSet(i, camp, o.v, true);
+}
+function lotsTancaMenu(senseRepintar) {
+  const pop = document.getElementById('lots-pop');
+  if (pop) pop.style.display = 'none';
+  if (!_lotsMenu) return;
+  const i = _lotsMenu.i;
+  _lotsMenu = null;
+  if (!senseRepintar) lotsRenderRow(i);
+}
+document.addEventListener('click', e => {
+  if (_lotsMenu && !e.target.closest('#lots-pop')) lotsTancaMenu();
+  const cfg = document.getElementById('ent-cfg');
+  if (cfg && cfg.style.display !== 'none' && !e.target.closest('#ent-cfg') && !e.target.closest('.ent-nav')) cfg.style.display = 'none';
+});
+
+function lotsCanviaDia(v) {
+  _lotsDia = v || lotsAvui();
+  loadLots();
+}
+
+function lotsConfig() {
+  lotsTancaMenu();
+  const cfg = document.getElementById('ent-cfg');
+  document.getElementById('ent-cfg-inici').checked = !!(state.tatuador && localStorage.getItem('tat_default_pendents_' + state.tatuador) === '1');
+  document.getElementById('ent-cfg-ver').textContent = 'App Tatuador v' + APP_VER + ' · ' + (state.tatuador || '');
+  cfg.style.display = cfg.style.display === 'none' ? 'block' : 'none';
 }
 
 function lotsDesatsHtml() {
   if (!_lotsDesats.length) return '';
-  return `<div class="lots-sec">✓ Ja desats avui (${_lotsDesats.length})</div>` +
+  return `<div class="lots-sec">✓ Ja desats (${_lotsDesats.length})</div>` +
     _lotsDesats.map(d => {
-      const info = [d.concepte, d.cobrament || '—', d.perc_tatuador != null ? Math.round(d.perc_tatuador) + '% tatuador' : '',
-                    state.isAdmin ? '👤 ' + d.tatuador : ''].filter(Boolean).map(lotsEsc).join(' · ');
+      const info = [d.concepte, d.cobrament ? lotsLlarg(d.cobrament) : '—', d.perc_tatuador != null ? Math.round(d.perc_tatuador) + '% tatuador' : '',
+                    state.isAdmin ? d.tatuador : ''].filter(Boolean).map(lotsEsc).join(' · ');
       return `<div class="lots-fet"><span style="color:#4ade80;">✓</span><div><b>${lotsEsc(d.nom)}</b><div>${info}</div></div>
         <span class="preu">${fmt(parseFloat(d.preu) || 0)}</span></div>`;
     }).join('') +
@@ -3797,11 +3936,16 @@ function lotsDesatsHtml() {
 
 function renderLots() {
   const list = document.getElementById('lots-list');
-  const dia = document.getElementById('lots-dia');
-  if (dia) dia.textContent = 'Clients, tatuatges i pagaments · ' + new Date().toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  const dia = _lotsDia || lotsAvui();
+  const dt = new Date(dia + 'T12:00:00');
+  const curt = dt.toLocaleDateString('ca-ES', { day: 'numeric', month: 'short' });
+  document.getElementById('ent-data-txt').textContent = dia === lotsAvui() ? 'Avui, ' + curt : dt.toLocaleDateString('ca-ES', { weekday: 'short' }) + ' ' + curt;
+  document.getElementById('ent-data').value = dia;
+  document.getElementById('ent-av').textContent = (state.tatuador || '·').trim().charAt(0).toUpperCase();
+  document.getElementById('ent-nom').textContent = (state.tatuador || '').split(' ')[0];
   list.innerHTML = _lots.length
     ? _lots.map((_, i) => lotsRowHtml(i)).join('')
-    : `<div style="color:#666;text-align:center;padding:24px;font-size:13px;">✅ Cap check-in pendent d'introduir</div>`;
+    : `<div style="color:#77736a;text-align:center;padding:24px;font-size:13px;">✅ Cap check-in pendent d'introduir</div>`;
   document.getElementById('lots-desats').innerHTML = lotsDesatsHtml();
   lotsTotals();
 }
@@ -3826,9 +3970,8 @@ function lotsTotals() {
   document.getElementById('lots-tot-net').textContent  = fmt(total);
   document.getElementById('lots-tot-pend').textContent = String(pend);
   const btn = document.getElementById('lots-btn-tot');
-  btn.textContent = `💾 Desa tot (${llestos} llest${llestos === 1 ? '' : 's'})`;
+  btn.innerHTML = `${ico('save', 20)}Desa tot (${llestos} llest${llestos === 1 ? '' : 's'})`;
   btn.disabled = !llestos;
-  btn.style.opacity = llestos ? '' : '0.5';
 }
 
 // rerender=false mentre s'escriu (no es perd el focus): només s'actualitzen imports i estat
@@ -3851,7 +3994,7 @@ function lotsSet(i, camp, val, rerender) {
   lotsTotals();
 }
 
-// Xip "Repartiment": 60/40 o 70/30 = Feina No / Sí (el % surt del tatuador); "Altre…" = % a mà
+// Repartiment: 60/40 o 70/30 = Feina No / Sí (el % surt del tatuador); "Altre…" = % a mà (al menú ⋮)
 function lotsRep(i, v) {
   const r = _lots[i];
   if (!r || r.estat !== 'pendent') return;
@@ -3868,6 +4011,7 @@ function lotsRep(i, v) {
 function lotsToggle(i) {
   const r = _lots[i];
   if (!r) return;
+  lotsTancaMenu(true);
   r.obert = !r.obert;
   lotsRenderRow(i);
 }
@@ -3917,7 +4061,7 @@ async function lotsDesa(i) {
       r.deposit.cobrat = true;
     }
     const row = buildDiariRowFrom({
-      preu: parseFloat(r.preu) || 0, pctTatBase: k.pctBase, pctCom: k.pctCom,
+      preu: parseFloat(r.preu) || 0, pctTatBase: k.pctBase, pctCom: k.pctCom, data: r.cita.data,
       cobrament: r.cobrament, concepte: r.concepte, esAutonom: r.u.esAutonom,
       tatuador: r.cita.tatuador, email: r.u.email, telefon: r.telefon,
       feina: r.feina, deposit: r.deposit, bon: r.bon
