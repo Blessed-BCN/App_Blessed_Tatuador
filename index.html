@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.2 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.3 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -548,7 +548,7 @@
     .ent-data input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
     .ent-sub { font-size: 15px; color: #a8a396; margin: 2px 2px 14px; }
     .ent-row { background: #151517; border: 1px solid #26262a; border-radius: 14px; padding: 9px 7px 9px 9px; margin-bottom: 8px;
-      display: grid; grid-template-columns: 90px repeat(4, minmax(0,1fr)) 18px; gap: 4px 5px; align-items: end; }
+      display: grid; grid-template-columns: 88px repeat(4, minmax(0,1fr)) 44px 16px; gap: 4px 5px; align-items: end; }
     .ent-row.ok { border-color: #5c4d24; }
     .ent-row.desat { opacity: .5; }
     .ent-row.descartat { opacity: .35; }
@@ -576,6 +576,11 @@
     .ent-chip input { width: 100%; min-width: 0; background: none; border: none; color: inherit; font: inherit; font-size: 16px; padding: 0; outline: none; }
     .ent-chip:disabled, .ent-chip:has(input:disabled) { cursor: default; }
     .ent-more { background: none; border: none; color: #c9a84c; padding: 0; height: 44px; cursor: pointer; line-height: 0; }
+    .ent-lab .lab-c, .ent-lab .lab-c2 { display: none; }
+    .ent-fchip { justify-content: center; gap: 3px !important; padding: 0 3px !important; }
+    .ent-fchip .ico { display: inline-block !important; color: #c9a84c; }
+    .ent-fchip b { font-size: 15px; }
+    .ent-fchip.err .ico, .ent-fchip.err b { color: #f87171; }
     .ent-fotos { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 4px; }
     .ent-fbtn { display: inline-flex; align-items: center; gap: 7px; height: 42px; padding: 0 14px; border-radius: 10px;
       border: 1.5px dashed #8a7333; color: #c9a84c; background: #1b1b1e; font-size: 15px; font-weight: 700; cursor: pointer; }
@@ -635,11 +640,12 @@
     .lots-fet .preu { margin-left: auto; font-weight: 800; color: #e0e0e0; white-space: nowrap; }
     .lots-sub { font-size: 12.5px; color: #888; }
     @media (max-width: 419px) {
-      .ent-row { grid-template-columns: 88px repeat(4, minmax(0,1fr)) 14px; gap: 4px; padding: 9px 5px 9px 8px; }
+      .ent-row { grid-template-columns: 74px repeat(4, minmax(0,1fr)) 40px 11px; gap: 4px 3px; padding: 9px 4px 9px 7px; }
       .ent-nom { font-size: 17px; }
       .ent-chip { padding: 0 4px; gap: 2px; font-size: 15px; }
-      .ent-cons { font-size: 11px; gap: 4px; }
-      .ent-lab { font-size: 12px; overflow: visible; text-overflow: clip; }
+      .ent-cons { font-size: 9.5px; gap: 3px; letter-spacing: -.1px; }
+      .ent-chip { font-size: 14.5px; }
+      .ent-lab { font-size: 11px; }
       .ent-nav { gap: 4px; padding-left: 6px; padding-right: 6px; }
       .ent-sum { grid-template-columns: .8fr 1.5fr .8fr; }
       .ent-sum > div { gap: 6px; padding: 0 5px; }
@@ -649,11 +655,24 @@
     @media (max-width: 699px) {
       .ent-chip > .ico:first-child, .ent-chip .ico.dn { display: none; }
     }
+    @media (min-width: 420px) and (max-width: 699px) {
+      .ent-lab { font-size: 11px; }
+      .ent-chip { font-size: 14.5px; padding: 0 4px; gap: 2px; }
+      .ent-cons { font-size: 10.5px; gap: 3px; }
+    }
+    @media (max-width: 699px) {
+      .ent-lab:has(.lab-c) .lab-l { display: none; }
+      .ent-lab .lab-c { display: inline; }
+    }
+    @media (max-width: 389px) {
+      .ent-lab:has(.lab-c2) .lab-l { display: none; }
+      .ent-lab .lab-c2 { display: inline; }
+    }
     @media (min-width: 700px) {
-      .ent-row { grid-template-columns: 140px repeat(4, minmax(0,1fr)) 22px; gap: 4px 8px; padding: 11px 9px 11px 13px; }
+      .ent-row { grid-template-columns: 130px repeat(4, minmax(0,1fr)) 64px 22px; gap: 4px 8px; padding: 11px 9px 11px 13px; }
       .ent-nom { font-size: 21px; }
-      .ent-chip { font-size: 17px; padding: 0 10px; gap: 7px; height: 50px; }
-      .ent-chip input { font-size: 17px; }
+      .ent-chip { font-size: 16px; padding: 0 8px; gap: 5px; height: 50px; }
+      .ent-chip input { font-size: 16px; }
       .ent-lab { font-size: 13.5px; }
       .ent-cons { font-size: 13px; }
     }
@@ -1485,7 +1504,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.21.2", APP_DATE="2026-10-26";
+const APP_VER="2.21.3", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3871,17 +3890,15 @@ function lotsRowHtml(i) {
         oninput="lotsSet(${i},'preu',this.value,false)" onchange="lotsSet(${i},'preu',this.value,true)"><span style="flex:none;">€</span></label></div>
     <div><div class="ent-lab">Tipus</div>
       <button class="ent-chip set${oberta('concepte')}" ${dis} onclick="lotsMenu(event,${i},'concepte')">${ico('tag', 14)}<span>${lotsEsc(lotsCurt(r.concepte))}</span>${ico(oberta('concepte') ? 'up' : 'down', 12, 'dn')}</button></div>
-    <div><div class="ent-lab">Pagament</div>
+    <div><div class="ent-lab"><span class="lab-l">Pagament</span><span class="lab-c2">Pagam.</span></div>
       <button class="ent-chip ${!tancada && !r.cobrament ? 'err' : r.cobrament ? 'set' : ''}${oberta('cobrament')}" ${dis} onclick="lotsMenu(event,${i},'cobrament')">${r.cobrament ? ico(lotsIcoPag(r.cobrament), 14) : ''}<span>${r.cobrament ? lotsEsc(lotsCurt(r.cobrament)) : 'Tria'}</span>${ico(oberta('cobrament') ? 'up' : 'down', 12, 'dn')}</button></div>
-    <div><div class="ent-lab">Repartiment</div>
+    <div><div class="ent-lab"><span class="lab-l">Repartiment</span><span class="lab-c">Repart.</span></div>
       <button class="ent-chip set${oberta('rep')}" ${dis} onclick="lotsMenu(event,${i},'rep')">${ico('users', 14)}<span>${lotsEsc(repTxt)}</span>${ico(oberta('rep') ? 'up' : 'down', 12, 'dn')}</button></div>
+    <div><div class="ent-lab">Fotos</div>
+      <label class="ent-chip ent-fchip ${!tancada && !r.fotos.length ? 'err' : r.fotos.length ? 'set' : ''}" title="Fotos del tatuatge (mínim 1)">${ico('cam', 16)}<b>${r.fotos.length}</b>
+        ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label></div>
     <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
-    <div class="ent-fotos">
-      ${tancada ? '' : `<label class="ent-fbtn ${!r.fotos.length ? 'err' : ''}">${ico('cam', 18)}${r.fotos.length ? 'Afegir més' : 'Afegir fotos'}
-        <input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)"></label>`}
-      ${fotos}
-      ${!r.fotos.length && !tancada ? `<span class="lots-sub" style="color:#f87171;">mínim 1 foto</span>` : ''}
-    </div>
+    ${r.fotos.length ? `<div class="ent-fotos">${fotos}</div>` : ''}
     ${st ? `<div class="ent-st" id="lots-st-${i}">${st}</div>` : ''}
     ${det}
   </div>`;
