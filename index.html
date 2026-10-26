@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.5 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.6 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1000,7 +1000,7 @@
     <div id="fotos-ov-empty" class="fotos-ov-empty">
       <span class="big-icon">📷</span>
       Fes la primera foto o vídeo del tatuatge
-      <br><span class="hint">Cal mínim 1 arxiu per gravar</span>
+      <br><span class="hint">Les fotos són opcionals: també pots gravar sense cap foto</span>
     </div>
     <div id="fotos-ov-grid" class="fotos-ov-grid"></div>
   </div>
@@ -1501,7 +1501,7 @@ function updateFotosOverlay() {
   const btn   = document.getElementById('btn-gravar-tattoo');
   const count = document.getElementById('fotos-ov-count');
   empty.style.display = n > 0 ? 'none' : 'block';
-  btn.style.display   = n > 0 ? 'block' : 'none';
+  btn.style.display   = 'block';   // fotos opcionals: es pot gravar també sense cap foto
   count.textContent   = n > 0 ? `${n} arxiu${n > 1 ? 's' : ''}` : '';
 }
 
@@ -1517,7 +1517,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.21.5", APP_DATE="2026-10-26";
+const APP_VER="2.21.6", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2869,7 +2869,7 @@ async function gravaTattoo() {
   if (state.editingDiariId) { return desaEdicioTattoo(); }
 
   const fotosValides = state.fotos.filter(Boolean);
-  if (fotosValides.length === 0) { showToast('Cal mínim 1 foto del tatuatge', 'err'); return; }
+  // Fotos opcionals (decisió de l'usuari, 2026-10-26): es pot gravar sense cap foto
 
   const preu = parseFloat(document.getElementById('preu').value) || 0;
   if (preu <= 0) { showToast('Introdueix el preu del tatuatge', 'err'); return; }
@@ -2894,7 +2894,7 @@ async function gravaTattoo() {
 
     hideLoading();
     clearSession();
-    showToast(`✓ Tattoo gravat! (${fotosValides.length} foto${fotosValides.length > 1 ? 's' : ''})`, 'ok');
+    showToast(`✓ Tattoo gravat! (${fotosValides.length ? fotosValides.length + ' foto' + (fotosValides.length > 1 ? 's' : '') : 'sense fotos'})`, 'ok');
 
     // Tancar overlay i reiniciar app (o tornar a l'App Client si venim del PIN de l'iPad)
     setTimeout(() => finishAndReturn(), 2000);
@@ -3790,7 +3790,7 @@ function lotsFalta(r) {
   const f = [];
   if (!((parseFloat(r.preu) || 0) > 0)) f.push('preu');
   if (!r.cobrament) f.push('cobrament');
-  // Fotos opcionals en aquesta pantalla (decisió de l'usuari, 2026-10-26); el formulari normal encara en demana 1
+  // Fotos opcionals (decisió de l'usuari, 2026-10-26), igual que al formulari normal
   return f;
 }
 
