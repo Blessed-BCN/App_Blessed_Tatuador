@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.1 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.2 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -560,7 +560,7 @@
     .lr-llum.verd { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
     .lr-llum.groc { background: #f5b942; box-shadow: 0 0 6px #f5b942; }
     .lr-llum.vermell { background: #26262a; border: 1.5px solid #ef4444; }
-    .ent-mini { display: flex; align-items: center; gap: 7px; margin-top: 5px; font-size: 13.5px; color: #a8a396; }
+    .ent-mini { display: flex; align-items: center; gap: 7px; margin-top: 5px; min-height: 4px; font-size: 13.5px; color: #a8a396; }
     .ent-cam { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; }
     .ent-cam.err { color: #f87171; }
     .ent-lab { font-size: 12.5px; color: #9a968c; margin: 0 0 3px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -576,6 +576,12 @@
     .ent-chip input { width: 100%; min-width: 0; background: none; border: none; color: inherit; font: inherit; font-size: 16px; padding: 0; outline: none; }
     .ent-chip:disabled, .ent-chip:has(input:disabled) { cursor: default; }
     .ent-more { background: none; border: none; color: #c9a84c; padding: 0; height: 44px; cursor: pointer; line-height: 0; }
+    .ent-fotos { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 4px; }
+    .ent-fbtn { display: inline-flex; align-items: center; gap: 7px; height: 42px; padding: 0 14px; border-radius: 10px;
+      border: 1.5px dashed #8a7333; color: #c9a84c; background: #1b1b1e; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .ent-fbtn.err { border-color: #ef4444; color: #f87171; }
+    .ent-fotos .lots-th { width: 42px; height: 42px; }
+    .ent-fotos .lots-th button { width: 19px; height: 19px; font-size: 11px; }
     .ent-st { grid-column: 1 / -1; font-size: 13px; font-weight: 700; }
     .ent-pop { position: fixed; z-index: 160; min-width: 210px; max-width: 280px; background: #1d1d20; border: 1px solid #3a3a40;
       border-radius: 12px; padding: 5px; box-shadow: 0 10px 28px rgba(0,0,0,.55); }
@@ -589,7 +595,7 @@
     .ent-sum > div { display: flex; align-items: center; gap: 8px; padding: 0 7px; min-width: 0; }
     .ent-sum > div + div { border-left: 1px solid #2a2a2d; }
     .ent-sum .ico { color: #c9a84c; }
-    .ent-sum .v { font-size: 24px; font-weight: 700; color: #f5efe0; line-height: 1.1; }
+    .ent-sum .v { white-space: nowrap; font-size: 24px; font-weight: 700; color: #f5efe0; line-height: 1.1; }
     .ent-sum .k { font-size: 12.5px; color: #a8a396; }
     .ent-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 58px; border-radius: 15px;
       font-size: 18px; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 9px; }
@@ -601,7 +607,7 @@
     .ent-nav button { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: 1px solid transparent; border-radius: 18px;
       padding: 11px 0 9px; color: #bdb8aa; font-size: 14px; font-family: inherit; cursor: pointer; }
     .ent-nav button.on { background: #2a2414; border-color: #4a3d1c; color: #c9a84c; }
-    .ent-cfg { position: fixed; z-index: 165; left: 12px; right: 12px; bottom: 104px; max-width: 420px; margin: 0 auto; background: #1d1d20;
+    .ent-cfg { position: fixed; z-index: 165; left: 12px; right: 12px; top: 70px; max-width: 420px; margin: 0 auto; background: #1d1d20;
       border: 1px solid #3a3a40; border-radius: 14px; padding: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.55); font-size: 14px; }
     .lr-det { grid-column: 1 / -1; margin-top: 4px; padding-top: 8px; border-top: 1px dashed #333; display: grid;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px 10px; }
@@ -635,6 +641,9 @@
       .ent-cons { font-size: 11px; gap: 4px; }
       .ent-lab { font-size: 12px; overflow: visible; text-overflow: clip; }
       .ent-nav { gap: 4px; padding-left: 6px; padding-right: 6px; }
+      .ent-sum { grid-template-columns: .8fr 1.5fr .8fr; }
+      .ent-sum > div { gap: 6px; padding: 0 5px; }
+      .ent-sum .v { font-size: 20px; }
       .ent-nav button { font-size: 13px; }
     }
     @media (max-width: 699px) {
@@ -720,6 +729,9 @@
     <div id="sala-espera-grid" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;width:100%;"></div>
     <button class="btn-skip-qr" onclick="document.getElementById('overlay-sala-espera').style.display='none';goToQR();" style="margin-top:28px;">
       🔍 Escanejar QR / Cerca manual
+    </button>
+    <button class="btn-skip-qr" onclick="tatAnar('entrades')" style="margin-top:10px;border-color:#c9a84c;color:#c9a84c;">
+      📋 Entrades del dia
     </button>
   </div>
 </div>
@@ -809,7 +821,7 @@
 <!-- ── HISTORIAL OVERLAY ── -->
 <div id="overlay-historial" class="overlay" style="display:none;">
   <div class="fotos-ov-header">
-    <button class="fotos-ov-back" onclick="hideHistorial()">← Tancar</button>
+    <button class="fotos-ov-back" onclick="tancaITorna('historial')">← Tancar</button>
     <div class="fotos-ov-title">Els meus tattoos</div>
     <div></div>
   </div>
@@ -876,7 +888,7 @@
 <!-- ── CITES OVERLAY ── -->
 <div id="overlay-cites" class="overlay" style="display:none;">
   <div class="fotos-ov-header">
-    <button class="fotos-ov-back" onclick="hideCites()">← Tancar</button>
+    <button class="fotos-ov-back" onclick="tancaITorna('cites')">← Tancar</button>
     <div class="fotos-ov-title">Les meves cites</div>
     <button onclick="loadCites()" style="background:none;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;padding:6px 10px;cursor:pointer;">↻</button>
   </div>
@@ -906,7 +918,7 @@
   <div class="ent-scroll" onscroll="lotsTancaMenu()">
     <div class="ent-wrap">
       <div class="ent-hdr">
-        <button class="ent-ic" onclick="hideLots()" aria-label="Tornar" data-ico="menu" data-s="26"></button>
+        <button class="ent-ic" onclick="lotsConfig()" aria-label="Menú" data-obre-cfg="1" data-ico="menu" data-s="26"></button>
         <div class="ent-logo"><img src="icons/icon-192.png" alt=""><div><div class="b1">BLESSED</div><div class="b2">ART TATTOO BCN</div></div></div>
         <div class="ent-user"><span class="ent-av" id="ent-av">·</span><span id="ent-nom">—</span></div>
       </div>
@@ -924,17 +936,18 @@
         <div><span data-ico="pie" data-s="24"></span><div><div class="v" id="lots-tot-pend">—</div><div class="k">sense revisar</div></div></div>
       </div>
       <button id="lots-btn-tot" class="ent-btn or" onclick="lotsDesaTot()">Desa tot</button>
-      <button class="ent-btn sec" onclick="hideLots();hideCites();goToQR();"><span data-ico="plus" data-s="20"></span>Afegir entrada manual<span data-ico="right" data-s="18"></span></button>
+      <button class="ent-btn sec" onclick="tatAnar('qr')"><span data-ico="plus" data-s="20"></span>Afegir entrada manual<span data-ico="right" data-s="18"></span></button>
     </div>
   </div>
   <nav class="ent-nav">
     <button class="on" onclick="lotsTancaMenu()"><span data-ico="list" data-s="27"></span>Entrades</button>
-    <button onclick="hideLots();hideCites();goToQR();"><span data-ico="users" data-s="27"></span>Clients</button>
-    <button onclick="hideLots();showHistorial();"><span data-ico="bars" data-s="27"></span>Estadístiques</button>
-    <button onclick="lotsConfig()"><span data-ico="gear" data-s="27"></span>Configuració</button>
+    <button onclick="tatAnar('sala')"><span data-ico="users" data-s="27"></span>Sala</button>
+    <button onclick="tatAnar('cites')"><span data-ico="cal" data-s="27"></span>Cites</button>
+    <button onclick="tatAnar('historial')"><span data-ico="clip" data-s="27"></span>Historial</button>
   </nav>
   <div id="lots-pop" class="ent-pop" style="display:none;"></div>
   <div id="ent-cfg" class="ent-cfg" style="display:none;">
+    <button class="ent-btn sec" style="height:50px;font-size:16px;margin-bottom:12px;" onclick="tatAnar('qr')">🔍 Escanejar QR / cerca manual</button>
     <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
       <input type="checkbox" id="ent-cfg-inici" onchange="togglePendentsPref(this.checked)" style="width:20px;height:20px;">
       Obrir aquesta pantalla en entrar a l'app</label>
@@ -1472,7 +1485,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.21.1", APP_DATE="2026-10-26";
+const APP_VER="2.21.2", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3836,8 +3849,6 @@ function lotsRowHtml(i) {
       <div class="${r.custom ? '' : 'full'}"><span class="lab">Col·laborador extern</span><select class="lots-in" ${dis} onchange="lotsSet(${i},'extId',this.value,true)">${extOpts}</select></div>
       ${(r.deposit.import && !r.deposit.cobrat) ? `<div class="full"><label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#ffd38a;cursor:pointer;">
         <input type="checkbox" ${r.depRebut ? 'checked' : ''} ${dis} onchange="lotsSet(${i},'depRebut',this.checked,true)" style="width:18px;height:18px;">Dipòsit de ${r.deposit.import}€ rebut</label></div>` : ''}
-      <div class="full"><span class="lab">Fotos (mínim 1)</span><div class="lots-fotos">${fotos}
-        ${tancada ? '' : `<label class="lots-cam">${ico('cam', 20)}<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)"></label>`}</div></div>
       <div><span class="lab">Cobrar avui</span><div class="lots-calc" id="lots-net-${i}">${k.c ? fmt(k.net) : '—'}</div></div>
       <div><span class="lab">Per al tatuador</span><div class="lots-calc" id="lots-tat-${i}">${k.c ? fmt(k.perTat) : '—'}</div></div>
       ${tancada ? '' : `<div class="full ent-acts">
@@ -3852,8 +3863,6 @@ function lotsRowHtml(i) {
       ${state.isAdmin ? `<div class="ent-tat">${lotsEsc(r.cita.tatuador)}</div>` : ''}
       <div class="ent-cons" title="${lotsEsc(cons.txt)}"><span class="lr-llum ${cons.cls}"></span>Consentiment</div>
       <div class="ent-mini">
-        <label class="ent-cam ${!tancada && !r.fotos.length ? 'err' : ''}" title="Fotos (mínim 1)">${ico('cam', 14)}${r.fotos.length}
-          ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label>
         ${avisos}
       </div>
     </div>
@@ -3867,6 +3876,12 @@ function lotsRowHtml(i) {
     <div><div class="ent-lab">Repartiment</div>
       <button class="ent-chip set${oberta('rep')}" ${dis} onclick="lotsMenu(event,${i},'rep')">${ico('users', 14)}<span>${lotsEsc(repTxt)}</span>${ico(oberta('rep') ? 'up' : 'down', 12, 'dn')}</button></div>
     <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
+    <div class="ent-fotos">
+      ${tancada ? '' : `<label class="ent-fbtn ${!r.fotos.length ? 'err' : ''}">${ico('cam', 18)}${r.fotos.length ? 'Afegir més' : 'Afegir fotos'}
+        <input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)"></label>`}
+      ${fotos}
+      ${!r.fotos.length && !tancada ? `<span class="lots-sub" style="color:#f87171;">mínim 1 foto</span>` : ''}
+    </div>
     ${st ? `<div class="ent-st" id="lots-st-${i}">${st}</div>` : ''}
     ${det}
   </div>`;
@@ -3914,8 +3929,30 @@ function lotsTancaMenu(senseRepintar) {
 document.addEventListener('click', e => {
   if (_lotsMenu && !e.target.closest('#lots-pop')) lotsTancaMenu();
   const cfg = document.getElementById('ent-cfg');
-  if (cfg && cfg.style.display !== 'none' && !e.target.closest('#ent-cfg') && !e.target.closest('.ent-nav')) cfg.style.display = 'none';
+  if (cfg && cfg.style.display !== 'none' && !e.target.closest('#ent-cfg') && !e.target.closest('[data-obre-cfg]')) cfg.style.display = 'none';
 });
+
+// ── Navegació entre pantalles (pestanyes inferiors i menú) ─────────────────────
+// Totes les pantalles de l'app són capes (overlay) amb el mateix z-index: si una queda oberta, tapa la
+// següent. Per això primer es tanquen totes i després s'obre la de destí.
+let _tornaEntrades = false;
+function tatAnar(d) {
+  ['overlay-sala-espera', 'overlay-qr', 'overlay-qr-client', 'overlay-historial', 'overlay-cites'].forEach(id => {
+    const e = document.getElementById(id);
+    if (e) e.style.display = 'none';
+  });
+  if (d === 'entrades') { _tornaEntrades = false; showLots(); return; }
+  hideLots();
+  _tornaEntrades = (d === 'cites' || d === 'historial');
+  if (d === 'sala') goToSalaEspera();
+  else if (d === 'cites') showCites('avui');
+  else if (d === 'historial') showHistorial();
+  else if (d === 'qr') goToQR();
+}
+function tancaITorna(d) {
+  if (d === 'cites') hideCites(); else hideHistorial();
+  if (_tornaEntrades) { _tornaEntrades = false; showLots(); }
+}
 
 function lotsCanviaDia(v) {
   _lotsDia = v || lotsAvui();
