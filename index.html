@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.21.6 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.22.0 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -549,8 +549,8 @@
     .ent-sub { font-size: 15px; color: #a8a396; margin: 2px 2px 14px; }
     .ent-row { background: #151517; border: 1px solid #26262a; border-radius: 14px; padding: 9px 7px 9px 9px; margin-bottom: 8px;
       display: grid; grid-template-columns: 88px repeat(4, minmax(0,1fr)) 44px 16px; gap: 4px 5px; align-items: end; }
-    .ent-row.ok { border-color: #5c4d24; }
-    .ent-row.desat { opacity: .5; }
+    .ent-row.ok { border-color: #2f9e5a; background: #0f1a13; }
+    .ent-row.desat { opacity: .6; border-color: #2f9e5a; }
     .ent-row.descartat { opacity: .35; }
     .ent-nomcol { align-self: center; min-width: 0; }
     .ent-nom { font-size: 18px; font-weight: 700; color: #f5efe0; line-height: 1.15; overflow-wrap: anywhere; }
@@ -573,6 +573,24 @@
     .ent-chip.set { background: #2a2414; border-color: #8a7333; color: #f3e6bf; }
     .ent-chip.err { border-color: #ef4444; }
     .ent-chip.oberta { border-color: #c9a84c; }
+    .ent-chip, .ent-row { transition: background-color .25s, border-color .25s; }
+    .ent-chip.verd, .ent-row.ok .ent-chip, .ent-row.desat .ent-chip { background: #11241a; border-color: #2f9e5a; color: #dcf7e6; }
+    .ent-chip.verd .ico, .ent-row.ok .ent-chip .ico, .ent-row.desat .ent-chip .ico { color: #4ade80; }
+    .ent-dep { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; }
+    .ent-dep > * { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 11px; border-radius: 16px; border: 1px solid;
+      background: none; font-size: 14px; font-weight: 700; font-family: inherit; }
+    .ent-dep button { cursor: pointer; }
+    .ent-dep .ok { color: #4ade80; border-color: #2f9e5a; background: #11241a; }
+    .ent-dep .pend { color: #f5b942; border-color: #8a6a1f; background: #241d0e; }
+    .ent-dep .bon { color: #c9a0ff; border-color: #5b4485; background: #1c1527; }
+    .ent-telin { width: 100%; height: 34px; margin-top: 4px; border-radius: 8px; border: 1px solid #34343a; background: #1b1b1e;
+      color: #ece7da; font-size: 16px; font-family: inherit; padding: 0 6px; outline: none; }
+    .ent-add { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 50px; margin: 2px 0 8px;
+      border: 1.5px dashed #5c4d24; border-radius: 14px; background: none; color: #c9a84c; font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; }
+    .ent-auto { color: #4ade80; }
+    .ent-sbtn { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 9px; border: 1px solid #5c4d24;
+      background: #1b1b1e; color: #c9a84c; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
+    .ent-sbtn.ok { background: #1f7a44; border-color: #2f9e5a; color: #fff; }
     .ent-chip input { width: 100%; min-width: 0; background: none; border: none; color: inherit; font: inherit; font-size: 16px; padding: 0; outline: none; }
     .ent-chip:disabled, .ent-chip:has(input:disabled) { cursor: default; }
     .ent-more { background: none; border: none; color: #c9a84c; padding: 0; height: 44px; cursor: pointer; line-height: 0; }
@@ -587,7 +605,8 @@
     .ent-fbtn.err { border-color: #ef4444; color: #f87171; }
     .ent-fotos .lots-th { width: 42px; height: 42px; }
     .ent-fotos .lots-th button { width: 19px; height: 19px; font-size: 11px; }
-    .ent-st { grid-column: 1 / -1; font-size: 13px; font-weight: 700; }
+    .ent-st { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; font-size: 13.5px; font-weight: 700; }
+    .ent-st:empty { display: none; }
     .ent-pop { position: fixed; z-index: 160; min-width: 210px; max-width: 280px; background: #1d1d20; border: 1px solid #3a3a40;
       border-radius: 12px; padding: 5px; box-shadow: 0 10px 28px rgba(0,0,0,.55); }
     .ent-pop button { display: flex; align-items: center; gap: 11px; width: 100%; padding: 12px; border: none; border-radius: 9px;
@@ -968,7 +987,7 @@
       </div>
       <div id="lots-per-tat"></div>
       <button id="lots-btn-tot" class="ent-btn or" onclick="lotsDesaTot()">Desa tot</button>
-      <button class="ent-btn sec" onclick="tatAnar('qr')"><span data-ico="plus" data-s="20"></span>Afegir entrada manual<span data-ico="right" data-s="18"></span></button>
+      <button class="ent-btn sec" onclick="tatAnar('qr')"><span data-ico="plus" data-s="20"></span>Cercar client (QR o manual)<span data-ico="right" data-s="18"></span></button>
     </div>
   </div>
   <nav class="ent-nav">
@@ -983,6 +1002,9 @@
     <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
       <input type="checkbox" id="ent-cfg-inici" onchange="togglePendentsPref(this.checked)" style="width:20px;height:20px;">
       Obrir aquesta pantalla en entrar a l'app</label>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:12px;">
+      <input type="checkbox" id="ent-cfg-auto" onchange="lotsAutoPref(this.checked)" style="width:20px;height:20px;">
+      Desar sola cada fila quan està completa</label>
     <div class="lots-sub" style="margin:10px 0 12px;" id="ent-cfg-ver"></div>
     <button class="lots-desa" onclick="document.getElementById('ent-cfg').style.display='none'">Tancar</button>
   </div>
@@ -1517,7 +1539,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.21.6", APP_DATE="2026-10-26";
+const APP_VER="2.22.0", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3645,6 +3667,7 @@ async function showLots() {
 }
 
 function hideLots() {
+  _lots.forEach((_, i) => lotsCancelaDesat(i, false));
   lotsTancaMenu();
   document.getElementById('ent-cfg').style.display = 'none';
   document.getElementById('overlay-lots').style.display = 'none';
@@ -3667,6 +3690,7 @@ async function lotsUsuari(nom) {
 
 async function loadLots() {
   if (!state.tatuador) return;
+  _lots.forEach((_, i) => lotsCancelaDesat(i, false));
   const list = document.getElementById('lots-list');
   list.innerHTML = '<div style="color:#666;text-align:center;padding:30px;font-size:13px;">⏳ Carregant...</div>';
   _lotsUsuaris = {};
@@ -3700,7 +3724,7 @@ async function loadLots() {
         aplicarDeposit: t ? t.aplicar_deposit !== false : true,
         aplicarBon:     t ? t.aplicar_bon !== false : true,
         preu: '', cobrament: '', concepte: concepteDef(), feina: 'No', extId: '', pctBase: null, depRebut: false,
-        custom: false, obert: false,
+        custom: false, obert: false, toc: {},
         fotos: [], estat: 'pendent', saving: false, error: null
       };
     }));
@@ -3862,17 +3886,11 @@ function lotsRowHtml(i) {
   const avisos = [
     r.esMenor ? `<span title="Menor d'edat" style="color:#f5b942;">${ico('user', 14)}</span>` : '',
     r.alertaMedica.length ? `<span title="Afecció mèdica: ${lotsEsc(r.alertaMedica.join(' · '))}" style="color:#f87171;">${ico('warn', 14)}</span>` : '',
-    (r.deposit.import && !(r.deposit.cobrat || r.depRebut)) ? `<span title="Dipòsit de ${r.deposit.import}€ pendent (⋮)" style="color:#f5b942;">${ico('coin', 14)}</span>` : '',
-    r.bon.codi ? `<span title="Val de regal ${r.bon.import}€" style="color:#c9a0ff;">${ico('gift', 14)}</span>` : ''
   ].join('');
   const extOpts = ['<option value="">— Cap —</option>'].concat((state.externs || []).map(e =>
     `<option value="${e.id}" ${String(e.id) === r.extId ? 'selected' : ''}>${lotsEsc(e.nom)} (${e.pct}%)</option>`)).join('');
   const fotos = r.fotos.map((f, j) => `<div class="lots-th">${f.isVideo ? `<video src="${f.url}" muted playsinline preload="metadata"></video>` : `<img src="${f.url}">`}${tancada ? '' : `<button onclick="lotsDelFoto(${i},${j})">✕</button>`}</div>`).join('');
-  let st = '';
-  if (r.saving) st = `<span style="color:#c9a84c;">Desant...</span>`;
-  else if (r.estat === 'desat') st = `<span style="color:#4ade80;">✓ Desat</span>`;
-  else if (r.estat === 'descartat') st = `<span style="color:#888;">Descartat</span>`;
-  else if (r.error) st = `<span style="color:#ffb4b4;">${lotsEsc(r.error)}</span>`;
+  const st = lotsEstatHtml(i);
 
   const det = !r.obert ? '' : `<div class="lr-det">
       <div class="full lots-sub">Check-in fa ${temps}${r.cita.hora_inici ? ' · cita ' + r.cita.hora_inici.slice(0, 5) : ''}${r.telefon ? ' · ' + lotsEsc(r.telefon) : ''} · <span style="color:${cons.cls === 'verd' ? '#4ade80' : cons.cls === 'groc' ? '#f5b942' : '#f87171'};">${lotsEsc(cons.txt)}</span>${r.alertaMedica.length ? ' · <span style="color:#f87171;">' + lotsEsc(r.alertaMedica.join(', ')) + '</span>' : ''}</div>
@@ -3891,7 +3909,9 @@ function lotsRowHtml(i) {
 
   return `<div class="ent-row ${cls}" id="lots-row-${i}">
     <div class="ent-nomcol">
-      <div class="ent-nom">${lotsEsc(r.nom)}</div>
+      ${r.manual ? `<div class="ent-nom" style="font-size:14px;">Entrada manual</div>
+      <input class="ent-telin" type="tel" inputmode="tel" placeholder="Telèfon" value="${lotsEsc(r.telefon)}" ${dis}
+        oninput="lotsSet(${i},'telefon',this.value.trim(),false)" onchange="lotsProgramaDesat(${i})">` : `<div class="ent-nom">${lotsEsc(r.nom)}</div>`}
       ${state.isAdmin ? `<div class="ent-tat">${lotsEsc(r.cita.tatuador)}</div>` : ''}
       <div class="ent-cons" title="${lotsEsc(cons.txt)}"><span class="lr-llum ${cons.cls}"></span>Consentiment</div>
       <div class="ent-mini">
@@ -3899,20 +3919,21 @@ function lotsRowHtml(i) {
       </div>
     </div>
     <div><div class="ent-lab">Preu</div>
-      <label class="ent-chip ${!tancada && !preuOk ? 'err' : preuOk ? 'set' : ''}"><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" value="${lotsEsc(r.preu)}" ${dis}
-        oninput="lotsSet(${i},'preu',this.value,false)" onchange="lotsSet(${i},'preu',this.value,true)"><span style="flex:none;">€</span></label></div>
+      <label class="ent-chip ent-preu ${!tancada && !preuOk ? 'err' : preuOk ? 'verd' : ''}"><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" value="${lotsEsc(r.preu)}" ${dis}
+        oninput="lotsSet(${i},'preu',this.value,false)" onchange="lotsSet(${i},'preu',this.value,false);lotsProgramaDesat(${i})"><span style="flex:none;">€</span></label></div>
     <div><div class="ent-lab">Tipus</div>
-      <button class="ent-chip set${oberta('concepte')}" ${dis} onclick="lotsMenu(event,${i},'concepte')">${ico('tag', 14)}<span>${lotsEsc(lotsCurt(r.concepte))}</span>${ico(oberta('concepte') ? 'up' : 'down', 12, 'dn')}</button></div>
+      <button class="ent-chip ${r.toc.concepte ? 'verd' : 'set'}${oberta('concepte')}" ${dis} onclick="lotsMenu(event,${i},'concepte')">${ico('tag', 14)}<span>${lotsEsc(lotsCurt(r.concepte))}</span>${ico(oberta('concepte') ? 'up' : 'down', 12, 'dn')}</button></div>
     <div><div class="ent-lab"><span class="lab-l">Pagament</span><span class="lab-c2">Pagam.</span></div>
-      <button class="ent-chip ${!tancada && !r.cobrament ? 'err' : r.cobrament ? 'set' : ''}${oberta('cobrament')}" ${dis} onclick="lotsMenu(event,${i},'cobrament')">${r.cobrament ? ico(lotsIcoPag(r.cobrament), 14) : ''}<span>${r.cobrament ? lotsEsc(lotsCurt(r.cobrament)) : 'Tria'}</span>${ico(oberta('cobrament') ? 'up' : 'down', 12, 'dn')}</button></div>
+      <button class="ent-chip ${!tancada && !r.cobrament ? 'err' : r.cobrament ? 'verd' : ''}${oberta('cobrament')}" ${dis} onclick="lotsMenu(event,${i},'cobrament')">${r.cobrament ? ico(lotsIcoPag(r.cobrament), 14) : ''}<span>${r.cobrament ? lotsEsc(lotsCurt(r.cobrament)) : 'Tria'}</span>${ico(oberta('cobrament') ? 'up' : 'down', 12, 'dn')}</button></div>
     <div><div class="ent-lab"><span class="lab-l">Repartiment</span><span class="lab-c">Repart.</span></div>
-      <button class="ent-chip set${oberta('rep')}" ${dis} onclick="lotsMenu(event,${i},'rep')">${ico('users', 14)}<span>${lotsEsc(repTxt)}</span>${ico(oberta('rep') ? 'up' : 'down', 12, 'dn')}</button></div>
+      <button class="ent-chip ${r.toc.rep ? 'verd' : 'set'}${oberta('rep')}" ${dis} onclick="lotsMenu(event,${i},'rep')">${ico('users', 14)}<span>${lotsEsc(repTxt)}</span>${ico(oberta('rep') ? 'up' : 'down', 12, 'dn')}</button></div>
     <div><div class="ent-lab">Fotos</div>
-      <label class="ent-chip ent-fchip ${r.fotos.length ? 'set' : ''}" title="Fotos del tatuatge (opcionals)">${ico('cam', 16)}<b>${r.fotos.length}</b>
+      <label class="ent-chip ent-fchip ${r.fotos.length ? 'verd' : ''}" title="Fotos del tatuatge (opcionals)" onclick="lotsCancelaDesat(${i})">${ico('cam', 16)}<b>${r.fotos.length}</b>
         ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label></div>
     <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
+    ${lotsDepHtml(i, tancada)}
     ${r.fotos.length ? `<div class="ent-fotos">${fotos}</div>` : ''}
-    ${st ? `<div class="ent-st" id="lots-st-${i}">${st}</div>` : ''}
+    <div class="ent-st" id="lots-st-${i}">${st}</div>
     ${det}
   </div>`;
 }
@@ -3933,6 +3954,7 @@ function lotsMenu(ev, i, camp) {
   const pop = document.getElementById('lots-pop');
   pop.innerHTML = ops.map((o, n) => `<button class="${o.v === cur ? 'on' : ''}" ${o.off ? 'disabled title="No disponible amb col·laborador extern"' : ''} onclick="lotsTria(${i},'${camp}',${n})">${ico(o.ic, 18)}${lotsEsc(o.t)}</button>`).join('');
   pop._ops = ops;
+  lotsCancelaDesat(i, false);
   _lotsMenu = { i, camp };
   lotsRenderRow(i);
   const chip = document.querySelector(`#lots-row-${i} .ent-chip.oberta`);
@@ -3945,7 +3967,7 @@ function lotsMenu(ev, i, camp) {
 function lotsTria(i, camp, n) {
   const o = (document.getElementById('lots-pop')._ops || [])[n];
   lotsTancaMenu(true);
-  if (!o || o.off) return;
+  if (!o || o.off) { lotsProgramaDesat(i); return; }
   if (camp === 'rep') lotsRep(i, o.v); else lotsSet(i, camp, o.v, true);
 }
 function lotsTancaMenu(senseRepintar) {
@@ -3954,7 +3976,7 @@ function lotsTancaMenu(senseRepintar) {
   if (!_lotsMenu) return;
   const i = _lotsMenu.i;
   _lotsMenu = null;
-  if (!senseRepintar) lotsRenderRow(i);
+  if (!senseRepintar) { lotsRenderRow(i); lotsProgramaDesat(i); }
 }
 document.addEventListener('click', e => {
   if (_lotsMenu && !e.target.closest('#lots-pop')) lotsTancaMenu();
@@ -3993,6 +4015,7 @@ function lotsConfig() {
   lotsTancaMenu();
   const cfg = document.getElementById('ent-cfg');
   document.getElementById('ent-cfg-inici').checked = !!(state.tatuador && localStorage.getItem('tat_default_pendents_' + state.tatuador) === '1');
+  document.getElementById('ent-cfg-auto').checked = lotsAutoOn();
   document.getElementById('ent-cfg-ver').textContent = 'App Tatuador v' + APP_VER + ' · ' + (state.tatuador || '');
   cfg.style.display = cfg.style.display === 'none' ? 'block' : 'none';
 }
@@ -4018,9 +4041,10 @@ function renderLots() {
   document.getElementById('ent-data').value = dia;
   document.getElementById('ent-av').textContent = (state.tatuador || '·').trim().charAt(0).toUpperCase();
   document.getElementById('ent-nom').textContent = (state.tatuador || '').split(' ')[0];
-  list.innerHTML = _lots.length
+  list.innerHTML = (_lots.length
     ? _lots.map((_, i) => lotsRowHtml(i)).join('')
-    : `<div style="color:#77736a;text-align:center;padding:24px;font-size:13px;">✅ Cap check-in pendent d'introduir</div>`;
+    : `<div style="color:#77736a;text-align:center;padding:24px;font-size:13px;">✅ Cap check-in pendent d'introduir</div>`)
+    + `<button class="ent-add" onclick="lotsAfegeix()">${ico('plus', 20)}Afegir fila</button>`;
   document.getElementById('lots-desats').innerHTML = lotsDesatsHtml();
   lotsTotals();
 }
@@ -4088,6 +4112,115 @@ function lotsTotalsTatuador() {
   if (falta) box.insertAdjacentHTML('beforeend', `<div class="lots-sub" style="margin:-6px 2px 12px;">* ${falta} entrada${falta > 1 ? 'es' : ''} sense forma de pagament: encara no se'n pot calcular la part del tatuador.</div>`);
 }
 
+// Paga i senyal (dipòsit) i val de regal, visibles a la fila. La paga i senyal pendent es pot marcar com a
+// rebuda tocant-la (fa el mateix que la casella «Dipòsit rebut» del ⋮); la que ja consta cobrada a la cita no.
+function lotsDepHtml(i, tancada) {
+  const r = _lots[i], b = [];
+  const d = r.deposit;
+  if (d.import) {
+    const pagada = d.cobrat || r.depRebut;
+    const txt = `Paga i senyal ${fmt(d.import)}` + (pagada ? (r.aplicarDeposit ? ' · pagada' : ' · pagada, no es descompta avui') : ' · pendent');
+    b.push(!tancada && !d.cobrat
+      ? `<button class="${pagada ? 'ok' : 'pend'}" onclick="lotsSet(${i},'depRebut',${!r.depRebut},true)" title="${pagada ? 'Toca per desmarcar' : 'Toca si el client ja la va pagar'}">${ico('coin', 15)}${txt}</button>`
+      : `<span class="${pagada ? 'ok' : 'pend'}">${ico('coin', 15)}${txt}</span>`);
+  }
+  if (r.bon.codi) b.push(`<span class="bon">${ico('gift', 15)}Val de regal ${fmt(r.bon.import)}${r.aplicarBon ? '' : ' · no s’aplica avui'}</span>`);
+  return b.length ? `<div class="ent-dep">${b.join('')}</div>` : '';
+}
+
+// ── Desat automàtic: amb la fila completa (preu + pagament) es desa sola al cap de LOTS_AUTO_S segons.
+// El compte enrere només comença quan es confirma un camp (no mentre s'escriu el preu), s'atura si s'obre
+// un desplegable, el ⋮ o les fotos, i es pot aturar amb «Atura» (aleshores queda el botó «Desa»).
+// Es pot desactivar al menú ☰ (preferència per tatuador en aquest dispositiu).
+const LOTS_AUTO_S = 5;
+function lotsAutoOn() {
+  try { return localStorage.getItem('tat_autodesa_' + state.tatuador) !== '0'; } catch(_) { return true; }
+}
+function lotsAutoPref(on) {
+  try {
+    if (on) localStorage.removeItem('tat_autodesa_' + state.tatuador);
+    else localStorage.setItem('tat_autodesa_' + state.tatuador, '0');
+  } catch(_) {}
+  _lots.forEach((_, i) => on ? lotsProgramaDesat(i) : lotsCancelaDesat(i));
+}
+function lotsCancelaDesat(i, pinta = true) {
+  const r = _lots[i];
+  if (!r || !r.autoT) return;
+  clearTimeout(r.autoT); clearInterval(r.autoI);
+  r.autoT = r.autoI = null;
+  if (pinta) lotsPintaEstat(i);
+}
+function lotsProgramaDesat(i) {
+  const r = _lots[i];
+  if (!r) return;
+  lotsCancelaDesat(i, false);
+  if (lotsAutoOn() && !r.autoOff && r.estat === 'pendent' && !r.saving && !r.obert
+      && !lotsFalta(r).length && !(_lotsMenu && _lotsMenu.i === i)) {
+    r.autoS = LOTS_AUTO_S;
+    r.autoI = setInterval(() => {
+      r.autoS = Math.max(0, r.autoS - 1);
+      const e = document.getElementById('lots-cd-' + i);
+      if (e) e.textContent = r.autoS;
+    }, 1000);
+    r.autoT = setTimeout(() => {
+      clearInterval(r.autoI);
+      r.autoT = r.autoI = null;
+      lotsDesa(i).then(lotsTotals);
+    }, LOTS_AUTO_S * 1000);
+  }
+  lotsPintaEstat(i);
+}
+function lotsAtura(i) {
+  const r = _lots[i];
+  if (!r) return;
+  lotsCancelaDesat(i, false);
+  r.autoOff = true;
+  lotsPintaEstat(i);
+}
+function lotsEstatHtml(i) {
+  const r = _lots[i];
+  if (r.saving) return `<span style="color:#c9a84c;">Desant...</span>`;
+  if (r.estat === 'desat') return `<span style="color:#4ade80;">✓ Desat</span>`;
+  if (r.estat === 'descartat') return `<span style="color:#888;">Descartat</span>`;
+  const err = r.error ? `<span style="color:#ffb4b4;">${lotsEsc(r.error)}</span>` : '';
+  if (lotsFalta(r).length) return err;
+  if (r.autoT) return `${err}<span class="ent-auto">Completa · es desa sola en <b id="lots-cd-${i}">${r.autoS}</b> s</span><button class="ent-sbtn" onclick="lotsAtura(${i})">Atura</button>`;
+  return `${err}<button class="ent-sbtn ok" onclick="lotsDesa(${i}).then(lotsTotals)">${ico('save', 15)}Desa</button>${r.autoOff ? '<span class="lots-sub">desat automàtic aturat</span>' : ''}`;
+}
+// Repinta només l'estat de la fila (verd, preu i compte enrere) sense refer-la: no es perd el focus del teclat
+function lotsPintaEstat(i) {
+  const r = _lots[i], row = document.getElementById('lots-row-' + i);
+  if (!r || !row) return;
+  const pend = r.estat === 'pendent';
+  row.classList.toggle('ok', pend && !lotsFalta(r).length);
+  const preu = row.querySelector('.ent-preu'), ok = (parseFloat(r.preu) || 0) > 0;
+  if (preu && pend) { preu.classList.toggle('verd', ok); preu.classList.toggle('err', !ok); }
+  const st = document.getElementById('lots-st-' + i);
+  if (st) st.innerHTML = lotsEstatHtml(i);
+}
+
+// Fila afegida a mà (botó + sota l'última fila): client sense check-in, del tatuador que ha entrat.
+// No té cita, token ni consentiment del check-in; el telèfon és opcional (el diari només guarda el telèfon).
+async function lotsAfegeix() {
+  if (!state.tatuador) return;
+  lotsTancaMenu(true);
+  const u = await lotsUsuari(state.tatuador);
+  _lots.push({
+    manual: true,
+    cita: { id: null, data: _lotsDia || lotsAvui(), tatuador: state.tatuador, checkin_at: new Date().toISOString(), hora_inici: null },
+    token: null, u, telefon: '', nom: 'Entrada manual', esMenor: false, alertaMedica: [],
+    consent: { cls: 'vermell', txt: 'Entrada manual: sense check-in ni consentiment signat' },
+    deposit: { import: 0, cobrat: false }, bon: { id: null, codi: null, import: 0 },
+    aplicarDeposit: true, aplicarBon: true,
+    preu: '', cobrament: '', concepte: concepteDef(), feina: 'No', extId: '', pctBase: null, depRebut: false,
+    custom: false, obert: false, toc: {},
+    fotos: [], estat: 'pendent', saving: false, error: null
+  });
+  renderLots();
+  const inp = document.querySelector(`#lots-row-${_lots.length - 1} .ent-telin`);
+  if (inp) { inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); inp.focus(); }
+}
+
 // rerender=false mentre s'escriu (no es perd el focus): només s'actualitzen imports i estat
 function lotsSet(i, camp, val, rerender) {
   const r = _lots[i];
@@ -4098,14 +4231,18 @@ function lotsSet(i, camp, val, rerender) {
   if (camp === 'cobrament' || camp === 'feina') { r.pctBase = null; r.custom = false; }
   // Com al formulari: amb comissió externa no es pot marcar "Feina Sí"
   if (camp === 'extId' && val && r.feina === 'Sí') { r.feina = 'No'; if (!r.custom) r.pctBase = null; }
+  if (camp === 'concepte') r.toc.concepte = true;
   r.error = null;
-  if (rerender) { lotsRenderRow(i); return; }
+  if (rerender) { lotsRenderRow(i); lotsProgramaDesat(i); return; }
   const k = lotsCalc(r);
   const net = document.getElementById('lots-net-' + i);
   const tat = document.getElementById('lots-tat-' + i);
   if (net) net.textContent = k.c ? fmt(k.net) : '—';
   if (tat) tat.textContent = k.c ? fmt(k.perTat) : '—';
   lotsTotals();
+  // mentre s'escriu no es desa (es tornarà a programar quan es confirmi el camp)
+  lotsCancelaDesat(i, false);
+  lotsPintaEstat(i);
 }
 
 // Repartiment: 60/40 o 70/30 = Feina No / Sí (el % surt del tatuador); "Altre…" = % a mà (al menú ⋮)
@@ -4118,8 +4255,10 @@ function lotsRep(i, v) {
   } else {
     r.custom = false; r.feina = v; r.pctBase = null;
   }
+  r.toc.rep = true;
   r.error = null;
   lotsRenderRow(i);
+  lotsProgramaDesat(i);
 }
 
 function lotsToggle(i) {
@@ -4128,13 +4267,16 @@ function lotsToggle(i) {
   lotsTancaMenu(true);
   r.obert = !r.obert;
   lotsRenderRow(i);
+  lotsProgramaDesat(i);   // amb el ⋮ obert no es desa sol
 }
 
 async function lotsFotos(i, input) {
   const r = _lots[i];
   const files = Array.from(input.files || []);
   input.value = '';
-  if (!r || !files.length) return;
+  if (!r) return;
+  if (!files.length) { lotsProgramaDesat(i); return; }
+  lotsCancelaDesat(i, false);
   showLoading('Pujant arxiu...');
   const folder = (r.telefon || 'walkin').replace(/\D/g, '');
   for (const file of files) {
@@ -4147,6 +4289,7 @@ async function lotsFotos(i, input) {
   }
   hideLoading();
   lotsRenderRow(i);
+  lotsProgramaDesat(i);
 }
 
 function lotsDelFoto(i, j) {
@@ -4154,11 +4297,13 @@ function lotsDelFoto(i, j) {
   if (!r || r.estat !== 'pendent') return;
   r.fotos.splice(j, 1);
   lotsRenderRow(i);
+  lotsProgramaDesat(i);
 }
 
 async function lotsDesa(i) {
   const r = _lots[i];
   if (!r || r.estat !== 'pendent' || r.saving) return false;
+  lotsCancelaDesat(i, false);
   const falta = lotsFalta(r);
   if (falta.length) { r.error = 'Falta: ' + falta.join(', '); lotsRenderRow(i); return false; }
   const k = lotsCalc(r);
@@ -4194,6 +4339,7 @@ async function lotsDesa(i) {
 }
 
 async function lotsDesaTot() {
+  _lots.forEach((_, i) => lotsCancelaDesat(i, false));
   const idx = _lots.map((_, i) => i).filter(i => _lots[i].estat === 'pendent' && !lotsFalta(_lots[i]).length);
   if (!idx.length) { showToast('Cap fila completa per desar', 'err'); return; }
   if (!confirm(`Desar ${idx.length} tatuatge${idx.length > 1 ? 's' : ''}?`)) return;
