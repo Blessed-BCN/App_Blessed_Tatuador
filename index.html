@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.20.0 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.20.1 | Data: 2026-10-26 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -535,37 +535,52 @@
     .lots-sum > div { flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 8px 10px; }
     .lots-sum .k { font-size: 10px; color: #888; text-transform: uppercase; }
     .lots-sum .v { font-size: 18px; font-weight: 800; color: #e0e0e0; }
-    .lots-row { background: #1a1a1a; border: 1px solid #2a2a2a; border-left: 4px solid #ef4444; border-radius: 12px;
-      padding: 10px; margin-bottom: 9px; }
+    .lots-row { background: #1a1a1a; border: 1px solid #2a2a2a; border-left: 4px solid #ef4444; border-radius: 10px;
+      padding: 8px 8px 8px 9px; margin-bottom: 7px; display: grid; grid-template-columns: 88px minmax(0,1fr) 30px;
+      gap: 5px 8px; align-items: start; }
     .lots-row.ok { border-left-color: #4ade80; }
     .lots-row.mig { border-left-color: #c9a84c; }
     .lots-row.desat { opacity: .55; border-left-color: #4ade80; }
     .lots-row.descartat { opacity: .4; border-left-color: #555; }
-    .lr-top { display: flex; align-items: center; gap: 7px; }
-    .lr-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
-    .lots-nom { font-weight: 800; color: #e0e0e0; font-size: 15px; }
-    .lots-sub { font-size: 11px; color: #888; }
-    .lr-more { margin-left: auto; background: none; border: 1px solid #38383e; border-radius: 8px; color: #c9a84c;
-      font-size: 18px; line-height: 1; width: 36px; height: 32px; cursor: pointer; flex: 0 0 36px; }
+    .lr-left { min-width: 0; }
+    .lots-nom { display: block; font-weight: 800; color: #e0e0e0; font-size: 14px; line-height: 1.15; overflow-wrap: anywhere; }
+    .lots-sub { font-size: 10.5px; color: #888; }
+    .lr-hora { display: flex; align-items: center; gap: 4px; font-size: 10.5px; color: #888; margin-top: 2px; }
+    .lr-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px; }
+    .lr-cons { display: flex; align-items: center; gap: 5px; margin-top: 5px; font-size: 9.5px; font-weight: 700;
+      color: #aaa; text-transform: uppercase; letter-spacing: .2px; cursor: help; }
+    .lr-llum { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 11px; }
+    .lr-llum.verd { background: #4ade80; box-shadow: 0 0 7px #4ade80; }
+    .lr-llum.groc { background: #f5b942; box-shadow: 0 0 7px #f5b942; }
+    .lr-llum.vermell { background: #2a1414; border: 1.5px solid #ef4444; }
+    .lr-foto { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 11.5px; font-weight: 800;
+      color: #e0e0e0; background: #232327; border: 1px solid #38383e; border-radius: 7px; padding: 3px 8px; cursor: pointer; }
+    .lr-foto.set { background: #2a2414; border-color: #6b5a2a; }
+    .lr-foto.err { border-color: #ef4444; color: #ffb4b4; }
+    .lr-more { background: none; border: 1px solid #38383e; border-radius: 8px; color: #c9a84c; font-size: 17px; line-height: 1;
+      width: 30px; height: 30px; padding: 0; cursor: pointer; }
     .lr-more.on { background: #2a2414; border-color: #c9a84c; }
-    .lr-badges { margin-top: 2px; }
-    .lots-badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 999px; margin: 3px 3px 0 0; }
-    .lr-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(98px, 1fr)); gap: 7px; margin-top: 9px; }
-    .lr-chip { display: flex; flex-direction: column; justify-content: center; min-height: 48px; background: #232327;
-      border: 1px solid #38383e; border-radius: 10px; padding: 4px 9px; position: relative; cursor: pointer; }
+    .lr-badges { grid-column: 1 / -1; }
+    .lr-badges:empty { display: none; }
+    .lots-badge { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 999px; margin: 0 3px 3px 0; }
+    .lr-chips { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 5px; }
+    .lr-chip { display: flex; flex-direction: column; justify-content: center; min-height: 38px; min-width: 0; background: #232327;
+      border: 1px solid #38383e; border-radius: 8px; padding: 2px 7px; position: relative; cursor: pointer; }
     .lr-chip.set { background: #2a2414; border-color: #6b5a2a; }
     .lr-chip.err { border-color: #ef4444; }
-    .lr-chip .k { font-size: 9.5px; font-weight: 700; color: #c9a84c; text-transform: uppercase; letter-spacing: .3px; }
-    .lr-chip select, .lr-chip input { width: 100%; background: none; border: none; color: #e0e0e0; font-size: 15px;
-      font-weight: 700; font-family: inherit; padding: 2px 0; outline: none; -webkit-appearance: none; appearance: none; }
-    .lr-chip select { padding-right: 14px; cursor: pointer; }
+    .lr-chip .k { font-size: 8.5px; font-weight: 700; color: #c9a84c; text-transform: uppercase; letter-spacing: .3px; }
+    .lr-chip select, .lr-chip input { width: 100%; background: none; border: none; color: #e0e0e0; font-size: 13.5px;
+      font-weight: 700; font-family: inherit; padding: 1px 0; outline: none; -webkit-appearance: none; appearance: none;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lr-chip select { padding-right: 12px; cursor: pointer; }
     .lr-chip select option { background: #232327; color: #e0e0e0; }
-    .lr-chip.sel::after { content: '▾'; position: absolute; right: 9px; bottom: 9px; color: #888; font-size: 12px; pointer-events: none; }
-    .lr-chip .euro { display: flex; align-items: center; gap: 3px; color: #e0e0e0; font-weight: 700; }
-    .lr-chip.foto { align-items: center; text-align: center; }
-    .lr-chip.foto .v { font-size: 15px; font-weight: 800; color: #e0e0e0; }
-    .lr-chip:has(select:disabled), .lr-chip:has(input:disabled) { cursor: default; }
-    .lr-det { margin-top: 9px; padding-top: 9px; border-top: 1px dashed #333; display: grid;
+    .lr-chip.sel::after { content: '▾'; position: absolute; right: 7px; bottom: 7px; color: #888; font-size: 10px; pointer-events: none; }
+    .lr-chip .euro { display: flex; align-items: center; gap: 2px; color: #e0e0e0; font-weight: 700; }
+    @media (min-width: 560px) {
+      .lots-row { grid-template-columns: 130px minmax(0,1fr) 30px; }
+      .lr-chips { grid-template-columns: minmax(0,.8fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
+    }
+    .lr-det { grid-column: 1 / -1; margin-top: 2px; padding-top: 8px; border-top: 1px dashed #333; display: grid;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px 10px; }
     .lr-det .full { grid-column: 1 / -1; }
     .lr-det .lab { display: block; font-size: 10px; font-weight: 700; color: #c9a84c; text-transform: uppercase; margin-bottom: 3px; }
@@ -581,10 +596,10 @@
       display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
     .lots-desc { background: none; border: 1px solid #5a2424; color: #ffb4b4; border-radius: 9px; font-weight: 700;
       font-size: 13px; padding: 9px 12px; cursor: pointer; }
-    .lr-foot { display: flex; align-items: center; gap: 8px; margin-top: 9px; }
+    .lr-foot { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; }
     .lots-st { flex: 1; font-size: 11px; font-weight: 700; }
-    .lots-desa { background: #4ade80; color: #0b1a10; border: none; border-radius: 9px; font-weight: 800; font-size: 14px;
-      padding: 9px 18px; cursor: pointer; }
+    .lots-desa { background: #4ade80; color: #0b1a10; border: none; border-radius: 8px; font-weight: 800; font-size: 13px;
+      padding: 6px 14px; cursor: pointer; }
     .lots-desa:disabled { background: #2a2a2e; color: #666; cursor: not-allowed; }
     .lots-sec { font-size: 11px; font-weight: 800; color: #4ade80; text-transform: uppercase; margin: 16px 2px 8px; }
     .lots-fet { display: flex; align-items: center; gap: 8px; background: #161816; border: 1px solid #23302a;
@@ -1403,7 +1418,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.20.0", APP_DATE="2026-10-26";
+const APP_VER="2.20.1", APP_DATE="2026-10-26";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3564,6 +3579,7 @@ async function loadLots() {
     ) || [] : [];
     const tokPerCita = {};
     toks.forEach(t => { if (!tokPerCita[t.cita_id]) tokPerCita[t.cita_id] = t; });
+    const consInfo = await lotsCarregaConsent([...new Set(Object.values(tokPerCita).map(t => t.consentiment_id).filter(Boolean))]);
 
     _lots = await Promise.all(cites.map(async c => {
       const t = tokPerCita[c.id] || null;
@@ -3573,6 +3589,7 @@ async function loadLots() {
         cita: c, token: t ? t.token : null, u, telefon,
         nom: [t?.client_nom || c.client_nom, t?.client_cognom].filter(Boolean).join(' ') || telefon || 'Client',
         esMenor: cons.esMenor, alertaMedica: cons.alertaMedica,
+        consent: lotsConsentEstat(t, consInfo),
         // El dipòsit es pot haver marcat com a cobrat a la cita després del check-in (marcarDepositCobrat)
         deposit: { import: (t ? t.deposit_import : c.deposit_import) || 0, cobrat: !!(t?.deposit_cobrat || c.deposit_cobrat) },
         bon: { id: t?.bon_id ?? c.bon_id ?? null, codi: t?.bon_codi ?? c.bon_codi ?? null, import: (t?.bon_import ?? c.bon_import) || 0 },
@@ -3588,6 +3605,35 @@ async function loadLots() {
   } catch(e) {
     list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${lotsEsc(e.message)}</div>`;
   }
+}
+
+// Consentiment del check-in (cada check-in de l'App Client en signa un, enllaçat al token): només es mira
+// si hi ha signatura (i la del tutor si és menor), sense baixar cap imatge.
+async function lotsCarregaConsent(ids) {
+  const info = {};
+  if (!ids.length) return info;
+  const inIds = `id=in.(${ids.map(id => encodeURIComponent(id)).join(',')})`;
+  try {
+    const [base, signats, tutors] = await Promise.all([
+      apiFetch(`${SUPA_URL}/rest/v1/consentiments?${inIds}&select=id,es_menor,doc_caducat`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/consentiments?${inIds}&signatura_img=not.is.null&signatura_img=neq.&select=id`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/consentiments?${inIds}&es_menor=is.true&tutor_signatura=not.is.null&tutor_signatura=neq.&select=id`, { headers: hdrs() })
+    ]);
+    const sig = new Set((signats || []).map(x => x.id));
+    const tut = new Set((tutors || []).map(x => x.id));
+    (base || []).forEach(c => { info[c.id] = { signat: sig.has(c.id), menor: !!c.es_menor, tutorOk: tut.has(c.id), docCaducat: !!c.doc_caducat }; });
+  } catch(_) { info._error = true; }
+  return info;
+}
+
+function lotsConsentEstat(t, info) {
+  if (info._error) return { cls: 'groc', txt: "No s'ha pogut comprovar el consentiment" };
+  const c = t && t.consentiment_id ? info[t.consentiment_id] : null;
+  if (!c) return { cls: 'vermell', txt: 'Sense consentiment en aquest check-in' };
+  if (!c.signat) return { cls: 'vermell', txt: 'Consentiment sense signar' };
+  if (c.menor && !c.tutorOk) return { cls: 'groc', txt: 'Menor: falta la signatura del tutor' };
+  if (c.docCaducat) return { cls: 'groc', txt: "Document d'identitat caducat" };
+  return { cls: 'verd', txt: 'Consentiment signat' };
 }
 
 // Entrades d'avui ja desades (per veure el dia sencer). Si falla, la pantalla funciona igual.
@@ -3679,8 +3725,9 @@ function lotsRowHtml(i) {
     r.alertaMedica.length ? `<span class="lots-badge" style="background:#3a1717;color:#ffb4b4;" title="${lotsEsc(r.alertaMedica.join(' · '))}">🩺 Afecció mèdica</span>` : '',
     r.deposit.import ? `<span class="lots-badge" style="background:${r.deposit.cobrat || r.depRebut ? '#13261a;color:#8fe3a8' : '#3a2a10;color:#ffd38a'};">Dipòsit ${r.deposit.import}€ ${r.deposit.cobrat || r.depRebut ? '✓' : '! (⋮)'}</span>` : '',
     r.bon.codi ? `<span class="lots-badge" style="background:#2a1838;color:#e1b8ff;">🎁 Val ${r.bon.import}€</span>` : '',
-    (!r.deposit.import && !r.bon.codi) ? `<span class="lots-badge" style="background:#26262a;color:#aaa;">Walk-in</span>` : ''
+    (r.consent && r.consent.cls !== 'verd') ? `<span class="lots-badge" style="background:${r.consent.cls === 'vermell' ? '#3a1717;color:#ffb4b4' : '#3a2a10;color:#ffd38a'};">${r.consent.cls === 'vermell' ? '✕' : '⚠'} ${lotsEsc(r.consent.txt)}</span>` : ''
   ].join('');
+  const cons = r.consent || { cls: 'groc', txt: 'Consentiment no comprovat' };
   const ext = lotsExt(r);
   const extOpts = ['<option value="">— Cap —</option>'].concat((state.externs || []).map(e =>
     `<option value="${e.id}" ${String(e.id) === r.extId ? 'selected' : ''}>${lotsEsc(e.nom)} (${e.pct}%)</option>`)).join('');
@@ -3707,13 +3754,14 @@ function lotsRowHtml(i) {
     </div>`;
 
   return `<div class="lots-row ${cls}" id="lots-row-${i}">
-    <div class="lr-top">
-      <span class="lr-dot" style="background:${color};"></span>
+    <div class="lr-left">
       <span class="lots-nom">${lotsEsc(r.nom)}</span>
-      <span class="lots-sub">${r.cita.hora_inici ? r.cita.hora_inici.slice(0, 5) + ' · ' : ''}fa ${temps}${state.isAdmin ? ' · 👤 ' + lotsEsc(r.cita.tatuador) : ''}</span>
-      <button class="lr-more ${r.obert ? 'on' : ''}" onclick="lotsToggle(${i})" title="Més opcions: col·laborador, dipòsit, fotos, imports, descartar">⋮</button>
+      <div class="lr-hora"><span class="lr-dot" style="background:${color};"></span>${r.cita.hora_inici ? r.cita.hora_inici.slice(0, 5) + ' · ' : ''}${temps}</div>
+      ${state.isAdmin ? `<div class="lots-sub">👤 ${lotsEsc(r.cita.tatuador)}</div>` : ''}
+      <div class="lr-cons" title="${lotsEsc(cons.txt)}"><span class="lr-llum ${cons.cls}"></span>Consentiment</div>
+      <label class="lr-foto ${!tancada && !r.fotos.length ? 'err' : r.fotos.length ? 'set' : ''}" title="Fotos (mínim 1)">📷 ${r.fotos.length}
+        ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label>
     </div>
-    <div class="lr-badges">${badges}</div>
     <div class="lr-chips">
       <label class="lr-chip ${!tancada && !preuOk ? 'err' : preuOk ? 'set' : ''}"><span class="k">Preu</span>
         <span class="euro"><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" value="${lotsEsc(r.preu)}" ${dis}
@@ -3724,9 +3772,9 @@ function lotsRowHtml(i) {
         <select ${dis} onchange="lotsSet(${i},'cobrament',this.value,true)">${lotsOpts(_llistes.cobrament, r.cobrament, true)}</select></label>
       <label class="lr-chip sel set"><span class="k">Repartiment</span>
         <select ${dis} onchange="lotsRep(${i},this.value)">${lotsRepOpts(r, ext)}</select></label>
-      <label class="lr-chip foto ${!tancada && !r.fotos.length ? 'err' : r.fotos.length ? 'set' : ''}"><span class="k">Fotos</span><span class="v">📷 ${r.fotos.length}</span>
-        ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label>
     </div>
+    <button class="lr-more ${r.obert ? 'on' : ''}" onclick="lotsToggle(${i})" title="Més opcions: col·laborador, dipòsit, fotos, imports, descartar">⋮</button>
+    <div class="lr-badges">${badges}</div>
     ${det}
     <div class="lr-foot">
       <div class="lots-st" id="lots-st-${i}">${st}</div>
