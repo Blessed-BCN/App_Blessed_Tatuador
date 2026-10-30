@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.23.0 | Data: 2026-10-26 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.24.0 | Data: 2026-10-30 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1563,7 +1563,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.23.0", APP_DATE="2026-10-26";
+const APP_VER="2.24.0", APP_DATE="2026-10-30";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3732,14 +3732,27 @@ async function loadLots() {
     ) || [] : [];
     const tokPerCita = {};
     toks.forEach(t => { if (!tokPerCita[t.cita_id]) tokPerCita[t.cita_id] = t; });
+    // Walk-ins del dia (check-in sense cita: cita_tokens amb cita_id nul i no usats), com a la pestanya Sala.
+    // Es tracten com una cita sense id: desar-los marca el token com a usat (persistTattoo) i no toca cap cita.
+    const diaIni = new Date(today + 'T00:00:00'), diaFi = new Date(diaIni.getTime() + 86400000);
+    const walkins = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?cita_id=is.null&usat=eq.false&created_at=gte.${diaIni.toISOString()}&created_at=lt.${diaFi.toISOString()}${tatFilter}&order=created_at.asc&limit=50`,
+      { headers: hdrs() }
+    ) || [];
+    walkins.forEach(t => {
+      tokPerCita['walkin:' + t.token] = t;
+      cites.push({ id: null, walkin: true, wkey: 'walkin:' + t.token, data: today, tatuador: t.tatuador || state.tatuador,
+        checkin_at: t.created_at, hora_inici: null, client_telefon: t.client_telefon, client_nom: t.client_nom });
+    });
+    cites.sort((a, b) => new Date(a.checkin_at) - new Date(b.checkin_at));
     const consInfo = await lotsCarregaConsent([...new Set(Object.values(tokPerCita).map(t => t.consentiment_id).filter(Boolean))]);
 
     _lots = await Promise.all(cites.map(async c => {
-      const t = tokPerCita[c.id] || null;
+      const t = tokPerCita[c.walkin ? c.wkey : c.id] || null;
       const telefon = t?.client_telefon || c.client_telefon || null;
       const [u, cons] = await Promise.all([lotsUsuari(c.tatuador), loadConsentiments(telefon)]);
       return {
-        cita: c, token: t ? t.token : null, u, telefon,
+        cita: c, token: t ? t.token : null, walkin: !!c.walkin, u, telefon,
         nom: [t?.client_nom || c.client_nom, t?.client_cognom].filter(Boolean).join(' ') || telefon || 'Client',
         esMenor: cons.esMenor, alertaMedica: cons.alertaMedica,
         consent: lotsConsentEstat(t, consInfo),
@@ -3920,7 +3933,7 @@ function lotsRowHtml(i) {
   const st = lotsEstatHtml(i);
 
   const det = !r.obert ? '' : `<div class="lr-det">
-      <div class="full lots-sub">${r.edit ? 'Corregint un tatuatge ja desat' : r.manual ? 'Entrada manual' : 'Check-in fa ' + temps}${r.cita.hora_inici ? ' · cita ' + r.cita.hora_inici.slice(0, 5) : ''}${r.telefon ? ' · ' + lotsEsc(r.telefon) : ''} · <span style="color:${cons.cls === 'verd' ? '#4ade80' : cons.cls === 'groc' ? '#f5b942' : '#f87171'};">${lotsEsc(cons.txt)}</span>${r.alertaMedica.length ? ' · <span style="color:#f87171;">' + lotsEsc(r.alertaMedica.join(', ')) + '</span>' : ''}</div>
+      <div class="full lots-sub">${r.edit ? 'Corregint un tatuatge ja desat' : r.manual ? 'Entrada manual' : (r.walkin ? 'Sense cita · check-in fa ' : 'Check-in fa ') + temps}${r.cita.hora_inici ? ' · cita ' + r.cita.hora_inici.slice(0, 5) : ''}${r.telefon ? ' · ' + lotsEsc(r.telefon) : ''} · <span style="color:${cons.cls === 'verd' ? '#4ade80' : cons.cls === 'groc' ? '#f5b942' : '#f87171'};">${lotsEsc(cons.txt)}</span>${r.alertaMedica.length ? ' · <span style="color:#f87171;">' + lotsEsc(r.alertaMedica.join(', ')) + '</span>' : ''}</div>
       ${r.custom ? `<div><span class="lab">% per al tatuador</span><input class="lots-in" type="number" inputmode="decimal" min="0" max="100" step="0.1"
         value="${k.pctBase}" ${dis} oninput="lotsSet(${i},'pctBase',this.value,false)" onchange="lotsSet(${i},'pctBase',this.value,true)"></div>` : ''}
       <div class="${r.custom ? '' : 'full'}"><span class="lab">Col·laborador extern</span><select class="lots-in" ${dis} onchange="lotsSet(${i},'extId',this.value,true)">${extOpts}</select></div>
@@ -3942,6 +3955,7 @@ function lotsRowHtml(i) {
         oninput="lotsSet(${i},'telefon',this.value.trim(),false)" onchange="lotsProgramaDesat(${i})">` : `<div class="ent-nom">${lotsEsc(r.nom)}</div>`}
       ${state.isAdmin ? `<div class="ent-tat">${lotsEsc(r.cita.tatuador)}</div>` : ''}
       ${r.edit && r.estat === 'pendent' ? `<div class="ent-tat" style="color:#c9a84c;">✎ corregint</div>` : ''}
+      ${r.walkin ? `<div class="ent-tat" title="Check-in sense cita (walk-in)">sense cita</div>` : ''}
       <div class="ent-cons" title="${lotsEsc(cons.txt)}"><span class="lr-llum ${cons.cls}"></span>Consentiment</div>
       <div class="ent-mini">
         ${avisos}
@@ -4700,7 +4714,16 @@ async function lotsDescarta(i) {
   if (!r || r.estat !== 'pendent') return;
   if (!confirm(`Marcar el check-in de ${r.nom} com a "no realitzat"?\n\nNo es crearà cap tatuatge.`)) return;
   try {
-    await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(r.cita.id)}`, {
+    // Walk-in: no hi ha cita on posar checkin_descartat; es marca el token com a usat (com en desar-lo),
+    // i així també desapareix de la Sala.
+    if (r.walkin) {
+      if (!r.token) throw new Error('walk-in sense token');
+      await apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?token=eq.${encodeURIComponent(r.token)}`, {
+        method: 'PATCH',
+        headers: hdrs({ 'Prefer': 'return=minimal' }),
+        body: JSON.stringify({ usat: true })
+      });
+    } else await apiFetch(`${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(r.cita.id)}`, {
       method: 'PATCH',
       headers: hdrs({ 'Prefer': 'return=minimal' }),
       body: JSON.stringify({ checkin_descartat: true })
