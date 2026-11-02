@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.26.0 | Data: 2026-11-02 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.27.0 | Data: 2026-11-02 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -1601,7 +1601,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.26.0", APP_DATE="2026-11-02";
+const APP_VER="2.27.0", APP_DATE="2026-11-02";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2337,6 +2337,7 @@ function adaptUIPerMode() {
 }
 
 function onPinOk() {
+  if (bloqueigDesbloqueja()) return;
   state.esPropietari = (state.tatuador === 'Enric Puyalto');
   document.getElementById('hdr-artist').textContent = state.tatuador;
   document.getElementById('qr-logged-as').textContent = '👤 ' + state.tatuador;
@@ -2377,6 +2378,80 @@ function togglePendentsPref(checked) {
   const key = 'tat_default_pendents_' + state.tatuador;
   if (checked) localStorage.removeItem(key); else localStorage.setItem(key, '0');
 }
+
+// ── Bloqueig per inactivitat (v2.27.0, petició del fill) ──
+// Als BLOQUEIG_MIN minuts sense tocar res torna la pantalla del PIN, per sobre de qualsevol altra.
+// Si entra el mateix tatuador ho troba tot com ho havia deixat; si n'entra un altre, es recarrega
+// l'app (formulari buit) i se l'entra automàticament amb la identitat que acaba de validar.
+const BLOQUEIG_MIN = 5;
+const BLOQUEIG_HANDOFF = 'tat:bloqueig_relogin';
+let _bloqueigUltima = Date.now();
+let _bloqueig = null; // { nom, snap } mentre la pantalla està bloquejada
+
+function bloqueigActivitat() { if (!_bloqueig) _bloqueigUltima = Date.now(); }
+['pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'].forEach(ev =>
+  document.addEventListener(ev, bloqueigActivitat, { capture: true, passive: true }));
+
+function bloqueigComprova() {
+  if (_bloqueig || !state.tatuador) return;
+  if (Date.now() - _bloqueigUltima < BLOQUEIG_MIN * 60000) return;
+  // No bloquegem enmig d'un desat: es torna a mirar a la propera comprovació
+  if (document.getElementById('loading').classList.contains('show')) return;
+  if (_lots.some(r => r && (r.saving || r.autoT))) return;
+  bloqueigActiva();
+}
+
+function bloqueigActiva() {
+  _bloqueig = { nom: _adminOrigIdentity ? _adminOrigIdentity.tatuador : state.tatuador, snap: { ...state } };
+  pinBuffer = '';
+  updatePinDots();
+  document.getElementById('pin-err').textContent = '';
+  document.getElementById('pin-step').style.display = '';
+  document.getElementById('bio-step').style.display = 'none';
+  const ov = document.getElementById('overlay-pin');
+  ov.style.zIndex = '1000'; // per sobre d'Entrades, fotos i modals
+  ov.style.display = 'flex';
+}
+
+// Cridada a l'inici d'onPinOk(): retorna true si ja ha resolt el desbloqueig
+function bloqueigDesbloqueja() {
+  if (!_bloqueig) return false;
+  const b = _bloqueig;
+  if (state.tatuador === b.nom) {
+    _bloqueig = null;
+    state = { ...b.snap, mediaToken: state.mediaToken || b.snap.mediaToken };
+    _bloqueigUltima = Date.now();
+    const ov = document.getElementById('overlay-pin');
+    ov.style.display = 'none';
+    ov.style.zIndex = '';
+    return true;
+  }
+  // Un altre tatuador: no ha de veure res de l'anterior
+  try {
+    clearSession();
+    sessionStorage.setItem(BLOQUEIG_HANDOFF, JSON.stringify({ nom: state.tatuador, mediaToken: state.mediaToken, ts: Date.now() }));
+  } catch (_) {}
+  location.reload();
+  return true;
+}
+
+async function bloqueigReprenLogin() {
+  let h = null;
+  try { h = JSON.parse(sessionStorage.getItem(BLOQUEIG_HANDOFF) || 'null'); sessionStorage.removeItem(BLOQUEIG_HANDOFF); } catch (_) {}
+  if (!h || !h.nom || Date.now() - h.ts > 60000) return false;
+  showLoading('Entrant...');
+  try {
+    state.tatuador = h.nom;
+    state.mediaToken = h.mediaToken || null;
+    await fetchDadesUsuari(h.nom);
+    await Promise.all([fetchExterns(), fetchLlistes()]);
+  } finally { hideLoading(); }
+  onPinOk();
+  return true;
+}
+
+setInterval(bloqueigComprova, 15000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) bloqueigComprova(); });
 
 async function doBioAuth() {
   try {
@@ -5123,7 +5198,7 @@ function tryAutoLoginFromUrl() {
   checkPin();
 }
 
-initPin().then(tryAutoLoginFromUrl);
+initPin().then(async () => { if (!(await bloqueigReprenLogin())) tryAutoLoginFromUrl(); });
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(reg => {
