@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.27.0 | Data: 2026-11-02 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.27.2 | Data: 2026-11-02 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -904,7 +904,7 @@
     <div class="must-reg-title" id="must-reg-title">Client no registrat</div>
     <div class="must-reg-sub" id="must-reg-sub">Aquest client no té compte. Ha de registrar-se i signar els consentiments abans de fer el tattoo.</div>
     <img id="must-reg-qr-img" class="must-reg-qr" src="" alt="QR registre">
-    <div class="must-reg-url">blessed-checkin.puyaltoworks.workers.dev</div>
+    <div class="must-reg-url">blessed-bcn.github.io/App_Blessed_Client</div>
     <button class="must-reg-retry" onclick="retrySearch()">✓ Ja s'ha registrat</button>
     <button class="must-reg-back" onclick="hideMustRegister()">← Tornar enrere</button>
   </div>
@@ -916,7 +916,7 @@
   <div class="overlay-title">QR per al client</div>
   <div class="overlay-sub">El client escaneja aquest QR<br>per obrir l'app de check-in al seu mòbil</div>
   <img id="img-client-qr" src="" alt="QR App Client" style="width:240px;height:240px;border-radius:12px;border:4px solid var(--gold);margin-bottom:20px;background:#fff;">
-  <div style="color:#888;font-size:11px;text-align:center;margin-bottom:28px;">blessed-checkin.puyaltoworks.workers.dev</div>
+  <div style="color:#888;font-size:11px;text-align:center;margin-bottom:28px;">blessed-bcn.github.io/App_Blessed_Client</div>
   <button onclick="hideClientQR()" style="background:var(--gold);border:none;border-radius:10px;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 40px;cursor:pointer;">✓ Tancar</button>
 </div>
 
@@ -1601,7 +1601,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.27.0", APP_DATE="2026-11-02";
+const APP_VER="2.27.2", APP_DATE="2026-11-02";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2810,7 +2810,7 @@ function skipQR() {
 }
 
 // ── QR per al client ──────────────────────────────────────────────────────
-const CLIENT_APP_URL = 'https://blessed-checkin.puyaltoworks.workers.dev/';
+const CLIENT_APP_URL = CLIENT_URL; // adreça oficial del check-in (GitHub Pages; a staging, la còpia del QNAP)
 function showClientQR() {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(CLIENT_APP_URL)}&bgcolor=ffffff&color=1a1a1a&margin=14`;
   document.getElementById('img-client-qr').src = qrUrl;
@@ -3693,8 +3693,18 @@ async function loadPendents() {
       `${SUPA_URL}/rest/v1/cites?data=eq.${today}&checkin_at=not.is.null&checkin_descartat=eq.false&estat=eq.confirmada${tatFilter}&order=checkin_at.asc&limit=50`,
       { headers: hdrs() }
     );
+    // Walk-ins del dia (check-in sense cita) barrejats amb les cites, tot per hora de check-in
+    const ini = new Date(); ini.setHours(0, 0, 0, 0);
+    const fi = new Date(ini.getTime() + 86400000);
+    const walkins = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?cita_id=is.null&usat=eq.false&created_at=gte.${ini.toISOString()}&created_at=lt.${fi.toISOString()}${tatFilter}&order=created_at.asc&limit=50`,
+      { headers: hdrs() }
+    ) || [];
+    const llista = (data || []).concat(walkins.map(t => ({ id: null, walkin: true, tok: t, tatuador: t.tatuador || state.tatuador,
+      checkin_at: t.created_at, hora_inici: null, client_telefon: t.client_telefon, client_nom: t.client_nom })));
+    llista.sort((a, b) => new Date(a.checkin_at) - new Date(b.checkin_at));
     document.getElementById('cites-loading').style.display = 'none';
-    _citesData = data || [];
+    _citesData = llista;
     renderPendentsList(_citesData);
   } catch(e) {
     document.getElementById('cites-loading').style.display = 'none';
@@ -3720,7 +3730,7 @@ function renderPendentsList(data) {
     div.innerHTML = `
       <div class="hist-item-info" style="flex:1;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-          <span style="font-size:12px;font-weight:700;color:#e0e0e0;">${c.hora_inici ? c.hora_inici.slice(0,5) : '—'}</span>
+          <span style="font-size:12px;font-weight:700;color:#e0e0e0;">${new Date(c.checkin_at).toLocaleTimeString('ca', { hour: '2-digit', minute: '2-digit' })}${c.walkin ? ' · walk-in' : c.hora_inici ? ' · cita ' + c.hora_inici.slice(0,5) : ''}</span>
           <span style="font-size:10px;color:${color};margin-left:auto;font-weight:700;">check-in fa ${temps}</span>
         </div>
         <div style="font-size:12px;color:#c9a84c;font-weight:700;">${c.client_nom || c.client_telefon || 'Client'}</div>
@@ -3729,14 +3739,14 @@ function renderPendentsList(data) {
           ${state.isAdmin ? `<span>👤 ${c.tatuador}</span>` : ''}
         </div>
         <div style="margin-top:8px;display:flex;gap:8px;">
-          <button onclick="omplirPendent(_citesData[${i}])"
+          <button onclick="${c.walkin ? `registrarDesToken(_citesData[${i}].tok)` : `omplirPendent(_citesData[${i}])`}"
             style="flex:1;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer;">
             📋 Omplir tattoo
           </button>
-          <button onclick="descartaCheckin('${c.id}')"
+          ${c.walkin ? '' : `<button onclick="descartaCheckin('${c.id}')"
             style="background:none;border:1px solid #444;border-radius:6px;color:#888;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer;">
             ✕ Descartar
-          </button>
+          </button>`}
         </div>
       </div>`;
     list.appendChild(div);
@@ -4044,7 +4054,7 @@ function lotsRowHtml(i) {
   ].join('');
   const extOpts = (r.pctComFix ? [`<option value="" selected>Extern desat (${r.pctComFix}%)</option>`, '<option value="__cap">— Cap —</option>'] : ['<option value="">— Cap —</option>']).concat((state.externs || []).map(e =>
     `<option value="${e.id}" ${String(e.id) === r.extId ? 'selected' : ''}>${lotsEsc(e.nom)} (${e.pct}%)</option>`)).join('');
-  const fotos = r.fotos.map((f, j) => `<div class="lots-th">${f.isVideo ? `<video src="${f.url}" muted playsinline preload="metadata"></video>` : `<img src="${f.url}">`}${tancada ? '' : `<button onclick="lotsDelFoto(${i},${j})">✕</button>`}</div>`).join('');
+  const fotos = r.fotos.map((f, j) => `<div class="lots-th">${f.isVideo ? `<video src="${f.url}" muted playsinline preload="metadata"></video>` : `<img src="${f.url}">`}${tancada || f.saved ? '' : `<button onclick="lotsDelFoto(${i},${j})">✕</button>`}</div>`).join('');
   const st = lotsEstatHtml(i);
   const dup = lotsDup(i);
 
@@ -4505,6 +4515,12 @@ async function lotsEdita(k) {
     custom: false, obert: false, toc: { concepte: true, rep: true },
     fotos: [], fotosDesades: 0, estat: 'pendent', saving: false, error: null
   };
+  // fotos ja desades d'aquest tatuatge: es mostren (sense botó d'esborrar) i no es tornen a desar
+  try {
+    const fs = await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos?tattoo_id=eq.${encodeURIComponent(d.id)}&deleted_at=is.null&select=public_url,storage_path,is_video&order=created_at.asc`, { headers: hdrs() });
+    r.fotos = (fs || []).map(f => ({ url: f.public_url, path: f.storage_path, isVideo: !!f.is_video, saved: true }));
+    r.fotosDesades = r.fotos.length;
+  } catch(e) { console.warn('Error carregant fotos:', e.message); }
   // si el % desat és el que surt sol per a aquest tatuador, es mostra 60/40 o 70/30; si no, «Altre»
   r.custom = Math.abs(pctBase - lotsPctAuto({ ...r, pctBase: null })) > 0.01;
   if (!r.custom) r.pctBase = null;
@@ -4904,7 +4920,7 @@ async function lotsDesa(i, auto = false) {
         headers: hdrs({ 'Prefer': 'return=minimal' }),
         body: JSON.stringify(row)
       });
-      for (const f of r.fotos.slice(r.fotosDesades || 0)) {
+      for (const f of r.fotos.filter(x => !x.saved)) {
         try {
           await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos`, {
             method: 'POST',
@@ -4920,6 +4936,7 @@ async function lotsDesa(i, auto = false) {
         telefon: r.telefon, uploadedBy: r.cita.tatuador, fotos: r.fotos
       });
     }
+    r.fotos.forEach(f => { f.saved = true; });
     r.fotosDesades = r.fotos.length;
     r.reobert = false;
     r.estat = 'desat';
@@ -5023,6 +5040,15 @@ async function loadHistorial(filtres = {}) {
       { headers: hdrs() }
     );
     historialData = data || [];
+    // Recompte de fotos per tatuatge (el badge de la llista abans sortia sempre a 0)
+    if (historialData.length) {
+      try {
+        const fs = await apiFetch(`${SUPA_URL}/rest/v1/tattoo_fotos?tattoo_id=in.(${historialData.map(x => x.id).join(',')})&deleted_at=is.null&select=id,tattoo_id`, { headers: hdrs() });
+        const per = {};
+        (fs || []).forEach(f => { (per[f.tattoo_id] = per[f.tattoo_id] || []).push(f); });
+        historialData.forEach(x => { x.tattoo_fotos = per[x.id] || []; });
+      } catch(e) { console.warn('Error recomptant fotos:', e.message); }
+    }
     const info = document.getElementById('hist-f-info');
     if (filtres.phone || filtres.from || filtres.to) {
       info.textContent = `${historialData.length} resultat${historialData.length !== 1 ? 's' : ''} trobat${historialData.length !== 1 ? 's' : ''}`;
