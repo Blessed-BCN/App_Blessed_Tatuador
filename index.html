@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.24.0 | Data: 2026-10-30 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.25.0 | Data: 2026-11-02 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -546,7 +546,26 @@
       border: 1px solid #3a3a40; background: #1b1b1e; font-size: 15px; color: #ece7da; cursor: pointer; white-space: nowrap; }
     .ent-data .ico { color: #c9a84c; }
     .ent-data input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-    .ent-sub { font-size: 15px; color: #a8a396; margin: 2px 2px 14px; }
+    .ent-sub { font-size: 15px; color: #a8a396; margin: 2px 2px 10px; }
+    .ent-dianav { display: flex; align-items: center; gap: 5px; }
+    .ent-pas { width: 38px; height: 42px; border-radius: 11px; border: 1px solid #3a3a40; background: #1b1b1e; color: #c9a84c;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .ent-cerca { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; margin: 0 0 12px; border-radius: 11px;
+      border: 1px solid #3a3a40; background: #1b1b1e; color: #c9a84c; }
+    .ent-cerca input { flex: 1; min-width: 0; height: 100%; border: none; background: none; color: #ece7da; font-size: 16px; font-family: inherit; outline: none; }
+    #ent-cerca-res:empty { display: none; }
+    #ent-cerca-res { margin: -4px 0 12px; border: 1px solid #3a3a40; border-radius: 11px; background: #151517; overflow: hidden; }
+    .ent-cres { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border: none; border-bottom: 1px solid #26262a;
+      background: none; color: #ece7da; font-size: 15px; font-family: inherit; text-align: left; cursor: pointer; }
+    .ent-cres:last-child { border-bottom: none; }
+    .ent-cres .d { color: #c9a84c; font-size: 13px; white-space: nowrap; min-width: 62px; }
+    .ent-cres .n { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .ent-cres .e { font-size: 12.5px; white-space: nowrap; }
+    .ent-row.trobada { box-shadow: 0 0 0 2px #c9a84c; }
+    .ent-tel { font-size: 12.5px; color: #c8c3b6; margin-top: 2px; white-space: nowrap; letter-spacing: .01em; }
+    .ent-telrow { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; }
+    .ent-telrow .ent-telin { margin-top: 0; flex: 1; height: 40px; font-size: 17px; padding: 0 10px; letter-spacing: .03em; }
+    .ent-telrow span { font-size: 13px; color: #a8a396; white-space: nowrap; }
     .ent-row { background: #151517; border: 1px solid #26262a; border-radius: 14px; padding: 9px 7px 9px 9px; margin-bottom: 8px;
       display: grid; grid-template-columns: 88px repeat(4, minmax(0,1fr)) 44px 16px; gap: 4px 5px; align-items: end; }
     .ent-row.ok { border-color: #2f9e5a; background: #0f1a13; }
@@ -696,6 +715,12 @@
     .lots-fet .preu { margin-left: auto; font-weight: 800; color: #e0e0e0; white-space: nowrap; }
     .lots-sub { font-size: 12.5px; color: #888; }
     @media (max-width: 419px) {
+      .ent-tit { gap: 6px; }
+      .ent-tit h1 { font-size: 31px; }
+      .ent-dianav { gap: 4px; }
+      .ent-pas { width: 32px; }
+      .ent-data { padding: 0 8px; gap: 5px; font-size: 14px; }
+      .ent-data > span:first-child { display: none; }
       .ent-row { grid-template-columns: 74px repeat(4, minmax(0,1fr)) 40px 11px; gap: 4px 3px; padding: 9px 4px 9px 7px; }
       .ent-nom { font-size: 17px; }
       .ent-chip { padding: 0 4px; gap: 2px; font-size: 15px; }
@@ -996,10 +1021,18 @@
       </div>
       <div class="ent-tit">
         <h1>Entrades</h1>
-        <label class="ent-data"><span data-ico="cal" data-s="17"></span><span id="ent-data-txt">Avui</span><span data-ico="down" data-s="14"></span>
-          <input type="date" id="ent-data" onchange="lotsCanviaDia(this.value)" aria-label="Dia"></label>
+        <div class="ent-dianav">
+          <button class="ent-pas" onclick="lotsPasDia(-1)" aria-label="Dia anterior" data-ico="left" data-s="18"></button>
+          <label class="ent-data"><span data-ico="cal" data-s="17"></span><span id="ent-data-txt">Avui</span>
+            <input type="date" id="ent-data" onchange="lotsCanviaDia(this.value)" aria-label="Dia"></label>
+          <button class="ent-pas" onclick="lotsPasDia(1)" aria-label="Dia següent" data-ico="right" data-s="18"></button>
+        </div>
       </div>
       <div class="ent-sub">Clients, tatuatges i pagaments del dia.</div>
+      <div class="ent-cerca"><span data-ico="search" data-s="17"></span>
+        <input type="search" id="ent-cerca" placeholder="Cerca client (nom o telèfon)" title="Busca als últims 90 dies" autocomplete="off"
+          oninput="lotsCercaProg(this.value)" aria-label="Cerca un client"></div>
+      <div id="ent-cerca-res"></div>
       <div id="lots-list"></div>
       <div id="lots-desats"></div>
       <div class="ent-sum">
@@ -1563,7 +1596,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.24.0", APP_DATE="2026-10-30";
+const APP_VER="2.25.0", APP_DATE="2026-11-02";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3768,6 +3801,7 @@ async function loadLots() {
     }));
     _lotsDesats = await lotsCarregaDesats(today, tatFilter);
     renderLots();
+    if (_lotsBusca) await lotsMostraTrobada();
   } catch(e) {
     list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${lotsEsc(e.message)}</div>`;
   }
@@ -3859,7 +3893,8 @@ function lotsFalta(r) {
 // ── Icones (dibuixades aquí mateix: cap descàrrega externa) ─────────────────────
 const ICO = {
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', down: '<path d="M6 9l6 6 6-6"/>', up: '<path d="M6 15l6-6 6 6"/>',
-  right: '<path d="M9 6l6 6-6 6"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+  right: '<path d="M9 6l6 6-6 6"/>', left: '<path d="M15 6l-6 6 6 6"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
   dots: '<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>',
   cal: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/>',
   tag: '<path d="M7.5 7.5h.01M3 6v5.2c0 .5.2 1 .6 1.4l7.8 7.8a2 2 0 0 0 2.8 0l5.2-5.2a2 2 0 0 0 0-2.8L11.6 4.6A2 2 0 0 0 10.2 4H5a2 2 0 0 0-2 2z"/>',
@@ -3950,9 +3985,8 @@ function lotsRowHtml(i) {
 
   return `<div class="ent-row ${cls}" id="lots-row-${i}">
     <div class="ent-nomcol">
-      ${r.manual ? `<div class="ent-nom" style="font-size:14px;">Entrada manual</div>
-      <input class="ent-telin" type="tel" inputmode="tel" placeholder="Telèfon" value="${lotsEsc(r.telefon)}" ${dis}
-        oninput="lotsSet(${i},'telefon',this.value.trim(),false)" onchange="lotsProgramaDesat(${i})">` : `<div class="ent-nom">${lotsEsc(r.nom)}</div>`}
+      ${r.manual ? `<div class="ent-nom" style="font-size:14px;">Entrada manual</div>` : `<div class="ent-nom">${lotsEsc(r.nom)}</div>
+      ${r.telefon && r.telefon !== r.nom ? `<div class="ent-tel">${lotsEsc(r.telefon)}</div>` : ''}`}
       ${state.isAdmin ? `<div class="ent-tat">${lotsEsc(r.cita.tatuador)}</div>` : ''}
       ${r.edit && r.estat === 'pendent' ? `<div class="ent-tat" style="color:#c9a84c;">✎ corregint</div>` : ''}
       ${r.walkin ? `<div class="ent-tat" title="Check-in sense cita (walk-in)">sense cita</div>` : ''}
@@ -3974,6 +4008,9 @@ function lotsRowHtml(i) {
       <label class="ent-chip ent-fchip ${r.fotos.length ? 'verd' : ''}" title="Fotos del tatuatge (opcionals)" onclick="lotsCancelaDesat(${i})">${ico('cam', 16)}<b>${r.fotos.length}</b>
         ${tancada ? '' : `<input type="file" accept="image/*,video/*" multiple style="display:none;" onchange="lotsFotos(${i},this)">`}</label></div>
     <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
+    ${r.manual ? `<div class="ent-telrow"><span>Telèfon</span>
+      <input class="ent-telin" type="tel" inputmode="tel" placeholder="Mòbil del client" value="${lotsEsc(r.telefon)}" ${dis}
+        oninput="lotsSet(${i},'telefon',this.value.trim(),false)" onchange="lotsProgramaDesat(${i})"></div>` : ''}
     ${lotsDepHtml(i, tancada)}
     ${r.fotos.length ? `<div class="ent-fotos">${fotos}</div>` : ''}
     <div class="ent-st" id="lots-st-${i}">${st}</div>
@@ -4052,6 +4089,94 @@ function tancaITorna(d) {
 function lotsCanviaDia(v) {
   _lotsDia = v || lotsAvui();
   loadLots();
+}
+// Fletxes ‹ › del costat de la data: dia anterior / següent
+function lotsPasDia(n) {
+  const d = new Date((_lotsDia || lotsAvui()) + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  lotsCanviaDia(d.toISOString().slice(0, 10));
+}
+
+// ── Cerca d'un client als últims 90 dies (pendents i ja desats) ─────────────────
+// Pendents: cites amb check-in sense tatuatge i walk-ins no usats (les mateixes condicions que loadLots());
+// desats: diari. En tocar un resultat es va a aquell dia i s'obre la fila (o es posa a corregir si ja era desat).
+let _lotsCercaT = null, _lotsCercaRes = [], _lotsBusca = null;
+const lotsDiaLocal = iso => new Date(iso).toLocaleDateString('sv-SE');
+function lotsCercaProg(v) {
+  clearTimeout(_lotsCercaT);
+  _lotsCercaT = setTimeout(() => lotsCerca(v), 350);
+}
+async function lotsCerca(v) {
+  const box = document.getElementById('ent-cerca-res');
+  const paraules = String(v || '').toLowerCase().replace(/[,()*%\\:."'&=]/g, ' ').split(/\s+/).filter(Boolean);
+  const digits = paraules.join('').replace(/\D/g, '');
+  const esTel = digits.length >= 3 && digits.length === paraules.join('').replace(/^\+/, '').length;
+  if (paraules.join('').length < 3) { box.innerHTML = ''; _lotsCercaRes = []; return; }
+  box.innerHTML = '<div class="lots-sub" style="padding:10px 12px;">⏳ Cercant...</div>';
+  const p = encodeURIComponent('*' + (esTel ? digits : paraules[0]) + '*');
+  const desde = new Date(); desde.setHours(0, 0, 0, 0); desde.setDate(desde.getDate() - 90);
+  const desdeDia = desde.toLocaleDateString('sv-SE');
+  const tatFilter = state.isAdmin ? '' : `&tatuador=eq.${encodeURIComponent(state.tatuador)}`;
+  const coincideix = (...camps) => { const t = camps.filter(Boolean).join(' ').toLowerCase(); return esTel ? t.replace(/\D/g, '').includes(digits) : paraules.every(w => t.includes(w)); };
+  try {
+    const [cl, cites, toks] = await Promise.all([
+      apiFetch(`${SUPA_URL}/rest/v1/clients?or=(${esTel ? `telefon.ilike.${p}` : `nom.ilike.${p},cognom.ilike.${p}`})&select=telefon,nom,cognom&limit=40`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/cites?data=gte.${desdeDia}&checkin_at=not.is.null&checkin_descartat=eq.false&estat=eq.confirmada&or=(${esTel ? `client_telefon.ilike.${p}` : `client_nom.ilike.${p}`})${tatFilter}&select=id,data,client_nom,client_telefon,tatuador&order=data.desc&limit=20`, { headers: hdrs() }),
+      apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?cita_id=is.null&usat=eq.false&created_at=gte.${desde.toISOString()}&or=(${esTel ? `client_telefon.ilike.${p}` : `client_nom.ilike.${p},client_cognom.ilike.${p}`})${tatFilter}&select=token,created_at,client_nom,client_cognom,client_telefon,tatuador&order=created_at.desc&limit=20`, { headers: hdrs() })
+    ]);
+    const noms = {};
+    (cl || []).forEach(c => { if (coincideix(c.nom, c.cognom, c.telefon)) noms[c.telefon] = [c.nom, c.cognom].filter(Boolean).join(' '); });
+    const tels = Object.keys(noms);
+    const filtreDiari = [tels.length ? `telefon.in.(${tels.map(t => encodeURIComponent(t)).join(',')})` : '', esTel ? `telefon.ilike.${p}` : ''].filter(Boolean);
+    const diari = filtreDiari.length ? await apiFetch(
+      `${SUPA_URL}/rest/v1/diari?data=gte.${desdeDia}&deleted_at=is.null&or=(${filtreDiari.join(',')})${tatFilter}&select=id,data,telefon,preu,concepte,tatuador&order=data.desc&limit=30`,
+      { headers: hdrs() }) || [] : [];
+    const res = [];
+    (cites || []).filter(c => coincideix(c.client_nom, c.client_telefon))
+      .forEach(c => res.push({ tipus: 'cita', id: c.id, dia: c.data, nom: c.client_nom || c.client_telefon, tel: c.client_telefon, tat: c.tatuador }));
+    (toks || []).filter(t => coincideix(t.client_nom, t.client_cognom, t.client_telefon))
+      .forEach(t => res.push({ tipus: 'token', id: t.token, dia: lotsDiaLocal(t.created_at), nom: [t.client_nom, t.client_cognom].filter(Boolean).join(' ') || t.client_telefon, tel: t.client_telefon, tat: t.tatuador }));
+    diari.forEach(d => res.push({ tipus: 'desat', id: d.id, dia: d.data, nom: noms[d.telefon] || d.telefon || 'Client', tel: d.telefon, tat: d.tatuador, preu: parseFloat(d.preu) || 0, concepte: d.concepte }));
+    res.sort((a, b) => b.dia.localeCompare(a.dia));
+    _lotsCercaRes = res;
+    box.innerHTML = res.length ? res.map((x, k) => {
+      const dt = new Date(x.dia + 'T12:00:00').toLocaleDateString('ca-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+      const est = x.tipus === 'desat' ? `<span class="e" style="color:#4ade80;">✓ ${fmt(x.preu)}</span>` : `<span class="e" style="color:#f5b942;">pendent</span>`;
+      return `<button class="ent-cres" onclick="lotsAnarA(${k})"><span class="d">${lotsEsc(dt)}</span><span class="n">${lotsEsc(x.nom)}${x.tel && x.tel !== x.nom ? ` <span style="color:#8a867c;font-size:13px;">${lotsEsc(x.tel)}</span>` : ''}${state.isAdmin && x.tat ? ` <span style="color:#8a867c;font-size:12px;">· ${lotsEsc(x.tat)}</span>` : ''}</span>${est}</button>`;
+    }).join('') : '<div class="lots-sub" style="padding:10px 12px;">Cap client trobat als últims 90 dies</div>';
+  } catch(e) {
+    box.innerHTML = `<div style="color:#ef4444;padding:10px 12px;font-size:13px;">Error: ${lotsEsc(e.message)}</div>`;
+  }
+}
+function lotsAnarA(k) {
+  const x = _lotsCercaRes[k];
+  if (!x) return;
+  _lotsBusca = x;
+  document.getElementById('ent-cerca').value = '';
+  document.getElementById('ent-cerca-res').innerHTML = '';
+  _lotsCercaRes = [];
+  lotsCanviaDia(x.dia);
+}
+// Després de carregar el dia triat a la cerca: obre la fila trobada (o la posa a corregir si ja era desada)
+async function lotsMostraTrobada() {
+  const x = _lotsBusca;
+  _lotsBusca = null;
+  if (!x) return;
+  if (x.tipus === 'desat') {
+    const k = _lotsDesats.findIndex(d => d.id === x.id);
+    if (k >= 0) { await lotsEdita(k); lotsMarcaTrobada(_lots.length - 1); return; }
+  } else {
+    const i = _lots.findIndex(r => x.tipus === 'cita' ? r.cita.id === x.id : r.token === x.id);
+    if (i >= 0) { _lots[i].obert = true; lotsRenderRow(i); lotsMarcaTrobada(i); return; }
+  }
+  showToast("No s'ha trobat la fila en aquest dia (potser ja s'ha desat o descartat)", 'err', 4000);
+}
+function lotsMarcaTrobada(i) {
+  const el = document.getElementById('lots-row-' + i);
+  if (!el) return;
+  el.classList.add('trobada');
+  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  setTimeout(() => { const e = document.getElementById('lots-row-' + i); if (e) e.classList.remove('trobada'); }, 3500);
 }
 
 function lotsConfig() {
