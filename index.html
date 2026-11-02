@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.25.0 | Data: 2026-11-02 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.26.0 | Data: 2026-11-02 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -564,6 +564,11 @@
     .ent-row.trobada { box-shadow: 0 0 0 2px #c9a84c; }
     .ent-tel { font-size: 12.5px; color: #c8c3b6; margin-top: 2px; white-space: nowrap; letter-spacing: .01em; }
     .ent-telrow { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; }
+    .ent-dup { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; padding: 7px 9px; margin-top: 2px;
+      border: 1px solid #7a5d1c; border-radius: 10px; background: #261d0b; color: #f5b942; font-size: 13.5px; line-height: 1.3; }
+    .ent-dup span { flex: 1 1 180px; color: #f0dfb4; }
+    .ent-dup button { height: 34px; padding: 0 12px; border-radius: 9px; border: 1px solid #b8862b; background: #1b1b1e; color: #f5b942;
+      font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; white-space: nowrap; }
     .ent-telrow .ent-telin { margin-top: 0; flex: 1; height: 40px; font-size: 17px; padding: 0 10px; letter-spacing: .03em; }
     .ent-telrow span { font-size: 13px; color: #a8a396; white-space: nowrap; }
     .ent-row { background: #151517; border: 1px solid #26262a; border-radius: 14px; padding: 9px 7px 9px 9px; margin-bottom: 8px;
@@ -1596,7 +1601,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.25.0", APP_DATE="2026-11-02";
+const APP_VER="2.26.0", APP_DATE="2026-11-02";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -3966,6 +3971,7 @@ function lotsRowHtml(i) {
     `<option value="${e.id}" ${String(e.id) === r.extId ? 'selected' : ''}>${lotsEsc(e.nom)} (${e.pct}%)</option>`)).join('');
   const fotos = r.fotos.map((f, j) => `<div class="lots-th">${f.isVideo ? `<video src="${f.url}" muted playsinline preload="metadata"></video>` : `<img src="${f.url}">`}${tancada ? '' : `<button onclick="lotsDelFoto(${i},${j})">✕</button>`}</div>`).join('');
   const st = lotsEstatHtml(i);
+  const dup = lotsDup(i);
 
   const det = !r.obert ? '' : `<div class="lr-det">
       <div class="full lots-sub">${r.edit ? 'Corregint un tatuatge ja desat' : r.manual ? 'Entrada manual' : (r.walkin ? 'Sense cita · check-in fa ' : 'Check-in fa ') + temps}${r.cita.hora_inici ? ' · cita ' + r.cita.hora_inici.slice(0, 5) : ''}${r.telefon ? ' · ' + lotsEsc(r.telefon) : ''} · <span style="color:${cons.cls === 'verd' ? '#4ade80' : cons.cls === 'groc' ? '#f5b942' : '#f87171'};">${lotsEsc(cons.txt)}</span>${r.alertaMedica.length ? ' · <span style="color:#f87171;">' + lotsEsc(r.alertaMedica.join(', ')) + '</span>' : ''}</div>
@@ -4010,7 +4016,9 @@ function lotsRowHtml(i) {
     <button class="ent-more" onclick="lotsToggle(${i})" title="Més: col·laborador, dipòsit, fotos, imports, desar, descartar">${ico('dots', 18)}</button>
     ${r.manual ? `<div class="ent-telrow"><span>Telèfon</span>
       <input class="ent-telin" type="tel" inputmode="tel" placeholder="Mòbil del client" value="${lotsEsc(r.telefon)}" ${dis}
-        oninput="lotsSet(${i},'telefon',this.value.trim(),false)" onchange="lotsProgramaDesat(${i})"></div>` : ''}
+        oninput="lotsSet(${i},'telefon',this.value.trim(),false)" onchange="lotsRenderRow(${i});lotsProgramaDesat(${i})"></div>` : ''}
+    ${dup ? `<div class="ent-dup">${ico('warn', 16)}<span><b>Possible duplicat:</b> ${lotsEsc(dup)}.</span>
+      <button onclick="${r.manual ? 'lotsTreu' : 'lotsDescarta'}(${i})">Tancar sense tattoo</button></div>` : ''}
     ${lotsDepHtml(i, tancada)}
     ${r.fotos.length ? `<div class="ent-fotos">${fotos}</div>` : ''}
     <div class="ent-st" id="lots-st-${i}">${st}</div>
@@ -4218,10 +4226,30 @@ function renderLots() {
   lotsTotals();
 }
 
-function lotsRenderRow(i) {
+// germanes: també es repinten les altres files del mateix telèfon (l'avís de possible duplicat depèn d'elles)
+function lotsRenderRow(i, germanes = true) {
   const el = document.getElementById('lots-row-' + i);
   if (el) el.outerHTML = lotsRowHtml(i);
+  const t = germanes && _lots[i] ? lotsTelNorm(_lots[i].telefon) : '';
+  if (t.length >= 9) _lots.forEach((o, j) => { if (j !== i && lotsTelNorm(o.telefon) === t) lotsRenderRow(j, false); });
   lotsTotals();
+}
+
+// ── Possibles duplicats: el mateix client (telèfon) dues vegades el mateix dia ──
+// Passa si el check-in es fa dos cops (p. ex. el tatuador omple el consentiment per al client i després el client
+// també fa el check-in): cada check-in crea un consentiment i un token nous. Només s'avisa; no s'esborra res.
+const lotsTelNorm = t => String(t || '').replace(/\D/g, '').slice(-9);
+function lotsDup(i) {
+  const r = _lots[i];
+  if (!r || r.estat !== 'pendent' || r.edit) return null;
+  const t = lotsTelNorm(r.telefon);
+  if (t.length < 9) return null;
+  if (_lotsDesats.some(d => lotsTelNorm(d.telefon) === t)
+      || _lots.some((o, j) => j !== i && (o.estat === 'desat' || o.edit) && lotsTelNorm(o.telefon) === t))
+    return 'aquest client ja té un tattoo desat aquest dia';
+  if (_lots.some((o, j) => j < i && o.estat === 'pendent' && !o.edit && lotsTelNorm(o.telefon) === t))
+    return 'aquest client ja té una altra fila aquest dia (dos check-ins?)';
+  return null;
 }
 
 // Resum com a la proposta: entrades del dia · import total (estimació: preus posats + ja desats) · sense revisar
@@ -4331,7 +4359,7 @@ function lotsProgramaDesat(i) {
   if (!r) return;
   lotsCancelaDesat(i, false);
   if (lotsAutoOn() && !r.autoOff && r.estat === 'pendent' && !r.saving && !r.obert
-      && !lotsFalta(r).length && !(_lotsMenu && _lotsMenu.i === i)) {
+      && !lotsFalta(r).length && !lotsDup(i) && !(_lotsMenu && _lotsMenu.i === i)) {
     r.autoS = LOTS_AUTO_S;
     r.autoI = setInterval(() => {
       r.autoS = Math.max(0, r.autoS - 1);
@@ -4341,7 +4369,7 @@ function lotsProgramaDesat(i) {
     r.autoT = setTimeout(() => {
       clearInterval(r.autoI);
       r.autoT = r.autoI = null;
-      lotsDesa(i).then(lotsTotals);
+      lotsDesa(i, true).then(lotsTotals);
     }, LOTS_AUTO_S * 1000);
   }
   lotsPintaEstat(i);
@@ -4761,12 +4789,17 @@ function lotsDelFoto(i, j) {
   lotsProgramaDesat(i);
 }
 
-async function lotsDesa(i) {
+async function lotsDesa(i, auto = false) {
   const r = _lots[i];
   if (!r || r.estat !== 'pendent' || r.saving) return false;
   lotsCancelaDesat(i, false);
   const falta = lotsFalta(r);
   if (falta.length) { r.error = 'Falta: ' + falta.join(', '); lotsRenderRow(i); return false; }
+  // Possible duplicat: mai es desa sol, i a mà es demana confirmació
+  const dup = lotsDup(i);
+  if (dup && (auto || !confirm(`Possible duplicat: ${dup}.\n\nDesar igualment un altre tattoo per a ${r.nom}?`))) {
+    r.autoOff = true; lotsRenderRow(i); return false;
+  }
   const k = lotsCalc(r);
   r.saving = true; r.error = null;
   lotsRenderRow(i);
