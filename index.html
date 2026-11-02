@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.27.2 | Data: 2026-11-02 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.28.1 | Data: 2026-11-02 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -150,13 +150,6 @@
       text-decoration: underline; padding: 4px 8px;
       text-align: center; display: block; width: 100%;
     }
-    .recover-input {
-      width: 100%; max-width: 280px; padding: 14px 16px;
-      border-radius: 12px; border: 1px solid #444;
-      background: #2a2a2a; color: #fff; font-size: 15px;
-      text-align: center; margin-bottom: 12px;
-    }
-
     /* ── HEADER ── */
     header {
       background: var(--black);
@@ -434,6 +427,16 @@
     }
     #btn-gravar-tattoo:active { transform: scale(.98); opacity: .9; }
     #btn-gravar-tattoo:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── ENTRADA PER BOTONS (v2.28.0) ── */
+    #users-grid { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; width: 100%; }
+    .user-btn { width: 140px; padding: 16px 10px 14px; background: #222; border: 1.5px solid #333; border-radius: 16px; color: #eee; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 700; -webkit-tap-highlight-color: transparent; }
+    .user-btn:active { background: #2e2e2e; border-color: var(--gold); }
+    .user-btn.solo { width: 200px; }
+    .user-btn img, .user-btn .user-ini { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #2a2a2a; }
+    .user-btn .user-ini { display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--gold); }
+    .user-btn .user-rol { font-size: 10px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-top: -6px; }
+    #pin-user-lbl { color: #fff; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 4px; }
 
     /* ── BIOMETRIA ── */
     #btn-bio { margin-top: 20px; display: none; flex-direction: column; align-items: center; gap: 4px; background: none; border: 1.5px solid #444; border-radius: 12px; padding: 12px 28px; color: #bbb; font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: .5px; }
@@ -768,9 +771,21 @@
 <!-- ── PIN OVERLAY ── -->
 <div id="overlay-pin" class="overlay">
 
-  <!-- Pas 1: PIN -->
-  <div id="pin-step">
+  <!-- Pas 0: un botó per cada tatuador o administrador (v2.28.0) -->
+  <div id="users-step" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:640px;">
     <div class="overlay-title">App Tatuador</div>
+    <div class="overlay-sub" id="users-sub" style="margin-bottom:24px;">Carregant...</div>
+    <div id="users-grid"></div>
+    <div class="pin-err" id="users-err" style="margin-top:16px;"></div>
+    <button class="btn-recover-pin" id="btn-no-soc-jo" style="display:none;" onclick="entradaNoSocJo()">No sóc jo</button>
+    <button class="btn-recover-pin" id="btn-aparell-mode" style="margin-top:6px;" onclick="entradaCanviaMode()"></button>
+    <div id="app-ver-users" style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:14px;text-align:center;"></div>
+  </div>
+
+  <!-- Pas 1: PIN -->
+  <div id="pin-step" style="display:none;">
+    <div class="overlay-title">App Tatuador</div>
+    <div id="pin-user-lbl"></div>
     <div class="overlay-sub">Introdueix el teu PIN de 4 dígits</div>
     <div id="app-ver-pin" style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:-4px;margin-bottom:2px;text-align:center;letter-spacing:0.5px;"></div>
     <button id="btn-test-mode" onclick="(function(){var v=localStorage.getItem('blessed_test_mode')==='1';localStorage.setItem('blessed_test_mode',v?'0':'1');window.location.reload();})()" style="background:none;border:none;cursor:pointer;font-size:10px;color:rgba(255,255,255,0.25);padding:0 0 8px;letter-spacing:0.3px;"></button>
@@ -799,7 +814,8 @@
       <span class="bio-icon">🖐</span>
       <span id="bio-nom-lbl">Tatuador</span>
     </button>
-    <button class="btn-recover-pin" onclick="showRecoverPin()">No recordo el PIN</button>
+    <div style="color:#777;font-size:12px;text-align:center;margin-top:20px;max-width:280px;">Si no recordes el PIN, demana a un administrador que te'l canviï a Gestió d'usuaris de l'App Blessed.</div>
+    <button class="btn-recover-pin" style="margin-top:6px;color:#999;" onclick="mostraEntrada()">← Canviar d'usuari</button>
   </div>
 
   <!-- Pas 2: Oferta biometria (dins el mateix overlay) -->
@@ -811,16 +827,6 @@
     <button onclick="closeBioOffer()" style="background:none;border:1px solid #444;color:#999;font-size:13px;cursor:pointer;padding:10px 24px;border-radius:8px;">Ara no</button>
   </div>
 
-</div>
-
-<!-- ── RECUPERAR PIN OVERLAY ── -->
-<div id="overlay-recover-pin" class="overlay" style="display:none;">
-  <div class="overlay-title">Recuperar PIN</div>
-  <div class="overlay-sub">Introdueix el teu nom exactament<br>com apareix a l'app. T'enviarem el PIN per correu.</div>
-  <input id="inp-recover-nom" type="text" class="recover-input" placeholder="El teu nom" autocomplete="off">
-  <div id="recover-msg" style="min-height:20px;font-size:13px;text-align:center;margin-bottom:16px;color:#999;max-width:280px;"></div>
-  <button id="btn-send-recovery" onclick="sendPinRecovery()" style="background:var(--gold);border:none;border-radius:10px;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 40px;cursor:pointer;margin-bottom:12px;">Enviar PIN per correu</button>
-  <button onclick="hideRecoverPin()" style="background:none;border:1px solid #444;color:#999;font-size:13px;padding:10px 24px;border-radius:8px;cursor:pointer;">← Enrere al PIN</button>
 </div>
 
 <!-- ── SALA D'ESPERA VISUAL (pantalla d'inici, punt 6) ── -->
@@ -1473,7 +1479,21 @@ let pinsMap = {};
 
 // ── Biometria ────────────────────────────────────────────────────────────
 const bio = {
-  LS_ID: 'tat:bio_id', LS_NOM: 'tat:bio_nom',
+  LS_ID: 'tat:bio_id', LS_NOM: 'tat:bio_nom', // format d'abans de v2.28.0 (una sola persona per aparell)
+  LS_MAP: 'tat:bio_map',                      // v2.28.0: { nom: credentialId }, una credencial per usuari
+  mapa: () => {
+    let m = {};
+    try { m = JSON.parse(localStorage.getItem(bio.LS_MAP) || '{}') || {}; } catch (_) {}
+    const id = localStorage.getItem(bio.LS_ID), nom = localStorage.getItem(bio.LS_NOM);
+    if (id && nom && !m[nom]) m[nom] = id;
+    return m;
+  },
+  te: nom => !!bio.mapa()[nom],
+  oblida: nom => {
+    const m = bio.mapa(); delete m[nom];
+    localStorage.setItem(bio.LS_MAP, JSON.stringify(m));
+    if (localStorage.getItem(bio.LS_NOM) === nom) { localStorage.removeItem(bio.LS_ID); localStorage.removeItem(bio.LS_NOM); }
+  },
   isAvailable: async () => {
     try { return !!(await window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable()); }
     catch { return false; }
@@ -1489,12 +1509,13 @@ const bio = {
       timeout: 60000
     }});
     const id = btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
-    localStorage.setItem(bio.LS_ID, id);
-    localStorage.setItem(bio.LS_NOM, nom);
+    const m = bio.mapa(); m[nom] = id;
+    localStorage.setItem(bio.LS_MAP, JSON.stringify(m));
+    if (localStorage.getItem(bio.LS_NOM) === nom) { localStorage.removeItem(bio.LS_ID); localStorage.removeItem(bio.LS_NOM); }
     return id;
   },
-  authenticate: async () => {
-    const id = localStorage.getItem(bio.LS_ID);
+  authenticate: async (nom) => {
+    const id = bio.mapa()[nom];
     if (!id) throw new Error('No credential');
     const ch = new Uint8Array(32); crypto.getRandomValues(ch);
     const idBytes = Uint8Array.from(atob(id), c => c.charCodeAt(0));
@@ -1503,9 +1524,28 @@ const bio = {
       allowCredentials: [{ id: idBytes, type: 'public-key' }],
       userVerification: 'required', timeout: 60000
     }});
-    return localStorage.getItem(bio.LS_NOM);
+    return nom;
   }
 };
+
+// Token de sessió de fotos (create_tatuador_session, 24h al servidor) desat per usuari en aquest aparell:
+// entrant amb biometria no hi ha PIN per crear-ne un de nou, i sense token no es poden pujar fotos.
+const MEDIA_TOK_LS = 'tat:media_tok';
+const MEDIA_TOK_MAX_H = 20;
+function mediaTokDesa(nom, token) {
+  if (!nom || !token) return;
+  try {
+    const m = JSON.parse(localStorage.getItem(MEDIA_TOK_LS) || '{}') || {};
+    m[nom] = { token, ts: Date.now() };
+    localStorage.setItem(MEDIA_TOK_LS, JSON.stringify(m));
+  } catch (_) {}
+}
+function mediaTokLlegeix(nom) {
+  try {
+    const t = (JSON.parse(localStorage.getItem(MEDIA_TOK_LS) || '{}') || {})[nom];
+    return t && Date.now() - t.ts < MEDIA_TOK_MAX_H * 3600000 ? t.token : null;
+  } catch (_) { return null; }
+}
 
 // ── Compressió imatge ────────────────────────────────────────────────────
 async function compressImg(file) {
@@ -1601,7 +1641,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.27.2", APP_DATE="2026-11-02";
+const APP_VER="2.28.1", APP_DATE="2026-11-02";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -1878,6 +1918,7 @@ document.addEventListener('touchstart', e => { if (!e.target.closest('input, sel
 
 calc(); syncAllW();
 document.getElementById('app-ver-pin').textContent = 'v' + APP_VER + ' · ' + APP_DATE;
+document.getElementById('app-ver-users').textContent = 'v' + APP_VER + ' · ' + APP_DATE;
 (function(){var isTest=localStorage.getItem('blessed_test_mode')==='1';var btn=document.getElementById('btn-test-mode');if(btn)btn.textContent=isTest?'🧪 Mode proves: ✅ ON (clic per desactivar)':'🧪 Mode proves: ⭕ OFF (clic per activar)';})();
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -1916,18 +1957,112 @@ document.getElementById('sel-cobrament').addEventListener('blur',   onCobramentC
 
 // ── PIN ──────────────────────────────────────────────────────────────────
 async function initPin() {
+  _bioDisponible = await bio.isAvailable();
+  await mostraEntrada();
+}
+
+async function carregaPins() {
   try {
     const data = await apiFetch(`${SUPA_URL}/rest/v1/opcions?id=eq.pins_tatuadors&select=valors`, { headers: hdrs() });
     pinsMap = data?.[0]?.valors || {};
   } catch(e) {
     pinsMap = null;
   }
-  const storedNom = localStorage.getItem(bio.LS_NOM);
-  const storedId  = localStorage.getItem(bio.LS_ID);
-  if (storedNom && storedId) {
-    document.getElementById('bio-nom-lbl').textContent = storedNom;
-    document.getElementById('btn-bio').style.display = 'flex';
+}
+
+// ── Entrada per botons (v2.28.0, petició del fill) ──
+// Un botó per cada tatuador o administrador d'allowed_users (es gestionen a l'App Blessed: qui s'hi dona
+// d'alta hi surt i qui s'hi esborra desapareix; la llista i els PIN es tornen a llegir cada cop).
+// Mòbil = una sola persona: PIN el primer cop i després biometria, i només surt el seu botó.
+// Tablet = compartida: sempre PIN (la biometria del navegador no distingeix qui posa el dit).
+const ENTRADA_MODE_LS  = 'tat:aparell_compartit'; // '1'/'0' força el mode; si no hi és, es dedueix de la pantalla
+const ENTRADA_MOBIL_LS = 'tat:mobil_usuari';      // de qui és aquest mòbil
+let _entradaUsuaris = [];
+let _entradaLlista = [];
+let _entradaSel = null;
+let _bioDisponible = false;
+
+function aparellCompartit() {
+  const v = localStorage.getItem(ENTRADA_MODE_LS);
+  if (v === '1' || v === '0') return v === '1';
+  const m = Math.min(screen.width, screen.height);
+  return !(m > 0 && m < 600); // pantalla petita = mòbil personal; si no se sap la mida, compartit (més segur)
+}
+
+function entradaPas(p) {
+  document.getElementById('users-step').style.display = p === 'users' ? 'flex' : 'none';
+  document.getElementById('pin-step').style.display   = p === 'pin' ? '' : 'none';
+  document.getElementById('bio-step').style.display   = p === 'bio' ? 'flex' : 'none';
+}
+
+async function carregaUsuarisEntrada() {
+  try {
+    const rows = await apiFetch(`${SUPA_URL}/rest/v1/allowed_users?select=nom,foto_url,rol,is_admin&order=nom.asc`, { headers: hdrs() });
+    _entradaUsuaris = (rows || []).filter(u => u.nom && (u.rol === 'tatuador' || u.rol === 'admin' || u.is_admin));
+  } catch (_) { _entradaUsuaris = null; }
+}
+
+async function mostraEntrada() {
+  _entradaSel = null;
+  pinBuffer = '';
+  updatePinDots();
+  document.getElementById('pin-err').textContent = '';
+  entradaPas('users');
+  await Promise.all([carregaUsuarisEntrada(), carregaPins()]);
+  const grid = document.getElementById('users-grid');
+  const err  = document.getElementById('users-err');
+  const sub  = document.getElementById('users-sub');
+  err.textContent = '';
+  const compartit = aparellCompartit();
+  document.getElementById('btn-aparell-mode').textContent = compartit
+    ? 'Aparell compartit (entrada amb PIN) · canviar'
+    : 'Mòbil personal (entrada amb biometria) · canviar';
+  if (_entradaUsuaris === null || pinsMap === null) {
+    sub.textContent = 'Qui ets?';
+    grid.innerHTML = '<button class="btn-skip-qr" onclick="mostraEntrada()">↻ Tornar-ho a provar</button>';
+    err.textContent = 'Error de connexió. Reintenta en uns segons.';
+    return;
   }
+  let amo = compartit ? null : localStorage.getItem(ENTRADA_MOBIL_LS);
+  if (amo && !_entradaUsuaris.some(u => u.nom === amo)) { localStorage.removeItem(ENTRADA_MOBIL_LS); amo = null; }
+  _entradaLlista = amo ? _entradaUsuaris.filter(u => u.nom === amo) : _entradaUsuaris;
+  sub.textContent = amo ? 'Toca per entrar' : 'Qui ets?';
+  document.getElementById('btn-no-soc-jo').style.display = amo ? '' : 'none';
+  const solo = _entradaLlista.length === 1 ? ' solo' : '';
+  grid.innerHTML = _entradaLlista.length ? _entradaLlista.map((u, i) => `
+    <button class="user-btn${solo}" onclick="entradaTria(${i})">
+      ${u.foto_url ? `<img src="${lotsEsc(u.foto_url)}" alt="">` : `<div class="user-ini">${lotsEsc(u.nom.charAt(0).toUpperCase())}</div>`}
+      <span>${lotsEsc(u.nom)}</span>
+      <span class="user-rol">${u.is_admin || u.rol === 'admin' ? 'Administrador' : 'Tatuador'}${!compartit && bio.te(u.nom) ? ' · 🖐' : ''}</span>
+    </button>`).join('') : '<div style="color:#888;font-size:13px;">No hi ha cap tatuador ni administrador donat d’alta a l’App Blessed.</div>';
+}
+
+function entradaTria(i) {
+  const u = _entradaLlista[i];
+  if (!u) return;
+  if (!aparellCompartit() && _bioDisponible && bio.te(u.nom)) { doBioAuth(u.nom); return; }
+  entradaDemanaPin(u.nom, '');
+}
+
+function entradaDemanaPin(nom, msg) {
+  _entradaSel = nom;
+  pinBuffer = '';
+  updatePinDots();
+  document.getElementById('pin-user-lbl').textContent = nom;
+  document.getElementById('pin-err').textContent = msg || '';
+  entradaPas('pin');
+}
+
+function entradaNoSocJo() {
+  localStorage.removeItem(ENTRADA_MOBIL_LS);
+  mostraEntrada();
+}
+
+function entradaCanviaMode() {
+  const c = aparellCompartit();
+  localStorage.setItem(ENTRADA_MODE_LS, c ? '0' : '1');
+  localStorage.removeItem(ENTRADA_MOBIL_LS);
+  mostraEntrada();
 }
 
 function pinKey(d) {
@@ -2091,8 +2226,10 @@ async function checkPin() {
     updatePinDots();
     return;
   }
-  // Comparació directa del PIN de 4 dígits
-  const matchNom = Object.entries(pinsMap).find(([, pin]) => String(pin) === pinBuffer)?.[0] || null;
+  // Comparació directa del PIN de 4 dígits: amb un botó triat, ha de ser el PIN d'aquell usuari
+  const matchNom = _entradaSel
+    ? (pinsMap[_entradaSel] != null && String(pinsMap[_entradaSel]) === pinBuffer ? _entradaSel : null)
+    : Object.entries(pinsMap).find(([, pin]) => String(pin) === pinBuffer)?.[0] || null;
   if (matchNom) {
     state.tatuador = matchNom;
     // Punt seguretat: el PIN es torna a validar AL SERVIDOR (no només aquí al navegador),
@@ -2103,6 +2240,7 @@ async function checkPin() {
       });
       state.mediaToken = sessData?.token || null;
     } catch (_) { state.mediaToken = null; }
+    mediaTokDesa(matchNom, state.mediaToken);
     await fetchDadesUsuari(matchNom);
     await Promise.all([fetchExterns(), fetchLlistes()]);
     onPinOk();
@@ -2111,98 +2249,6 @@ async function checkPin() {
     pinBuffer = '';
     updatePinDots();
   }
-}
-
-function genPin() { return String(Math.floor(1000 + Math.random() * 9000)); }
-
-// ── Mailer helper (recuperació PIN via endpoint propi) ────────────────────
-async function sendEmail(mailerUrl, mailerKey, toEmail, toName, subject, message) {
-  if (!mailerUrl || !toEmail) return false;
-  const res = await fetch(`${mailerUrl}/api/send-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${mailerKey || ''}` },
-    body: JSON.stringify({ to: toEmail, toName: toName || toEmail.split('@')[0], subject, message })
-  });
-  if (!res.ok) { const e = await res.json().catch(() => ({})); console.warn('Mailer error:', e); return false; }
-  return true;
-}
-
-// ── Recuperació de PIN ────────────────────────────────────────────────────
-function showRecoverPin() {
-  document.getElementById('inp-recover-nom').value = '';
-  document.getElementById('recover-msg').textContent = '';
-  document.getElementById('recover-msg').style.color = '#999';
-  document.getElementById('btn-send-recovery').disabled = false;
-  document.getElementById('btn-send-recovery').textContent = 'Enviar PIN per correu';
-  document.getElementById('overlay-recover-pin').style.display = 'flex';
-}
-function hideRecoverPin() {
-  document.getElementById('overlay-recover-pin').style.display = 'none';
-}
-async function sendPinRecovery() {
-  const nom    = document.getElementById('inp-recover-nom').value.trim();
-  const msgEl  = document.getElementById('recover-msg');
-  const btn    = document.getElementById('btn-send-recovery');
-  msgEl.textContent = '';
-  if (!nom) {
-    msgEl.style.color = '#ef4444';
-    msgEl.textContent = 'Introdueix el teu nom.';
-    return;
-  }
-  if (!pinsMap) {
-    msgEl.style.color = '#ef4444';
-    msgEl.textContent = 'Error de connexió. Torna-ho a provar.';
-    return;
-  }
-  // Cerca insensible a majúscules
-  const nomKey = Object.keys(pinsMap).find(k => k.toLowerCase() === nom.toLowerCase());
-  if (!nomKey) {
-    msgEl.style.color = '#ef4444';
-    msgEl.textContent = 'Nom no trobat. Comprova l\'ortografia o contacta amb l\'administrador.';
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Enviant...';
-  try {
-    const [users, opts] = await Promise.all([
-      apiFetch(`${SUPA_URL}/rest/v1/allowed_users?nom=eq.${encodeURIComponent(nomKey)}&select=nom,email`, { headers: hdrs() }),
-      apiFetch(`${SUPA_URL}/rest/v1/opcions?select=id,valors&id=in.(mailer_url,mailer_key)`, { headers: hdrs() })
-    ]);
-    const email     = users?.[0]?.email;
-    const optsById  = Object.fromEntries((opts || []).map(o => [o.id, o.valors]));
-    const mailerUrl = optsById.mailer_url;
-    const mailerKey = optsById.mailer_key || '';
-    if (!email) {
-      msgEl.style.color = '#ef4444';
-      msgEl.textContent = 'No hi ha email configurat per a aquest nom. Contacta amb l\'administrador.';
-      btn.disabled = false; btn.textContent = 'Enviar PIN per correu';
-      return;
-    }
-    if (!mailerUrl) {
-      msgEl.style.color = '#ef4444';
-      msgEl.textContent = 'Email no configurat al sistema. Contacta amb l\'administrador.';
-      btn.disabled = false; btn.textContent = 'Enviar PIN per correu';
-      return;
-    }
-    // Generar PIN nou i guardar a Supabase (text pla, 4 dígits)
-    const nouPin  = genPin();
-    const nouPinsMap = { ...pinsMap, [nomKey]: nouPin };
-    await fetch(`${SUPA_URL}/rest/v1/opcions?id=eq.pins_tatuadors`, {
-      method: 'PATCH',
-      headers: { ...hdrs(), 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ valors: nouPinsMap })
-    });
-    pinsMap = nouPinsMap;
-    const msg = `Hola ${nomKey},\n\nEl teu PIN d'accés a l'App Tatuador ha estat reiniciat.\n\nEl teu nou PIN és:\n\n${nouPin}\n\nGuarda'l en un lloc segur i no el comparteixis.\n\n─────────────────────────────────────────────\nBLESSED ART TATTOO BCN\nCarrer de Sardenya, 224, Eixample, 08013 Barcelona\nTel: 667 279 582\n─────────────────────────────────────────────\nAquest missatge ha estat generat automàticament.`;
-    await sendEmail(mailerUrl, mailerKey, email, nomKey, `PIN d'accés — App Tatuador`, msg);
-    msgEl.style.color = '#22c55e';
-    msgEl.textContent = `✓ PIN nou enviat a ${email}`;
-  } catch(e) {
-    msgEl.style.color = '#ef4444';
-    msgEl.textContent = 'Error en enviar el correu. Torna-ho a provar.';
-  }
-  btn.disabled = false;
-  btn.textContent = 'Enviar PIN per correu';
 }
 
 function goToQR() {
@@ -2354,10 +2400,10 @@ function onPinOk() {
   document.getElementById('pctTatBase').value = '';
   setFeina('No');
   calc();
-  const storedNom = localStorage.getItem(bio.LS_NOM);
-  if (storedNom !== state.tatuador) {
-    document.getElementById('pin-step').style.display = 'none';
-    document.getElementById('bio-step').style.display = 'flex';
+  const personal = !aparellCompartit() && !state.viaClientPin;
+  if (personal) localStorage.setItem(ENTRADA_MOBIL_LS, state.tatuador);
+  if (personal && _bioDisponible && !bio.te(state.tatuador)) {
+    entradaPas('bio');
   } else {
     document.getElementById('overlay-pin').style.display = 'none';
     if (!checkSavedSession()) goToHomeAfterLogin();
@@ -2406,11 +2452,10 @@ function bloqueigActiva() {
   pinBuffer = '';
   updatePinDots();
   document.getElementById('pin-err').textContent = '';
-  document.getElementById('pin-step').style.display = '';
-  document.getElementById('bio-step').style.display = 'none';
   const ov = document.getElementById('overlay-pin');
   ov.style.zIndex = '1000'; // per sobre d'Entrades, fotos i modals
   ov.style.display = 'flex';
+  mostraEntrada();
 }
 
 // Cridada a l'inici d'onPinOk(): retorna true si ja ha resolt el desbloqueig
@@ -2453,26 +2498,30 @@ async function bloqueigReprenLogin() {
 setInterval(bloqueigComprova, 15000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) bloqueigComprova(); });
 
-async function doBioAuth() {
+async function doBioAuth(nom) {
   try {
     showLoading('Verificant identitat...');
-    const nom = await bio.authenticate();
+    await bio.authenticate(nom);
     hideLoading();
-    if (!nom) throw new Error('No nom');
-    state.tatuador = nom;
-    await fetchDadesUsuari(nom);
-    await Promise.all([fetchExterns(), fetchLlistes()]);
-    onPinOk();
   } catch(e) {
     hideLoading();
-    // Diagnòstic temporal (punt biometria Android): mostrem l'error real en lloc d'amagar-lo,
-    // per saber si és un problema de certificat HTTPS, de navegador o de maquinari.
     console.error('Biometria (auth) error:', e);
-    document.getElementById('pin-err').textContent = `Biometria no disponible — usa el PIN [${e.name||'Error'}: ${e.message||'?'}]`;
-    document.getElementById('btn-bio').style.display = 'none';
-    localStorage.removeItem(bio.LS_ID);
-    localStorage.removeItem(bio.LS_NOM);
+    // Cancel·lada o no reconeguda: la credencial continua bona, es pot tornar a provar des del botó
+    if (e.name === 'NotAllowedError' || e.name === 'AbortError') { entradaDemanaPin(nom, 'Biometria cancel·lada — entra amb el PIN'); return; }
+    bio.oblida(nom);
+    entradaDemanaPin(nom, `Biometria no disponible — usa el PIN [${e.name||'Error'}: ${e.message||'?'}]`);
+    return;
   }
+  const tok = mediaTokLlegeix(nom);
+  if (!tok) { entradaDemanaPin(nom, 'Per seguretat, un cop al dia cal entrar amb el PIN'); return; }
+  state.tatuador = nom;
+  state.mediaToken = tok;
+  showLoading('Entrant...');
+  try {
+    await fetchDadesUsuari(nom);
+    await Promise.all([fetchExterns(), fetchLlistes()]);
+  } finally { hideLoading(); }
+  onPinOk();
 }
 
 async function doBioRegister() {
@@ -2481,8 +2530,6 @@ async function doBioRegister() {
     await bio.register(state.tatuador);
     hideLoading();
     showToast('✓ Biometria activada!', 'ok');
-    document.getElementById('bio-nom-lbl').textContent = state.tatuador;
-    document.getElementById('btn-bio').style.display = 'flex';
   } catch(e) {
     hideLoading();
     // Diagnòstic temporal (punt biometria Android): mostrem l'error real en lloc d'amagar-lo,
@@ -3224,8 +3271,6 @@ function resetApp() {
   document.getElementById('card-extras').style.display = 'none';
   document.getElementById('btn-enviar').style.display = 'none';
 
-  document.getElementById('pin-step').style.display = '';
-  document.getElementById('bio-step').style.display = 'none';
   if (state.tatuador) {
     document.getElementById('overlay-pin').style.display = 'none';
     if (_returnToPendents) {
@@ -3236,6 +3281,7 @@ function resetApp() {
     }
   } else {
     document.getElementById('overlay-pin').style.display = 'flex';
+    mostraEntrada();
     stopQRScanner();
     document.getElementById('overlay-qr').style.display = 'none';
   }
