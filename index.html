@@ -1,4 +1,4 @@
-﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.28.1 | Data: 2026-11-02 -->
+﻿<!-- Blessed Art Tattoo BCN | App Tatuador | Versió 2.29.0 | Data: 2026-11-03 -->
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -531,6 +531,9 @@
        capçalera, títol + data, una fila per client (nom + consentiment + fotos | Preu · Tipus · Pagament · Repartiment | ⋮),
        desplegables propis amb icones, resum del dia, botons i barra inferior. */
     #overlay-lots { position: fixed; inset: 0; z-index: 150; background: #0e0e0f; display: none; flex-direction: column; color: #ece7da; }
+    #avis-checkin { position: fixed; z-index: 900; left: 50%; transform: translateX(-50%); top: max(10px, env(safe-area-inset-top)); width: min(560px, calc(100% - 24px)); display: none; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: #c9a84c; color: #111; font-size: 15px; font-weight: 700; box-shadow: 0 6px 24px rgba(0,0,0,.55); cursor: pointer; }
+    #avis-checkin .avis-checkin-txt { flex: 1; min-width: 0; }
+    #avis-checkin .avis-checkin-x { font-size: 16px; opacity: .7; padding: 0 2px; }
     .ent-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .ent-wrap { max-width: 720px; margin: 0 auto; padding: 0 12px 18px; }
     .ico { display: inline-block; vertical-align: middle; flex: 0 0 auto; }
@@ -1641,7 +1644,7 @@ function showToast(msg, type = '', ms = 3000) {
   setTimeout(() => t.style.display = 'none', ms);
 }
 
-const APP_VER="2.28.1", APP_DATE="2026-11-02";
+const APP_VER="2.29.0", APP_DATE="2026-11-03";
 const fmt    = v => v.toFixed(2).replace('.', ',') + ' €';
 const fmtNum = v => v.toFixed(2).replace('.', ',');
 
@@ -2384,6 +2387,8 @@ function adaptUIPerMode() {
 
 function onPinOk() {
   if (bloqueigDesbloqueja()) return;
+  avisCheckinReset();
+  avisCheckinComprova();
   state.esPropietari = (state.tatuador === 'Enric Puyalto');
   document.getElementById('hdr-artist').textContent = state.tatuador;
   document.getElementById('qr-logged-as').textContent = '👤 ' + state.tatuador;
@@ -2469,6 +2474,7 @@ function bloqueigDesbloqueja() {
     const ov = document.getElementById('overlay-pin');
     ov.style.display = 'none';
     ov.style.zIndex = '';
+    setTimeout(avisCheckinComprova, 300); // check-ins arribats mentre estava bloquejat
     return true;
   }
   // Un altre tatuador: no ha de veure res de l'anterior
@@ -3910,31 +3916,12 @@ async function loadLots() {
     ) || [];
     walkins.forEach(t => {
       tokPerCita['walkin:' + t.token] = t;
-      cites.push({ id: null, walkin: true, wkey: 'walkin:' + t.token, data: today, tatuador: t.tatuador || state.tatuador,
-        checkin_at: t.created_at, hora_inici: null, client_telefon: t.client_telefon, client_nom: t.client_nom });
+      cites.push(lotsWalkinCita(t, today));
     });
     cites.sort((a, b) => new Date(a.checkin_at) - new Date(b.checkin_at));
     const consInfo = await lotsCarregaConsent([...new Set(Object.values(tokPerCita).map(t => t.consentiment_id).filter(Boolean))]);
 
-    _lots = await Promise.all(cites.map(async c => {
-      const t = tokPerCita[c.walkin ? c.wkey : c.id] || null;
-      const telefon = t?.client_telefon || c.client_telefon || null;
-      const [u, cons] = await Promise.all([lotsUsuari(c.tatuador), loadConsentiments(telefon)]);
-      return {
-        cita: c, token: t ? t.token : null, walkin: !!c.walkin, u, telefon,
-        nom: [t?.client_nom || c.client_nom, t?.client_cognom].filter(Boolean).join(' ') || telefon || 'Client',
-        esMenor: cons.esMenor, alertaMedica: cons.alertaMedica,
-        consent: lotsConsentEstat(t, consInfo),
-        // El dipòsit es pot haver marcat com a cobrat a la cita després del check-in (marcarDepositCobrat)
-        deposit: { import: (t ? t.deposit_import : c.deposit_import) || 0, cobrat: !!(t?.deposit_cobrat || c.deposit_cobrat) },
-        bon: { id: t?.bon_id ?? c.bon_id ?? null, codi: t?.bon_codi ?? c.bon_codi ?? null, import: (t?.bon_import ?? c.bon_import) || 0 },
-        aplicarDeposit: t ? t.aplicar_deposit !== false : true,
-        aplicarBon:     t ? t.aplicar_bon !== false : true,
-        preu: '', cobrament: '', concepte: concepteDef(), feina: 'No', extId: '', pctBase: null, depRebut: false,
-        custom: false, obert: false, toc: {},
-        fotos: [], estat: 'pendent', saving: false, error: null
-      };
-    }));
+    _lots = await Promise.all(cites.map(c => lotsFila(c, tokPerCita[c.walkin ? c.wkey : c.id] || null, consInfo)));
     _lotsDesats = await lotsCarregaDesats(today, tatFilter);
     renderLots();
     if (_lotsBusca) await lotsMostraTrobada();
@@ -3942,6 +3929,144 @@ async function loadLots() {
     list.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;font-size:12px;">Error: ${lotsEsc(e.message)}</div>`;
   }
 }
+
+// Walk-in (check-in sense cita): es tracta com una cita sense id
+function lotsWalkinCita(t, dia) {
+  return { id: null, walkin: true, wkey: 'walkin:' + t.token, data: dia, tatuador: t.tatuador || state.tatuador,
+    checkin_at: t.created_at, hora_inici: null, client_telefon: t.client_telefon, client_nom: t.client_nom };
+}
+
+// Fila d'«Entrades» a partir d'una cita (o walk-in) i el seu token de check-in
+async function lotsFila(c, t, consInfo) {
+  const telefon = t?.client_telefon || c.client_telefon || null;
+  const [u, cons] = await Promise.all([lotsUsuari(c.tatuador), loadConsentiments(telefon)]);
+  return {
+    cita: c, token: t ? t.token : null, walkin: !!c.walkin, u, telefon,
+    nom: [t?.client_nom || c.client_nom, t?.client_cognom].filter(Boolean).join(' ') || telefon || 'Client',
+    esMenor: cons.esMenor, alertaMedica: cons.alertaMedica,
+    consent: lotsConsentEstat(t, consInfo),
+    // El dipòsit es pot haver marcat com a cobrat a la cita després del check-in (marcarDepositCobrat)
+    deposit: { import: (t ? t.deposit_import : c.deposit_import) || 0, cobrat: !!(t?.deposit_cobrat || c.deposit_cobrat) },
+    bon: { id: t?.bon_id ?? c.bon_id ?? null, codi: t?.bon_codi ?? c.bon_codi ?? null, import: (t?.bon_import ?? c.bon_import) || 0 },
+    aplicarDeposit: t ? t.aplicar_deposit !== false : true,
+    aplicarBon:     t ? t.aplicar_bon !== false : true,
+    preu: '', cobrament: '', concepte: concepteDef(), feina: 'No', extId: '', pctBase: null, depRebut: false,
+    custom: false, obert: false, toc: {},
+    fotos: [], estat: 'pendent', saving: false, error: null
+  };
+}
+
+// ── Avís de check-in nou (v2.29.0) ─────────────────────────────────────────
+// Les llistes només es carregaven en obrir la pantalla: si l'app ja era oberta (o es desbloquejava amb el
+// PIN), el tatuador no veia els check-ins nous. Cada 30 s (i en tornar a l'app o desbloquejar) es miren els
+// tokens creats després de l'últim vist: es mostra un avís i s'afegeixen a la llista oberta. A «Entrades»
+// les files noves s'afegeixen al final, sense tornar a carregar (no es perd res del que s'està omplint).
+// Tatuador: només els seus; admin: tots.
+const AVIS_CHECKIN_SEG = 30;
+let _avisDes = null;              // created_at de l'últim token vist (hora del servidor)
+const _avisVistos = new Set();
+let _avisCorrent = false;
+let _avisNoms = [];
+
+function avisCheckinReset() { _avisDes = null; _avisVistos.clear(); avisCheckinTanca(); }
+
+async function avisCheckinComprova() {
+  if (_avisCorrent || !state.tatuador || _bloqueig || document.hidden) return;
+  _avisCorrent = true;
+  try {
+    // Si un admin omple el pendent d'un altre tatuador, l'identitat real és la guardada
+    const jo = _adminOrigIdentity || state;
+    if (!_avisDes) {
+      // Punt de partida: l'últim token que existeix ara (no s'avisa del que ja hi havia en entrar)
+      const r = await apiFetch(`${SUPA_URL}/rest/v1/cita_tokens?select=created_at&order=created_at.desc&limit=1`, { headers: hdrs() });
+      _avisDes = r?.[0]?.created_at || new Date().toISOString();
+      return;
+    }
+    const tatFilter = jo.isAdmin ? '' : `&tatuador=eq.${encodeURIComponent(jo.tatuador)}`;
+    const toks = await apiFetch(
+      `${SUPA_URL}/rest/v1/cita_tokens?usat=eq.false&created_at=gt.${encodeURIComponent(_avisDes)}${tatFilter}&order=created_at.asc&limit=20`,
+      { headers: hdrs() }
+    ) || [];
+    if (toks.length) _avisDes = toks[toks.length - 1].created_at;
+    const nous = toks.filter(t => !_avisVistos.has(t.token));
+    if (!nous.length) return;
+    nous.forEach(t => _avisVistos.add(t.token));
+    avisCheckinMostra(nous, jo.isAdmin);
+    if (document.getElementById('overlay-sala-espera').style.display === 'flex') loadSalaEspera();
+    if (document.getElementById('overlay-lots').style.display === 'flex') await lotsAfegeixCheckins(nous);
+  } catch (e) {
+    console.warn('Avís check-in:', e.message);
+  } finally {
+    _avisCorrent = false;
+  }
+}
+
+function avisCheckinMostra(nous, admin) {
+  _avisNoms = _avisNoms.concat(nous.map(t => {
+    const nom = [t.client_nom, t.client_cognom].filter(Boolean).join(' ') || t.client_telefon || 'Client';
+    return admin && t.tatuador ? `${nom} (${t.tatuador})` : nom;
+  }));
+  const el = document.getElementById('avis-checkin');
+  el.querySelector('.avis-checkin-txt').textContent = (_avisNoms.length === 1 ? 'Check-in nou: ' : `${_avisNoms.length} check-ins nous: `) + _avisNoms.join(', ');
+  if (TEST_MODE) el.style.top = '34px'; // per sota de la franja «MODE PROVES»
+  el.style.display = 'flex';
+  try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (_) {}
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.22].forEach(d => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = 880; g.gain.value = 0.15;
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime + d); o.stop(ctx.currentTime + d + 0.15);
+    });
+    setTimeout(() => ctx.close(), 800);
+  } catch (_) {}
+}
+
+function avisCheckinTanca() {
+  _avisNoms = [];
+  const el = document.getElementById('avis-checkin');
+  if (el) el.style.display = 'none';
+}
+
+// Afegeix a «Entrades» (només si mostra avui) les files dels check-ins nous que encara no hi són
+async function lotsAfegeixCheckins(toks) {
+  const dia = _lotsDia || lotsAvui();
+  if (dia !== lotsAvui()) return;
+  const noves = [];
+  for (const t of toks) {
+    if (_lots.some(r => r.token === t.token || (t.cita_id && r.cita && r.cita.id === t.cita_id))) continue;
+    let c = null;
+    if (!t.cita_id) {
+      c = lotsWalkinCita(t, dia);
+    } else {
+      // Les mateixes condicions que loadLots() per a les cites
+      const cs = await apiFetch(
+        `${SUPA_URL}/rest/v1/cites?id=eq.${encodeURIComponent(t.cita_id)}&data=eq.${dia}&checkin_at=not.is.null&checkin_descartat=eq.false&estat=eq.confirmada&limit=1`,
+        { headers: hdrs() }
+      ) || [];
+      c = cs[0] || null;
+    }
+    if (c) noves.push({ c, t });
+  }
+  if (!noves.length) return;
+  const consInfo = await lotsCarregaConsent([...new Set(noves.map(n => n.t.consentiment_id).filter(Boolean))]);
+  const files = await Promise.all(noves.map(n => lotsFila(n.c, n.t, consInfo)));
+  // S'afegeixen al final perquè els índexs de les files existents (menús, desats programats) no canviïn
+  const buida = !_lots.length;
+  files.forEach(r => _lots.push(r));
+  if (buida) { renderLots(); return; }
+  const boto = document.querySelector('#lots-list .ent-add');
+  files.forEach((_, k) => {
+    const i = _lots.length - files.length + k;
+    if (boto) boto.insertAdjacentHTML('beforebegin', lotsRowHtml(i));
+    lotsRenderRow(i);
+  });
+  if (!boto) renderLots();
+}
+
+setInterval(avisCheckinComprova, AVIS_CHECKIN_SEG * 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) avisCheckinComprova(); });
 
 // Consentiment del check-in (cada check-in de l'App Client en signa un, enllaçat al token): només es mira
 // si hi ha signatura (i la del tutor si és menor), sense baixar cap imatge.
@@ -5308,5 +5433,11 @@ if ('serviceWorker' in navigator) {
   setTimeout(checkVer, 8*1000);
 })();
 </script>
+<!-- Avís de check-in nou (v2.29.0): per sobre de les pantalles, per sota del bloqueig (z-index 1000) -->
+<div id="avis-checkin" onclick="avisCheckinTanca()" role="alert">
+  <span style="font-size:20px;line-height:1;">🔔</span>
+  <span class="avis-checkin-txt"></span>
+  <span class="avis-checkin-x">✕</span>
+</div>
 </body>
 </html>
